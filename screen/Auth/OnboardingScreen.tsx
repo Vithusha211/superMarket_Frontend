@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.primary,
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     gap: 20,
   },
   logoPill: {
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: COLORS.white,
     borderRadius: 30,
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     paddingTop: 20,
     paddingBottom: 24,
     justifyContent: 'space-between',
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   },
   illustration: {
     width: '100%',
-    height: 240,
+    aspectRatio: 400 / 240,
     alignItems: 'center',
     justifyContent: 'center',
   },

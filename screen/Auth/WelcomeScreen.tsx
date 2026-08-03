@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: '9%',
     gap: 40,
   },
   logoPill: {
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    maxWidth: 360,
+    maxWidth: '82%',
     backgroundColor: COLORS.white,
     borderRadius: 24,
     padding: 20,

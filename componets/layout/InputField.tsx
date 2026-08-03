@@ -201,8 +201,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    height: 51,
-    paddingHorizontal: 20,
+    minHeight: 51,
+    width: '100%',
+    paddingHorizontal: '4.5%',
     paddingVertical: 10,
     borderRadius: 8,
     backgroundColor: COLORS.inputBg,
@@ -210,7 +211,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   textareaContainer: {
-    height: 87,
+    minHeight: 87,
     alignItems: 'flex-start',
   },
   inputFocused: {

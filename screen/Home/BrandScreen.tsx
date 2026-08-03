@@ -12,30 +12,21 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ProductCard from '../../componets/layout/Cards';
 import Header from '../../componets/layout/Header';
+import ProductCard from '../../componets/layout/Cards';
 
 const COLORS = {
   primary: '#07C187',
   white: '#FFFFFF',
   text: '#111827',
   muted: '#9CA3AF',
-  searchBg: '#FFFFFF',
-  chipBg: '#F3F4F6',
+  chipBg: '#F2F2F3',
+  chipActive: '#07C187',
+  searchBg: '#F8F8F8',
+  sheet: '#FFFFFF',
 };
 
-const SUB_CHIPS = [
-  'All',
-  'Milk',
-  'Butter',
-  'Cheese',
-  'Yoghurt',
-  'Ice Cream',
-] as const;
-
-type SubChip = (typeof SUB_CHIPS)[number];
-
-export type DairyProduct = {
+export type BrandProduct = {
   id: string;
   image: ImageSourcePropType;
   brand: string;
@@ -44,152 +35,140 @@ export type DairyProduct = {
   price: number;
   oldPrice?: number;
   discount?: number;
-  tag?: string;
-  subCategory: SubChip;
+  category: string;
   description: string;
 };
 
-const PRODUCTS: DairyProduct[] = [
+const MALIBAN_PRODUCTS: BrandProduct[] = [
   {
-    id: 'ambewela-fresh',
-    image: require('../../assets/search/product-ambewela.png'),
-    brand: 'Ambewela',
-    name: 'Fresh Milk',
-    quantity: '1L',
-    price: 12,
-    oldPrice: 15,
-    discount: 20,
-    tag: 'FULL CREAM',
-    subCategory: 'Milk',
-    description:
-      'Fresh full cream milk sourced daily. Rich in calcium and vitamins.',
-  },
-  {
-    id: 'maliban-fresh',
-    image: require('../../assets/brands/fresh-milk.png'),
+    id: 'cream-cracker',
+    image: require('../../assets/brands/cream-cracker.png'),
     brand: 'Maliban',
-    name: 'Fresh Milk',
-    quantity: '1L',
-    price: 5,
-    subCategory: 'Milk',
-    description: 'Fresh full cream milk. Pure, nutritious and ready to drink.',
-  },
-  {
-    id: 'chocolate-milk',
-    image: require('../../assets/product/chocolate-milk.png'),
-    brand: 'Kotmale',
-    name: 'Chocolate Milk',
-    quantity: '1L',
-    price: 5,
-    subCategory: 'Milk',
-    description: 'Smooth chocolate flavoured milk packed with calcium.',
-  },
-  {
-    id: 'faluda-milk',
-    image: require('../../assets/product/faluda-milk.png'),
-    brand: 'RichLife',
-    name: 'Faluda Milk',
-    quantity: '180ml',
-    price: 2,
-    subCategory: 'Milk',
-    description: 'RichLife faluda flavoured milk in a handy pack.',
-  },
-  {
-    id: 'kotmale-butter',
-    image: require('../../assets/dairy/kotmale-butter.png'),
-    brand: 'Kotmale',
-    name: 'Butter',
-    quantity: '200g',
-    price: 8,
-    subCategory: 'Butter',
-    description: 'Creamy Kotmale butter. Perfect for cooking and spreading.',
-  },
-  {
-    id: 'vanilla-ice-cream',
-    image: require('../../assets/dairy/vanilla-ice-cream.png'),
-    brand: 'Dairy',
-    name: 'Vanilla Ice Cream',
-    quantity: '2L',
-    price: 18,
-    discount: 10,
-    subCategory: 'Ice Cream',
-    description: 'Smooth dairy vanilla ice cream. Family pack 2 litre tub.',
-  },
-  {
-    id: 'value-yoghurt',
-    image: require('../../assets/product/value-pack.png'),
-    brand: 'Highland',
-    name: 'Yoghurt Pack',
-    quantity: '8 pcs',
+    name: 'Cream Cracker',
+    quantity: '490g',
     price: 12,
-    subCategory: 'Yoghurt',
-    description: 'Buy 7 get 1 free yoghurt value pack for the whole family.',
+    category: 'Biscuits',
+    description:
+      'Classic Maliban cream crackers. Light, crispy and perfect with tea or cheese.',
   },
   {
-    id: 'kiri-powder',
+    id: 'real-chocolate',
+    image: require('../../assets/brands/real-chocolate.png'),
+    brand: 'Maliban',
+    name: 'Real Chocolate',
+    quantity: '400g',
+    price: 15,
+    discount: 10,
+    category: 'Biscuits',
+    description:
+      'Rich chocolate coated biscuits from Maliban. A sweet treat for everyday snacking.',
+  },
+  {
+    id: 'gold-marie',
+    image: require('../../assets/brands/gold-marie.png'),
+    brand: 'Maliban',
+    name: 'Gold Marie',
+    quantity: '350g',
+    price: 8,
+    category: 'Biscuits',
+    description:
+      'Soft and tasty Marie biscuits. Ideal with milk for kids and family tea time.',
+  },
+  {
+    id: 'ginger-biscuit',
+    image: require('../../assets/brands/ginger-biscuit.png'),
+    brand: 'Maliban',
+    name: 'Ginger Biscuit',
+    quantity: '240g',
+    price: 7,
+    category: 'Biscuits',
+    description:
+      'Spicy ginger biscuits with a crunchy bite. Great with hot tea.',
+  },
+  {
+    id: 'digestive',
+    image: require('../../assets/brands/digestive.png'),
+    brand: 'Maliban',
+    name: 'Digestive Biscuit',
+    quantity: '120g',
+    price: 6,
+    category: 'Biscuits',
+    description:
+      'Wholesome digestive biscuits made with wheat. A healthy everyday snack.',
+  },
+  {
+    id: 'kiri-milk-powder',
     image: require('../../assets/brands/kiri-milk-powder.png'),
     brand: 'Maliban',
     name: 'Kiri Milk Powder',
     quantity: '400g',
     price: 18,
-    subCategory: 'Milk',
-    description: 'Full cream milk powder for rich, creamy milk anytime.',
+    category: 'Milk & Dairy',
+    description:
+      'Full cream milk powder for rich, creamy milk anytime at home.',
+  },
+  {
+    id: 'maliban-fresh-milk',
+    image: require('../../assets/brands/fresh-milk.png'),
+    brand: 'Maliban',
+    name: 'Fresh Milk',
+    quantity: '1L',
+    price: 5,
+    category: 'Milk & Dairy',
+    description:
+      'Fresh full cream milk. Pure, nutritious and ready to drink.',
   },
 ];
 
-type DairyScreenProps = {
+const CHIPS = ['All', 'Tea', 'Milk & Dairy', 'Biscuits', 'Dairy', 'Spreads'];
+
+type BrandScreenProps = {
+  brandName?: string;
+  products?: BrandProduct[];
   onBack?: () => void;
-  onSearchPress?: () => void;
   onMenuPress?: () => void;
-  onProductPress?: (product: DairyProduct) => void;
-  onAddProduct?: (product: DairyProduct) => void;
+  onSearchPress?: () => void;
+  onProductPress?: (product: BrandProduct) => void;
+  onAddProduct?: (product: BrandProduct) => void;
 };
 
-export default function DairyScreen({
+export default function BrandScreen({
+  brandName = 'Maliban',
+  products = MALIBAN_PRODUCTS,
   onBack,
-  onSearchPress,
   onMenuPress,
+  onSearchPress,
   onProductPress,
   onAddProduct,
-}: DairyScreenProps) {
+}: BrandScreenProps) {
   const insets = useSafeAreaInsets();
   const [query, setQuery] = useState('');
-  const [activeChip, setActiveChip] = useState<SubChip>('All');
+  const [activeChip, setActiveChip] = useState('All');
 
-  const products = useMemo(() => {
-    let list = [...PRODUCTS];
+  const filtered = useMemo(() => {
+    let list = [...products];
     if (activeChip !== 'All') {
-      list = list.filter((item) => item.subCategory === activeChip);
+      list = list.filter((item) => item.category === activeChip);
     }
     const q = query.trim().toLowerCase();
     if (q) {
       list = list.filter(
         (item) =>
           item.name.toLowerCase().includes(q) ||
-          item.brand.toLowerCase().includes(q) ||
-          item.subCategory.toLowerCase().includes(q),
+          item.brand.toLowerCase().includes(q),
       );
     }
     return list;
-  }, [query, activeChip]);
+  }, [products, activeChip, query]);
 
   return (
     <View style={styles.screen}>
       <StatusBar style="light" />
       <Header
-        title="Dairy"
+        title={brandName}
         showBack
         onBack={onBack}
         backgroundColor={COLORS.primary}
-        right={
-          <Pressable
-            onPress={onSearchPress}
-            hitSlop={8}
-            style={styles.headerIcon}
-          >
-            <Ionicons name="search" size={20} color={COLORS.white} />
-          </Pressable>
-        }
       />
 
       <View style={styles.sheet}>
@@ -207,7 +186,7 @@ export default function DairyScreen({
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="Search"
+              placeholder={`Search ${brandName}`}
               placeholderTextColor={COLORS.muted}
               style={styles.searchInput}
               returnKeyType="search"
@@ -220,7 +199,7 @@ export default function DairyScreen({
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.chipRow}
         >
-          {SUB_CHIPS.map((chip) => {
+          {CHIPS.map((chip) => {
             const active = activeChip === chip;
             return (
               <Pressable
@@ -228,7 +207,9 @@ export default function DairyScreen({
                 onPress={() => setActiveChip(chip)}
                 style={[styles.chip, active && styles.chipActive]}
               >
-                <Text style={[styles.chipText, active && styles.chipTextActive]}>
+                <Text
+                  style={[styles.chipText, active && styles.chipTextActive]}
+                >
                   {chip}
                 </Text>
               </Pressable>
@@ -237,7 +218,7 @@ export default function DairyScreen({
         </ScrollView>
 
         <FlatList
-          data={products}
+          data={filtered}
           keyExtractor={(item) => item.id}
           numColumns={2}
           showsVerticalScrollIndicator={false}
@@ -255,14 +236,13 @@ export default function DairyScreen({
               price={item.price}
               oldPrice={item.oldPrice}
               discount={item.discount}
-              tag={item.tag}
               onPress={() => onProductPress?.(item)}
               onAddPress={() => onAddProduct?.(item)}
               style={styles.productCard}
             />
           )}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>No dairy products found</Text>
+            <Text style={styles.emptyText}>No products found</Text>
           }
         />
       </View>
@@ -270,22 +250,16 @@ export default function DairyScreen({
   );
 }
 
+export { MALIBAN_PRODUCTS };
+
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: COLORS.primary,
   },
-  headerIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.25)',
-  },
   sheet: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.sheet,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
   },
@@ -327,19 +301,19 @@ const styles = StyleSheet.create({
   },
   chipRow: {
     paddingHorizontal: '4.5%',
-    gap: 8,
+    gap: 12,
     paddingBottom: 12,
   },
   chip: {
     minHeight: 32,
+    paddingHorizontal: 14,
     borderRadius: 12,
-    paddingHorizontal: 12,
     backgroundColor: COLORS.chipBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   chipActive: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.chipActive,
   },
   chipText: {
     fontSize: 13,
@@ -352,6 +326,7 @@ const styles = StyleSheet.create({
   gridContent: {
     paddingHorizontal: '4.5%',
     paddingTop: '3%',
+    gap: 10,
   },
   gridRow: {
     justifyContent: 'space-between',

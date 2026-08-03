@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
   },
   content: {
     flex: 1,
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   },
   illustration: {
     width: '100%',
-    maxWidth: 345,
+    maxWidth: '78%',
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',

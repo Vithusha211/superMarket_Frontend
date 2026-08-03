@@ -349,8 +349,8 @@ const styles = StyleSheet.create({
   greenTop: {
     backgroundColor: COLORS.primary,
     alignItems: 'center',
-    paddingBottom: 28,
-    paddingHorizontal: 20,
+    paddingBottom: '6.5%',
+    paddingHorizontal: '4.5%',
   },
   brandHeader: {
     alignItems: 'center',
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
   headerCopy: {
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 24,
+    paddingHorizontal: '5.5%',
   },
   headerTitle: {
     fontSize: 28,
@@ -405,8 +405,8 @@ const styles = StyleSheet.create({
     marginTop: -8,
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 28,
+    paddingHorizontal: '4.5%',
+    paddingTop: '6.5%',
     gap: 24,
   },
   form: {
@@ -475,9 +475,11 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   socialButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: '11.5%',
+    aspectRatio: 1,
+    maxWidth: 56,
+    minWidth: 44,
+    borderRadius: 999,
     backgroundColor: COLORS.socialBg,
     alignItems: 'center',
     justifyContent: 'center',
@@ -499,7 +501,7 @@ const styles = StyleSheet.create({
   modalRoot: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,

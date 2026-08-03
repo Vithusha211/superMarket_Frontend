@@ -111,8 +111,8 @@ export default function Header({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    paddingHorizontal: 20,
-    paddingBottom: 16,
+    paddingHorizontal: '4.5%',
+    paddingBottom: '3.5%',
   },
   row: {
     flexDirection: 'row',
@@ -120,7 +120,9 @@ const styles = StyleSheet.create({
     minHeight: 40,
   },
   side: {
-    width: 40,
+    width: '9%',
+    minWidth: 36,
+    maxWidth: 44,
     alignItems: 'flex-start',
     justifyContent: 'center',
   },
@@ -128,8 +130,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   sideSpacer: {
-    width: 24,
-    height: 24,
+    width: '100%',
+    aspectRatio: 1,
   },
   center: {
     flex: 1,
@@ -142,14 +144,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   iconButton: {
-    width: 32,
-    height: 32,
+    width: '100%',
+    aspectRatio: 1,
+    maxWidth: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
   backButton: {
-    width: 32,
-    height: 32,
+    width: '100%',
+    aspectRatio: 1,
+    maxWidth: 36,
     borderRadius: 16,
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
     alignItems: 'center',
@@ -164,7 +168,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    padding: 10,
+    padding: '2%',
     borderRadius: 100,
     backgroundColor: COLORS.white,
   },

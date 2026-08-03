@@ -271,8 +271,8 @@ const styles = StyleSheet.create({
   greenTop: {
     backgroundColor: COLORS.primary,
     alignItems: 'center',
-    paddingBottom: 28,
-    paddingHorizontal: 20,
+    paddingBottom: '6.5%',
+    paddingHorizontal: '4.5%',
   },
   brandHeader: {
     alignItems: 'center',
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   headerCopy: {
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 24,
+    paddingHorizontal: '5.5%',
   },
   headerTitle: {
     fontSize: 28,
@@ -327,8 +327,8 @@ const styles = StyleSheet.create({
     marginTop: -8,
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingHorizontal: '4.5%',
+    paddingTop: '5.5%',
     gap: 24,
   },
   form: {

@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   content: {
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     paddingTop: 28,
     gap: 12,
   },
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   footer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     paddingTop: 12,
   },
   verifyButton: {

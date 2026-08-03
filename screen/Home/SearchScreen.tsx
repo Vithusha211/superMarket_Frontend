@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     paddingBottom: 16,
   },
   searchRow: {
@@ -368,13 +368,14 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     flex: 1,
-    height: 51,
+    minHeight: 51,
+    width: '100%',
     borderRadius: 8,
     backgroundColor: COLORS.searchBg,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingHorizontal: 14,
+    paddingHorizontal: '3.5%',
   },
   searchInput: {
     flex: 1,
@@ -389,7 +390,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 32,
   },
   content: {
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     paddingTop: 28,
     gap: 14,
   },
@@ -418,7 +419,7 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
   suggestions: {
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     paddingTop: 16,
     gap: 4,
   },
@@ -441,7 +442,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: '9%',
     gap: 16,
   },
   emptyTitle: {
@@ -455,7 +456,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   filterRow: {
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     gap: 8,
     paddingBottom: 12,
   },
@@ -479,7 +480,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
   },
   gridContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     gap: 12,
   },
   gridRow: {
@@ -488,6 +489,6 @@ const styles = StyleSheet.create({
   },
   productCard: {
     width: '48%',
-    maxWidth: 194,
+    maxWidth: '48%',
   },
 });

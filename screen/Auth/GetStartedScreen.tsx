@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: '7.3%',
     gap: 28,
   },
   logoPill: {
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   footer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     paddingTop: 12,
   },
   button: {

@@ -344,11 +344,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.overlay,
   },
   container: {
-    width: 230,
+    width: '48.5%',
+    maxWidth: 240,
+    minWidth: 200,
     height: '100%',
     backgroundColor: COLORS.white,
-    borderTopRightRadius: 24,
-    borderBottomRightRadius: 24,
+    borderTopRightRadius: 30,
+    borderBottomRightRadius: 30,
     zIndex: 2,
   },
   backButton: {
@@ -358,17 +360,17 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.backBg,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 16,
-    marginBottom: 14,
+    marginLeft: '7%',
+    marginBottom: '6%',
   },
   scrollContent: {
-    paddingBottom: 28,
+    paddingBottom: '6.5%',
   },
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',
     color: COLORS.text,
-    paddingHorizontal: 16,
+    paddingHorizontal: '7%',
     marginBottom: 8,
   },
   brandSectionTitle: {
@@ -383,7 +385,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingHorizontal: '7%',
     gap: 10,
   },
   categoryActive: {
@@ -406,7 +408,7 @@ const styles = StyleSheet.create({
     minHeight: 36,
     justifyContent: 'center',
     paddingVertical: 8,
-    paddingHorizontal: 28,
+    paddingHorizontal: '12%',
   },
   subItemActive: {
     backgroundColor: COLORS.activeBg,
@@ -423,7 +425,7 @@ const styles = StyleSheet.create({
     minHeight: 38,
     justifyContent: 'center',
     paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingHorizontal: '7%',
   },
   brandLabel: {
     fontSize: 14,

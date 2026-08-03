@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   md: {
     height: 51,
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
   },
   sm: {
     height: 41,
