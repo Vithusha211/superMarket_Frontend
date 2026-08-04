@@ -1,14 +1,12 @@
-import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
+import Logo from '../../componets/layout/Logo';
 
 const COLORS = {
   primary: '#07C187',
   white: '#FFFFFF',
-  text: '#111827',
-  muted: '#6B7280',
 };
 
 type GetStartedScreenProps = {
@@ -23,12 +21,7 @@ export default function GetStartedScreen({ onContinue }: GetStartedScreenProps) 
       <StatusBar style="light" />
 
       <View style={styles.content}>
-        <View style={styles.logoPill}>
-          <View style={styles.logoIcon}>
-            <Ionicons name="cart-outline" size={24} color={COLORS.white} />
-          </View>
-          <Text style={styles.logoText}>HappyCart</Text>
-        </View>
+        <Logo height={60} />
 
         <View style={styles.copy}>
           <Text style={styles.title}>Let's get started!</Text>
@@ -67,28 +60,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: '7.3%',
     gap: 28,
-  },
-  logoPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    padding: 10,
-    borderRadius: 100,
-    backgroundColor: COLORS.white,
-  },
-  logoIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.primary,
-  },
-  logoText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: COLORS.primary,
-    paddingHorizontal: 8,
   },
   copy: {
     alignItems: 'center',

@@ -9,6 +9,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Logo from './Logo';
 
 const COLORS = {
   primary: '#10B981',
@@ -27,17 +28,6 @@ type HeaderProps = {
   titleColor?: string;
   style?: ViewStyle;
 };
-
-function LogoPill() {
-  return (
-    <View style={styles.logoPill}>
-      <View style={styles.logoIcon}>
-        <Ionicons name="cart-outline" size={18} color={COLORS.white} />
-      </View>
-      <Text style={styles.logoText}>HappyCart</Text>
-    </View>
-  );
-}
 
 export default function Header({
   title,
@@ -65,7 +55,7 @@ export default function Header({
       <View style={styles.row}>
         {showLogo && !showBack && !left && !right && !title ? (
           <View style={styles.logoOnly}>
-            <LogoPill />
+            <Logo height={36} />
           </View>
         ) : (
           <>
@@ -87,7 +77,7 @@ export default function Header({
 
             <View style={styles.center}>
               {showLogo ? (
-                <LogoPill />
+                <Logo height={36} />
               ) : title ? (
                 <Text
                   style={[styles.title, { color: titleColor }]}
@@ -163,27 +153,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  logoPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    padding: '2%',
-    borderRadius: 100,
-    backgroundColor: COLORS.white,
-  },
-  logoIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoText: {
-    fontSize: 16,
-    fontWeight: '700',
-    fontStyle: 'italic',
-    color: COLORS.primary,
   },
 });

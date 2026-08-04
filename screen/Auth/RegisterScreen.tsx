@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -13,12 +12,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import Button from '../../componets/layout/Button';
 import InputField from '../../componets/layout/InputField';
+import Logo from '../../componets/layout/Logo';
 
 const COLORS = {
   primary: '#02B97D',
-  white: '#FFFFFF',
-  text: '#111827',
-  muted: '#727878',
+  white: 'rgba(255, 255, 255, 1)',
+  text: 'rgba(0, 0, 0, 1)',
+  muted: 'rgba(114, 130, 138, 1)',
   link: '#02B97D',
 };
 
@@ -55,12 +55,7 @@ function isValidEmail(value: string) {
 function BrandHeader() {
   return (
     <View style={styles.brandHeader}>
-      <View style={styles.logoPill}>
-        <View style={styles.logoIcon}>
-          <Ionicons name="cart-outline" size={20} color={COLORS.white} />
-        </View>
-        <Text style={styles.logoText}>HappyCart</Text>
-      </View>
+      <Logo height={48} />
 
       <View style={styles.headerCopy}>
         <Text style={styles.headerTitle}>Sign up</Text>
@@ -279,31 +274,9 @@ const styles = StyleSheet.create({
     gap: 16,
     width: '100%',
   },
-  logoPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    padding: 10,
-    borderRadius: 100,
-    backgroundColor: COLORS.white,
-  },
-  logoIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoText: {
-    fontSize: 18,
-    fontWeight: '700',
-    fontStyle: 'italic',
-    color: COLORS.primary,
-  },
   headerCopy: {
     alignItems: 'center',
-    gap: 8,
+    // gap: 8,
     paddingHorizontal: '5.5%',
   },
   headerTitle: {

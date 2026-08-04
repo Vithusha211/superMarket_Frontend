@@ -11,12 +11,12 @@ import Button from '../../componets/layout/Button';
 import Header from '../../componets/layout/Header';
 
 const COLORS = {
-  primary: '#07B787',
-  white: '#FFFFFF',
-  text: '#111827',
-  muted: '#9CA3AF',
-  border: '#E5E7EB',
-  radio: '#07B787',
+  primary: 'rgba(7, 193, 135, 1)',
+  white: 'rgba(255, 255, 255, 1)',
+  text: 'rgba(13, 13, 13, 1)',
+  muted: 'rgba(114, 130, 138, 1)',
+  border: 'rgba(255, 255, 255, 1)',
+  radio: 'rgba(7, 193, 135, 1)',
 };
 
 export type LanguageOption = {
@@ -136,15 +136,15 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    maxWidth: '82%',
     alignSelf: 'center',
     backgroundColor: COLORS.white,
     borderRadius: 24,
     padding: '4.5%',
-    gap: 16,
+     gap: 16,
   },
   illustration: {
     width: '100%',
+    marginBottom: 20,
     aspectRatio: 360 / 200,
     alignItems: 'center',
     justifyContent: 'center',
@@ -152,10 +152,12 @@ const styles = StyleSheet.create({
   illustrationImage: {
     width: '100%',
     height: '100%',
+    
   },
   copy: {
     alignItems: 'center',
-    gap: 8,
+    marginBottom: 30,
+  
   },
   title: {
     fontSize: 22,
@@ -181,17 +183,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: '4.5%',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.white,
     backgroundColor: COLORS.white,
   },
   languageRowSelected: {
     borderColor: COLORS.primary,
-    backgroundColor: '#F0FDF8',
+    backgroundColor: 'rgba(240, 253, 248, 1)',
   },
   languageLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 9,
     flex: 1,
   },
   radioOuter: {
@@ -209,11 +211,11 @@ const styles = StyleSheet.create({
   radioInner: {
     width: 10,
     height: 10,
-    borderRadius: 5,
+    borderRadius: 10,
     backgroundColor: COLORS.radio,
   },
   flag: {
-    fontSize: 22,
+    fontSize: 18,
   },
   languageText: {
     flex: 1,
@@ -229,7 +231,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   selectButton: {
-    height: 52,
+   paddingVertical: 14,
     backgroundColor: COLORS.primary,
   },
   selectButtonText: {
