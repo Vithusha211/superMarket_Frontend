@@ -24,18 +24,18 @@ const COLORS = {
   chipBg: '#F3F4F6',
 };
 
-const SUB_CHIPS = [
+const FILTERS = [
   'All',
-  'Milk',
-  'Butter',
-  'Cheese',
-  'Yoghurt',
-  'Ice Cream',
+  'Price ↓',
+  'Price ↑',
+  'Discount',
+  'Popularity',
+  'Newest',
 ] as const;
 
-type SubChip = (typeof SUB_CHIPS)[number];
+type FilterOption = (typeof FILTERS)[number];
 
-export type DairyProduct = {
+export type FruitProduct = {
   id: string;
   image: ImageSourcePropType;
   brand: string;
@@ -44,140 +44,117 @@ export type DairyProduct = {
   price: number;
   oldPrice?: number;
   discount?: number;
-  tag?: string;
-  subCategory: SubChip;
-  description: string;
 };
 
-const PRODUCTS: DairyProduct[] = [
+const PRODUCTS: FruitProduct[] = [
   {
-    id: 'ambewela-fresh',
-    image: require('../../assets/search/product-ambewela.png'),
-    brand: 'Ambewela',
-    name: 'Fresh Milk',
-    quantity: '1L',
-    price: 12,
-    oldPrice: 15,
+    id: 'sweet-melon-1',
+    image: require('../../assets/product/sweet-melon.png'),
+    brand: 'Supermarket',
+    name: 'Sweet Melon',
+    quantity: '1kg',
+    price: 5,
+    oldPrice: 6.25,
     discount: 20,
-    tag: 'FULL CREAM',
-    subCategory: 'Milk',
-    description:
-      'Fresh full cream milk sourced daily. Rich in calcium and vitamins.',
   },
   {
-    id: 'maliban-fresh',
-    image: require('../../assets/brands/fresh-milk.png'),
-    brand: 'Maliban',
-    name: 'Fresh Milk',
-    quantity: '1L',
+    id: 'sweet-melon-2',
+    image: require('../../assets/product/sweet-melon.png'),
+    brand: 'Supermarket',
+    name: 'Sweet Melon',
+    quantity: '1kg',
     price: 5,
-    subCategory: 'Milk',
-    description: 'Fresh full cream milk. Pure, nutritious and ready to drink.',
+    discount: 20,
   },
   {
-    id: 'chocolate-milk',
-    image: require('../../assets/product/chocolate-milk.png'),
-    brand: 'Kotmale',
-    name: 'Chocolate Milk',
-    quantity: '1L',
-    price: 5,
-    subCategory: 'Milk',
-    description: 'Smooth chocolate flavoured milk packed with calcium.',
+    id: 'sweet-melon-3',
+    image: require('../../assets/product/sweet-melon.png'),
+    brand: 'Supermarket',
+    name: 'Sweet Melon',
+    quantity: '1kg',
+    price: 4.5,
+    oldPrice: 6,
+    discount: 25,
   },
   {
-    id: 'faluda-milk',
-    image: require('../../assets/product/faluda-milk.png'),
-    brand: 'RichLife',
-    name: 'Faluda Milk',
-    quantity: '180ml',
-    price: 2,
-    subCategory: 'Milk',
-    description: 'RichLife faluda flavoured milk in a handy pack.',
+    id: 'sweet-melon-4',
+    image: require('../../assets/product/sweet-melon.png'),
+    brand: 'Supermarket',
+    name: 'Sweet Melon',
+    quantity: '1kg',
+    price: 5.5,
   },
   {
-    id: 'kotmale-butter',
-    image: require('../../assets/dairy/kotmale-butter.png'),
-    brand: 'Kotmale',
-    name: 'Butter',
-    quantity: '200g',
-    price: 8,
-    subCategory: 'Butter',
-    description: 'Creamy Kotmale butter. Perfect for cooking and spreading.',
+    id: 'sweet-melon-5',
+    image: require('../../assets/product/sweet-melon.png'),
+    brand: 'Supermarket',
+    name: 'Sweet Melon',
+    quantity: '2kg',
+    price: 9,
+    discount: 15,
   },
   {
-    id: 'vanilla-ice-cream',
-    image: require('../../assets/dairy/vanilla-ice-cream.png'),
-    brand: 'Dairy',
-    name: 'Vanilla Ice Cream',
-    quantity: '2L',
-    price: 18,
-    discount: 10,
-    subCategory: 'Ice Cream',
-    description: 'Smooth dairy vanilla ice cream. Family pack 2 litre tub.',
-  },
-  {
-    id: 'value-yoghurt',
-    image: require('../../assets/product/value-pack.png'),
-    brand: 'Highland',
-    name: 'Yoghurt Pack',
-    quantity: '8 pcs',
-    price: 12,
-    subCategory: 'Yoghurt',
-    description: 'Buy 7 get 1 free yoghurt value pack for the whole family.',
-  },
-  {
-    id: 'kiri-powder',
-    image: require('../../assets/brands/kiri-milk-powder.png'),
-    brand: 'Maliban',
-    name: 'Kiri Milk Powder',
-    quantity: '400g',
-    price: 18,
-    subCategory: 'Milk',
-    description: 'Full cream milk powder for rich, creamy milk anytime.',
+    id: 'sweet-melon-6',
+    image: require('../../assets/product/sweet-melon.png'),
+    brand: 'Supermarket',
+    name: 'Sweet Melon',
+    quantity: '500g',
+    price: 3,
   },
 ];
 
-type DairyScreenProps = {
+type FruitsVegetablesScreenProps = {
   onBack?: () => void;
   onSearchPress?: () => void;
   onMenuPress?: () => void;
-  onProductPress?: (product: DairyProduct) => void;
-  onAddProduct?: (product: DairyProduct) => void;
+  onProductPress?: (product: FruitProduct) => void;
+  onAddProduct?: (product: FruitProduct) => void;
 };
 
-export default function DairyScreen({
+export default function FruitsVegetablesScreen({
   onBack,
   onSearchPress,
   onMenuPress,
   onProductPress,
   onAddProduct,
-}: DairyScreenProps) {
+}: FruitsVegetablesScreenProps) {
   const insets = useSafeAreaInsets();
   const [query, setQuery] = useState('');
-  const [activeChip, setActiveChip] = useState<SubChip>('All');
+  const [activeFilter, setActiveFilter] = useState<FilterOption>('Newest');
 
   const products = useMemo(() => {
     let list = [...PRODUCTS];
-    if (activeChip !== 'All') {
-      list = list.filter((item) => item.subCategory === activeChip);
-    }
     const q = query.trim().toLowerCase();
     if (q) {
       list = list.filter(
         (item) =>
           item.name.toLowerCase().includes(q) ||
-          item.brand.toLowerCase().includes(q) ||
-          item.subCategory.toLowerCase().includes(q),
+          item.brand.toLowerCase().includes(q),
       );
     }
-    return list;
-  }, [query, activeChip]);
+
+    switch (activeFilter) {
+      case 'Price ↓':
+        return list.sort((a, b) => b.price - a.price);
+      case 'Price ↑':
+        return list.sort((a, b) => a.price - b.price);
+      case 'Discount':
+        return list.filter((item) => !!item.discount);
+      case 'Popularity':
+        return list.sort((a, b) => (b.discount ?? 0) - (a.discount ?? 0));
+      case 'Newest':
+        return list.reverse();
+      case 'All':
+      default:
+        return list;
+    }
+  }, [query, activeFilter]);
 
   return (
     <View style={styles.screen}>
       <StatusBar style="light" />
       <Header
-        title="Dairy"
+        title="Fruits & Vegetables"
         showBack
         onBack={onBack}
         backgroundColor={COLORS.primary}
@@ -218,18 +195,23 @@ export default function DairyScreen({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.chipRow}
+          contentContainerStyle={styles.filterRow}
         >
-          {SUB_CHIPS.map((chip) => {
-            const active = activeChip === chip;
+          {FILTERS.map((filter) => {
+            const active = activeFilter === filter;
             return (
               <Pressable
-                key={chip}
-                onPress={() => setActiveChip(chip)}
-                style={[styles.chip, active && styles.chipActive]}
+                key={filter}
+                onPress={() => setActiveFilter(filter)}
+                style={[styles.filterChip, active && styles.filterChipActive]}
               >
-                <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                  {chip}
+                <Text
+                  style={[
+                    styles.filterChipText,
+                    active && styles.filterChipTextActive,
+                  ]}
+                >
+                  {filter}
                 </Text>
               </Pressable>
             );
@@ -255,14 +237,13 @@ export default function DairyScreen({
               price={item.price}
               oldPrice={item.oldPrice}
               discount={item.discount}
-              tag={item.tag}
               onPress={() => onProductPress?.(item)}
               onAddPress={() => onAddProduct?.(item)}
               style={styles.productCard}
             />
           )}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>No dairy products found</Text>
+            <Text style={styles.emptyText}>No fruits or vegetables found</Text>
           }
         />
       </View>
@@ -325,12 +306,12 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     paddingVertical: 0,
   },
-  chipRow: {
+  filterRow: {
     paddingHorizontal: '4.5%',
     gap: 8,
     paddingBottom: 12,
   },
-  chip: {
+  filterChip: {
     minHeight: 32,
     borderRadius: 12,
     paddingHorizontal: 12,
@@ -338,15 +319,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  chipActive: {
+  filterChipActive: {
     backgroundColor: COLORS.primary,
   },
-  chipText: {
+  filterChipText: {
     fontSize: 13,
     fontWeight: '500',
     color: COLORS.text,
   },
-  chipTextActive: {
+  filterChipTextActive: {
     color: COLORS.white,
   },
   gridContent: {

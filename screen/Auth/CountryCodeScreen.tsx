@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   listContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     paddingTop: 20,
     paddingBottom: 12,
     gap: 10,
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
   },
   footer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     paddingTop: 8,
     backgroundColor: COLORS.white,
   },

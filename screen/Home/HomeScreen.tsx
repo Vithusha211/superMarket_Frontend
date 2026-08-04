@@ -125,7 +125,10 @@ type HomeScreenProps = {
   onSearchPress?: () => void;
   onLocationPress?: () => void;
   onCategoryPress?: (id: string) => void;
+  onCategoriesSeeAll?: () => void;
   onBrandPress?: (id: string) => void;
+  onBrandsSeeAll?: () => void;
+  onOffersSeeAll?: () => void;
   onProductPress?: (id: string) => void;
   onAddProduct?: (id: string) => void;
   onTabPress?: (tab: FooterTab) => void;
@@ -137,7 +140,10 @@ export default function HomeScreen({
   onSearchPress,
   onLocationPress,
   onCategoryPress,
+  onCategoriesSeeAll,
   onBrandPress,
+  onBrandsSeeAll,
+  onOffersSeeAll,
   onProductPress,
   onAddProduct,
   onTabPress,
@@ -210,7 +216,12 @@ export default function HomeScreen({
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Shop by Categories</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Shop by Categories</Text>
+            <Pressable onPress={onCategoriesSeeAll} hitSlop={8}>
+              <Text style={styles.seeAll}>See all</Text>
+            </Pressable>
+          </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -236,7 +247,12 @@ export default function HomeScreen({
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Shop by Brands</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Shop by Brands</Text>
+            <Pressable onPress={onBrandsSeeAll} hitSlop={8}>
+              <Text style={styles.seeAll}>See all</Text>
+            </Pressable>
+          </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -264,7 +280,12 @@ export default function HomeScreen({
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Best Offers</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Best Offers</Text>
+            <Pressable onPress={onOffersSeeAll} hitSlop={8}>
+              <Text style={styles.seeAll}>See all</Text>
+            </Pressable>
+          </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -308,8 +329,8 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 20,
-    paddingBottom: 14,
+    paddingHorizontal: '4.5%',
+    paddingBottom: '3%',
     gap: 14,
   },
   headerTop: {
@@ -325,8 +346,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   iconChip: {
-    width: 32,
-    height: 32,
+    width: '7.5%',
+    aspectRatio: 1,
+    maxWidth: 36,
+    minWidth: 28,
     borderRadius: 16,
     backgroundColor: COLORS.chipBg,
     alignItems: 'center',
@@ -347,8 +370,10 @@ const styles = StyleSheet.create({
     color: COLORS.white,
   },
   flagChip: {
-    width: 32,
-    height: 32,
+    width: '7.5%',
+    aspectRatio: 1,
+    maxWidth: 36,
+    minWidth: 28,
     borderRadius: 16,
     backgroundColor: COLORS.chipBg,
     alignItems: 'center',
@@ -358,13 +383,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   searchBar: {
-    height: 48,
+    width: '100%',
+    minHeight: 48,
     borderRadius: 12,
     backgroundColor: COLORS.searchBg,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingHorizontal: 14,
+    paddingHorizontal: '3.5%',
   },
   searchInput: {
     flex: 1,
@@ -379,15 +405,16 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
   },
   scrollContent: {
-    paddingTop: 20,
+    paddingTop: '4.5%',
     gap: 24,
+    paddingBottom: '4%',
   },
   bannerWrap: {
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
   },
   banner: {
     width: '100%',
-    height: 160,
+    aspectRatio: 400 / 160,
     borderRadius: 16,
   },
   section: {
@@ -397,21 +424,34 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: COLORS.sectionTitle,
-    paddingHorizontal: 20,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: '4.5%',
+    marginBottom: 4,
+  },
+  seeAll: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.primary,
   },
   hList: {
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     gap: 8,
   },
   categoryItem: {
-    width: 106,
+    width: '24%',
+    minWidth: 88,
+    maxWidth: 120,
     alignItems: 'center',
     gap: 8,
   },
   categoryCircle: {
-    width: 106,
-    height: 106,
-    borderRadius: 53,
+    width: '100%',
+    aspectRatio: 1,
+    borderRadius: 999,
     backgroundColor: COLORS.white,
     borderWidth: 1,
     borderColor: '#F3F4F6',
@@ -431,19 +471,21 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   brandItem: {
-    width: 106,
+    width: '24%',
+    minWidth: 88,
+    maxWidth: 120,
     alignItems: 'center',
     gap: 4,
   },
   brandCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: '68%',
+    aspectRatio: 1,
+    borderRadius: 999,
     backgroundColor: COLORS.brandCircle,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-    padding: 8,
+    padding: '8%',
   },
   brandImage: {
     width: '100%',
@@ -456,7 +498,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   offerCard: {
-    width: 160,
+    width: '36%',
+    minWidth: 140,
+    maxWidth: 180,
   },
   footerWrap: {
     position: 'absolute',

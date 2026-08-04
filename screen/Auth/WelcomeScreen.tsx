@@ -1,7 +1,7 @@
-import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Button from '../../componets/layout/Button';
+import Logo from '../../componets/layout/Logo';
 
 const COLORS = {
   primary: '#10B981',
@@ -13,17 +13,6 @@ type WelcomeScreenProps = {
   onCreateAccount?: () => void;
 };
 
-function LogoPill() {
-  return (
-    <View style={styles.logoPill}>
-      <View style={styles.logoIcon}>
-        <Ionicons name="cart-outline" size={24} color={COLORS.white} />
-      </View>
-      <Text style={styles.logoText}>HappyCart</Text>
-    </View>
-  );
-}
-
 export default function WelcomeScreen({
   onLogin,
   onCreateAccount,
@@ -33,7 +22,7 @@ export default function WelcomeScreen({
       <StatusBar style="light" />
 
       <View style={styles.content}>
-        <LogoPill />
+        <Logo height={60}/>
 
         <View style={styles.card}>
           <Button
@@ -58,44 +47,22 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: COLORS.primary,
+    
   },
   content: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 40,
-    gap: 40,
-  },
-  logoPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    padding: 10,
-    borderRadius: 100,
-    backgroundColor: COLORS.white,
-  },
-  logoIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoText: {
-    fontSize: 20,
-    fontWeight: '700',
-    fontStyle: 'italic',
-    color: COLORS.primary,
-    letterSpacing: 0.5,
+    // justifyContent: 'center',
+    paddingHorizontal: '9%',
+    paddingTop: 250,
+    gap: 30,
   },
   card: {
     width: '100%',
-    maxWidth: 360,
     backgroundColor: COLORS.white,
-    borderRadius: 24,
-    padding: 20,
-    gap: 12,
+    borderRadius: 30,
+    padding: 16,
+    gap: 20,
   },
   button: {
     height: 51,

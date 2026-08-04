@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
   Image,
@@ -11,6 +10,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import Button from '../../componets/layout/Button';
+import Logo from '../../componets/layout/Logo';
 
 const COLORS = {
   primary: '#07C187',
@@ -64,17 +64,6 @@ type OnboardingScreenProps = {
   onFinish?: () => void;
 };
 
-function LogoPill() {
-  return (
-    <View style={styles.logoPill}>
-      <View style={styles.logoIcon}>
-        <Ionicons name="cart-outline" size={20} color={COLORS.white} />
-      </View>
-      <Text style={styles.logoText}>HappyCart</Text>
-    </View>
-  );
-}
-
 function ProgressBar({
   currentIndex,
   total,
@@ -120,7 +109,7 @@ export default function OnboardingScreen({
     <View style={[styles.screen, { paddingTop: insets.top + 12 }]}>
       <StatusBar style="light" />
 
-      <LogoPill />
+      <Logo height={48} />
 
       <View
         style={[
@@ -170,37 +159,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.primary,
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     gap: 20,
-  },
-  logoPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    padding: 10,
-    borderRadius: 100,
-    backgroundColor: COLORS.white,
-  },
-  logoIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoText: {
-    fontSize: 18,
-    fontWeight: '700',
-    fontStyle: 'italic',
-    color: COLORS.primary,
   },
   card: {
     flex: 1,
     width: '100%',
     backgroundColor: COLORS.white,
     borderRadius: 30,
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     paddingTop: 20,
     paddingBottom: 24,
     justifyContent: 'space-between',
@@ -228,7 +195,7 @@ const styles = StyleSheet.create({
   },
   illustration: {
     width: '100%',
-    height: 240,
+    aspectRatio: 400 / 240,
     alignItems: 'center',
     justifyContent: 'center',
   },

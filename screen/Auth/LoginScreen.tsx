@@ -2,6 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
+  Image,
+  ImageSourcePropType,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -14,13 +16,14 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
 import InputField from '../../componets/layout/InputField';
+import Logo from '../../componets/layout/Logo';
 
 const COLORS = {
-  primary: '#02C173',
+  primary: 'rgba(7, 193, 135, 1)',
   white: '#FFFFFF',
   text: '#111827',
   muted: '#727878',
-  link: '#02C173',
+  link: 'rgba(7, 193, 135, 1)',
   socialBg: '#F2F2F3',
   border: '#E5E7EB',
   checkboxBorder: '#D1D5DB',
@@ -47,24 +50,18 @@ type LoginScreenProps = {
 
 const SOCIALS: {
   id: SocialProvider;
-  icon: keyof typeof Ionicons.glyphMap;
-  color: string;
+  icon: ImageSourcePropType;
 }[] = [
-  { id: 'google', icon: 'logo-google', color: '#DB4437' },
-  { id: 'apple', icon: 'logo-apple', color: '#111827' },
-  { id: 'facebook', icon: 'logo-facebook', color: '#1877F2' },
-  { id: 'instagram', icon: 'logo-instagram', color: '#E4405F' },
+  { id: 'google', icon: require('../../assets/social/google.png') },
+  { id: 'apple', icon: require('../../assets/social/apple.png') },
+  { id: 'facebook', icon: require('../../assets/social/facebook.png') },
+  { id: 'instagram', icon: require('../../assets/social/instagram.png') },
 ];
 
 function BrandHeader() {
   return (
     <View style={styles.brandHeader}>
-      <View style={styles.logoPill}>
-        <View style={styles.logoIcon}>
-          <Ionicons name="cart-outline" size={20} color={COLORS.white} />
-        </View>
-        <Text style={styles.logoText}>HappyCart</Text>
-      </View>
+      <Logo height={48} />
 
       <View style={styles.headerCopy}>
         <Text style={styles.headerTitle}>Sign in</Text>
@@ -271,10 +268,10 @@ export default function LoginScreen({
                   onPress={() => onSocialPress?.(social.id)}
                   style={styles.socialButton}
                 >
-                  <Ionicons
-                    name={social.icon}
-                    size={22}
-                    color={social.color}
+                  <Image
+                    source={social.icon}
+                    style={styles.socialIcon}
+                    resizeMode="contain"
                   />
                 </Pressable>
               ))}
@@ -349,40 +346,18 @@ const styles = StyleSheet.create({
   greenTop: {
     backgroundColor: COLORS.primary,
     alignItems: 'center',
-    paddingBottom: 28,
-    paddingHorizontal: 20,
+    paddingBottom: '6.5%',
+    paddingHorizontal: '4.5%',
   },
   brandHeader: {
     alignItems: 'center',
     gap: 16,
     width: '100%',
   },
-  logoPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    padding: 10,
-    borderRadius: 100,
-    backgroundColor: COLORS.white,
-  },
-  logoIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoText: {
-    fontSize: 18,
-    fontWeight: '700',
-    fontStyle: 'italic',
-    color: COLORS.primary,
-  },
   headerCopy: {
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 24,
+    paddingHorizontal: '5.5%',
   },
   headerTitle: {
     fontSize: 28,
@@ -400,14 +375,15 @@ const styles = StyleSheet.create({
   sheet: {
     flex: 1,
     backgroundColor: COLORS.white,
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    marginTop: -8,
+    borderRadius: 30,
+    marginTop: 30,
+    marginLeft:20,
+    marginRight:20,
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 28,
-    gap: 24,
+    paddingHorizontal: '4.5%',
+    paddingTop: '6.5%',
+    gap: 20,
   },
   form: {
     gap: 16,
@@ -475,12 +451,18 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   socialButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: '11.5%',
+    aspectRatio: 1,
+    maxWidth: 56,
+    minWidth: 44,
+    borderRadius: 999,
     backgroundColor: COLORS.socialBg,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  socialIcon: {
+    width: '55%',
+    height: '55%',
   },
   footer: {
     alignItems: 'center',
@@ -499,7 +481,7 @@ const styles = StyleSheet.create({
   modalRoot: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,

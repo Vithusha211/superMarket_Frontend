@@ -30,7 +30,11 @@ export type ProductDetail = {
   id: string;
   title: string;
   category: string;
+  brand?: string;
+  quantityLabel?: string;
   price: number;
+  oldPrice?: number;
+  discount?: number;
   description: string;
   image: ImageSourcePropType;
 };
@@ -39,7 +43,11 @@ const DEFAULT_PRODUCT: ProductDetail = {
   id: 'fresh-milk',
   title: 'Fresh Milk',
   category: 'Dairy',
-  price: 5,
+  brand: 'Ambewela',
+  quantityLabel: '1l',
+  price: 12,
+  oldPrice: 15,
+  discount: 20,
   description:
     'Fresh full cream milk sourced daily. Rich in calcium and vitamins for your everyday nutrition.',
   image: require('../../assets/search/product-ambewela.png'),
@@ -150,17 +158,35 @@ export default function ProductScreen({
             },
           ]}
         >
-          <View style={[styles.heroCard, { minHeight: isTablet ? 240 : 200 }]}>
+          <View style={styles.heroCard}>
             <Image
               source={product.image}
               style={styles.heroImage}
               resizeMode="contain"
             />
+            {product.discount != null && product.discount > 0 ? (
+              <View style={styles.discountBadge}>
+                <Text style={styles.discountText}>{product.discount}%</Text>
+              </View>
+            ) : null}
           </View>
 
           <View style={styles.infoBlock}>
+            {product.brand ? (
+              <Text style={styles.brand}>{product.brand.toUpperCase()}</Text>
+            ) : null}
             <Text style={styles.title}>{product.title}</Text>
-            <Text style={styles.price}>$ {product.price.toFixed(2)} / each</Text>
+            {product.quantityLabel ? (
+              <Text style={styles.qtyLabel}>{product.quantityLabel}</Text>
+            ) : null}
+            <View style={styles.priceRow}>
+              <Text style={styles.price}>$ {product.price.toFixed(2)}</Text>
+              {product.oldPrice != null ? (
+                <Text style={styles.oldPrice}>
+                  $ {product.oldPrice.toFixed(2)}
+                </Text>
+              ) : null}
+            </View>
           </View>
 
           <View style={styles.aboutBlock}>
@@ -278,24 +304,62 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    position: 'relative',
   },
   heroImage: {
     width: '70%',
     height: '85%',
   },
+  discountBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#EF4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  discountText: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '700',
+  },
   infoBlock: {
     width: '100%',
-    gap: 6,
+    gap: 4,
+  },
+  brand: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.muted,
+    letterSpacing: 0.6,
   },
   title: {
     fontSize: 22,
     fontWeight: '700',
     color: COLORS.text,
   },
+  qtyLabel: {
+    fontSize: 13,
+    color: COLORS.muted,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 4,
+  },
   price: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: '700',
     color: COLORS.text,
+  },
+  oldPrice: {
+    fontSize: 14,
+    color: COLORS.muted,
+    textDecorationLine: 'line-through',
   },
   aboutBlock: {
     width: '100%',

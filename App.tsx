@@ -10,12 +10,25 @@ import EnterLocationScreen from './screen/Auth/EnterLocationScreen';
 import ForgotPasswordScreen from './screen/Auth/ForgotPasswordScreen';
 import GetStartedScreen from './screen/Auth/GetStartedScreen';
 import HomeScreen from './screen/Home/HomeScreen';
-import DairyScreen from './screen/Home/DairyScreen';
+import DairyScreen, { DairyProduct } from './screen/Home/DairyScreen';
 import SearchScreen from './screen/Home/SearchScreen';
 import ProductScreen, {
   ProductDetail,
 } from './screen/Home/ProductDetailScreen';
 import CartScreen from './screen/Home/CartScreen';
+import PaymentScreen from './screen/Home/PaymentScreen';
+import InvoiceScreen from './screen/Home/InvoiceScreen';
+import AddressScreen, { SavedAddress } from './screen/Home/AdressScreen';
+import MenuScreen from './screen/Home/MenuScreen';
+import BrandScreen, {
+  BrandProduct,
+  MALIBAN_PRODUCTS,
+} from './screen/Home/BrandScreen';
+import BrandsScreen from './screen/Home/BrandsScreen';
+import CategoryScreen from './screen/Home/CategoryScreen';
+import FruitsVegetablesScreen, {
+  FruitProduct,
+} from './screen/Home/FruitsVegetablesScreen';
 import LanguageSelectScreen from './screen/Auth/LanguageSelectScreen';
 import LoginScreen from './screen/Auth/LoginScreen';
 import OnboardingScreen from './screen/Auth/OnboardingScreen';
@@ -37,14 +50,25 @@ type AppScreen =
   | 'enableLocation'
   | 'address'
   | 'addLocation'
+  | 'addressSelect'
   | 'getStarted'
   | 'home'
   | 'search'
+  | 'categories'
+  | 'brands'
   | 'dairy'
+  | 'fruits'
+  | 'menu'
+  | 'brand'
   | 'product'
   | 'cart'
+  | 'payment'
+  | 'invoice'
   | 'forgotPassword'
   | 'createNewPassword';
+
+/** Where address/add-location should return after finish */
+type AddressFlow = 'onboarding' | 'change' | 'addFromSelect';
 
 export default function App() {
   const [screen, setScreen] = useState<AppScreen>('splash');
@@ -52,18 +76,53 @@ export default function App() {
   const [signupPhone, setSignupPhone] = useState('1234565657');
   const [forgotEmail, setForgotEmail] = useState('');
   const [cartCount, setCartCount] = useState(0);
+  const [cartSubtotal, setCartSubtotal] = useState(25);
+  const [deliveryAddress, setDeliveryAddress] = useState(
+    '102 St Marks Pl, New York',
+  );
+  const [addressFlow, setAddressFlow] = useState<AddressFlow>('onboarding');
   const [productReturnTo, setProductReturnTo] = useState<AppScreen>('dairy');
   const [cartReturnTo, setCartReturnTo] = useState<AppScreen>('home');
-  const [addressReturnTo, setAddressReturnTo] = useState<AppScreen>('enableLocation');
+  const [menuReturnTo, setMenuReturnTo] = useState<AppScreen>('dairy');
+  const [brandReturnTo, setBrandReturnTo] = useState<AppScreen>('menu');
+  const [selectedBrand, setSelectedBrand] = useState({
+    id: 'maliban',
+    label: 'Maliban',
+  });
+  const [menuCategoryId, setMenuCategoryId] = useState<string | null>('dairy');
+  const [menuSubCategoryId, setMenuSubCategoryId] = useState<string | null>(
+    'milk',
+  );
   const [selectedProduct, setSelectedProduct] = useState<ProductDetail>({
     id: 'fresh-milk',
     title: 'Fresh Milk',
     category: 'Dairy',
-    price: 5,
+    brand: 'Ambewela',
+    quantityLabel: '1l',
+    price: 12,
+    oldPrice: 15,
+    discount: 20,
     description:
       'Fresh full cream milk sourced daily. Rich in calcium and vitamins for your everyday nutrition.',
     image: require('./assets/search/product-ambewela.png'),
   });
+
+  const openBrand = (from: AppScreen, brand: { id: string; label: string }) => {
+    setSelectedBrand(brand);
+    setBrandReturnTo(from);
+    setScreen('brand');
+  };
+
+  const openCategory = (id: string) => {
+    if (id === 'dairy') {
+      setScreen('dairy');
+    } else if (id === 'fruits') {
+      setScreen('fruits');
+    } else {
+      setScreen('search');
+    }
+  };
+
   const [selectedCountry, setSelectedCountry] = useState<CountryCodeOption>({
     id: 'de',
     label: 'Deutsch',
@@ -77,6 +136,40 @@ export default function App() {
       setSelectedProduct((prev: ProductDetail) => ({ ...prev, ...product }));
     }
     setScreen('product');
+  };
+
+  const finishAddLocation = () => {
+    // Signup first-time address → Get Started
+    if (addressFlow === 'onboarding') {
+      setScreen('getStarted');
+      return;
+    }
+    // Cart change / Add New Address (Figma: Save → Cart)
+    setScreen('cart');
+  };
+
+  const backFromEnterLocation = () => {
+    if (addressFlow === 'onboarding') {
+      setScreen('enableLocation');
+      return;
+    }
+    if (addressFlow === 'addFromSelect' || addressFlow === 'change') {
+      setScreen('addressSelect');
+      return;
+    }
+    setScreen('cart');
+  };
+
+  const backFromAddLocation = () => {
+    if (addressFlow === 'addFromSelect') {
+      setScreen('addressSelect');
+      return;
+    }
+    if (addressFlow === 'change') {
+      setScreen('addressSelect');
+      return;
+    }
+    setScreen('address');
   };
 
   return (
@@ -145,55 +238,96 @@ export default function App() {
         <EnableLocationScreen
           onBack={() => setScreen('phoneOtp')}
           onAllowMaps={() => {
-            setAddressReturnTo('enableLocation');
+            setAddressFlow('onboarding');
             setScreen('address');
           }}
           onSetManually={() => {
-            setAddressReturnTo('enableLocation');
+            setAddressFlow('onboarding');
             setScreen('address');
           }}
         />
       ) : screen === 'address' ? (
         <EnterLocationScreen
-          onBack={() => setScreen(addressReturnTo)}
+          onBack={backFromEnterLocation}
           onAllowMaps={() => setScreen('addLocation')}
           onSelectAddress={() => setScreen('addLocation')}
         />
       ) : screen === 'addLocation' ? (
         <AddLocationScreen
-          onBack={() => setScreen('address')}
-          onSave={() =>
-            setScreen(addressReturnTo === 'cart' ? 'cart' : 'getStarted')
-          }
+          onBack={backFromAddLocation}
+          onSave={(data) => {
+            const line = [data.flatHouseNo, data.streetRoad, data.city]
+              .filter(Boolean)
+              .join(', ');
+            if (line) {
+              setDeliveryAddress(line);
+            }
+            finishAddLocation();
+          }}
+        />
+      ) : screen === 'addressSelect' ? (
+        <AddressScreen
+          mode={addressFlow === 'addFromSelect' ? 'add' : 'change'}
+          deliveringTo={deliveryAddress}
+          onBack={() => setScreen('cart')}
+          onSave={(address: SavedAddress) => {
+            setDeliveryAddress(address.line);
+            setScreen('cart');
+          }}
+          onAddNew={() => {
+            setAddressFlow('addFromSelect');
+            setScreen('addLocation');
+          }}
         />
       ) : screen === 'getStarted' ? (
         <GetStartedScreen onContinue={() => setScreen('home')} />
       ) : screen === 'home' ? (
         <HomeScreen
           countryFlag={selectedCountry.flag}
-          onSearchPress={() => setScreen('search')}
-          onCategoryPress={(id) => {
-            if (id === 'dairy') {
-              setScreen('dairy');
-            } else {
-              setScreen('search');
-            }
-          }}
+          onSearchPress={() => setScreen('brands')}
+          onCategoriesSeeAll={() => setScreen('categories')}
+          onBrandsSeeAll={() => setScreen('brands')}
+          onOffersSeeAll={() => setScreen('dairy')}
+          onCategoryPress={openCategory}
+          onBrandPress={(id) =>
+            openBrand('home', {
+              id,
+              label: id.charAt(0).toUpperCase() + id.slice(1),
+            })
+          }
           onProductPress={(id) =>
             openProduct('home', {
               id,
               title: 'Fresh Milk',
               category: 'Dairy',
-              price: 5,
+              brand: 'Ambewela',
+              quantityLabel: '1l',
+              price: 12,
+              oldPrice: 15,
+              discount: 20,
             })
           }
+          onAddProduct={() => setCartCount((c) => c + 1)}
           onTabPress={(tab) => {
             if (tab === 'cart') {
               setCartReturnTo('home');
               setScreen('cart');
             }
+            if (tab === 'orders') setScreen('categories');
             if (tab === 'home') setScreen('home');
           }}
+        />
+      ) : screen === 'categories' ? (
+        <CategoryScreen
+          onBack={() => setScreen('home')}
+          onCategoryPress={openCategory}
+        />
+      ) : screen === 'brands' ? (
+        <BrandsScreen
+          onBack={() => setScreen('home')}
+          onBrandPress={(brand) =>
+            openBrand('brands', { id: brand.id, label: brand.name })
+          }
         />
       ) : screen === 'search' ? (
         <SearchScreen
@@ -213,13 +347,95 @@ export default function App() {
         <DairyScreen
           onBack={() => setScreen('home')}
           onSearchPress={() => setScreen('search')}
-          onProductPress={(id) =>
+          onMenuPress={() => {
+            setMenuReturnTo('dairy');
+            setMenuCategoryId('dairy');
+            setMenuSubCategoryId('milk');
+            setScreen('menu');
+          }}
+          onProductPress={(product: DairyProduct) =>
             openProduct('dairy', {
-              id,
-              title: 'Fresh Milk',
+              id: product.id,
+              title: product.name,
               category: 'Dairy',
-              price: 5,
-              image: require('./assets/search/product-ambewela.png'),
+              price: product.price,
+              description: product.description,
+              image: product.image,
+            })
+          }
+          onAddProduct={() => setCartCount((c) => c + 1)}
+        />
+      ) : screen === 'fruits' ? (
+        <FruitsVegetablesScreen
+          onBack={() => setScreen('home')}
+          onSearchPress={() => setScreen('search')}
+          onMenuPress={() => {
+            setMenuReturnTo('fruits');
+            setMenuCategoryId('fruits-vegetables');
+            setMenuSubCategoryId('fruits');
+            setScreen('menu');
+          }}
+          onProductPress={(product: FruitProduct) =>
+            openProduct('fruits', {
+              id: product.id,
+              title: product.name,
+              category: 'Fruits & Vegetables',
+              price: product.price,
+              description:
+                'Fresh sweet melon, juicy and ripe. Perfect for everyday snacking.',
+              image: product.image,
+            })
+          }
+          onAddProduct={() => setCartCount((c) => c + 1)}
+        />
+      ) : screen === 'menu' ? (
+        <MenuScreen
+          activeCategoryId={menuCategoryId}
+          activeSubCategoryId={menuSubCategoryId}
+          onBack={() => setScreen(menuReturnTo)}
+          onCategoryPress={(category) => {
+            setMenuCategoryId(category.id);
+            if (category.id === 'dairy') {
+              setScreen('dairy');
+            } else if (category.id === 'fruits-vegetables') {
+              setScreen('fruits');
+            }
+          }}
+          onSubCategoryPress={(category, sub) => {
+            setMenuCategoryId(category.id);
+            setMenuSubCategoryId(sub.id);
+            if (category.id === 'dairy') {
+              setScreen('dairy');
+            } else if (category.id === 'fruits-vegetables') {
+              setScreen('fruits');
+            } else {
+              setScreen('search');
+            }
+          }}
+          onBrandPress={(brand) => {
+            openBrand('menu', brand);
+          }}
+        />
+      ) : screen === 'brand' ? (
+        <BrandScreen
+          brandName={selectedBrand.label}
+          products={
+            selectedBrand.id === 'maliban' ? MALIBAN_PRODUCTS : MALIBAN_PRODUCTS
+          }
+          onBack={() => setScreen(brandReturnTo)}
+          onMenuPress={() => {
+            setMenuReturnTo('brand');
+            setScreen('menu');
+          }}
+          onSearchPress={() => setScreen('search')}
+          onProductPress={(product: BrandProduct) =>
+            openProduct('brand', {
+              id: product.id,
+              title: product.name,
+              category: selectedBrand.label,
+              price: product.price,
+              description: product.description,
+              image: product.image,
             })
           }
           onAddProduct={() => setCartCount((c) => c + 1)}
@@ -285,16 +501,30 @@ export default function App() {
         />
       ) : screen === 'cart' ? (
         <CartScreen
+          address={deliveryAddress}
           onBack={() => setScreen(cartReturnTo)}
           onChangeAddress={() => {
-            setAddressReturnTo('cart');
-            setScreen('address');
+            setAddressFlow('change');
+            setScreen('addressSelect');
           }}
-          onProceed={() => {}}
+          onProceed={() => setScreen('payment')}
           onTabPress={(tab) => {
             if (tab === 'home') setScreen('home');
             if (tab === 'cart') setScreen('cart');
           }}
+        />
+      ) : screen === 'payment' ? (
+        <PaymentScreen
+          subtotal={cartSubtotal}
+          onBack={() => setScreen('cart')}
+          onPay={() => setScreen('invoice')}
+        />
+      ) : screen === 'invoice' ? (
+        <InvoiceScreen
+          deliveryLocation={deliveryAddress}
+          subtotal={cartSubtotal}
+          onBack={() => setScreen('home')}
+          onDownload={() => setScreen('home')}
         />
       ) : (
         <RegisterScreen

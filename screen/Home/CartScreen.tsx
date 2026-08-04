@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   },
   itemRow: {
     width: '100%',
-    minHeight: 100,
+    minHeight: 90,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: COLORS.border,

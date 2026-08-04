@@ -9,6 +9,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Logo from './Logo';
 
 const COLORS = {
   primary: '#10B981',
@@ -27,17 +28,6 @@ type HeaderProps = {
   titleColor?: string;
   style?: ViewStyle;
 };
-
-function LogoPill() {
-  return (
-    <View style={styles.logoPill}>
-      <View style={styles.logoIcon}>
-        <Ionicons name="cart-outline" size={18} color={COLORS.white} />
-      </View>
-      <Text style={styles.logoText}>HappyCart</Text>
-    </View>
-  );
-}
 
 export default function Header({
   title,
@@ -65,7 +55,7 @@ export default function Header({
       <View style={styles.row}>
         {showLogo && !showBack && !left && !right && !title ? (
           <View style={styles.logoOnly}>
-            <LogoPill />
+            <Logo height={36} />
           </View>
         ) : (
           <>
@@ -87,7 +77,7 @@ export default function Header({
 
             <View style={styles.center}>
               {showLogo ? (
-                <LogoPill />
+                <Logo height={36} />
               ) : title ? (
                 <Text
                   style={[styles.title, { color: titleColor }]}
@@ -111,8 +101,8 @@ export default function Header({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    paddingHorizontal: 20,
-    paddingBottom: 16,
+    paddingHorizontal: '4.5%',
+    paddingBottom: '3.5%',
   },
   row: {
     flexDirection: 'row',
@@ -120,7 +110,9 @@ const styles = StyleSheet.create({
     minHeight: 40,
   },
   side: {
-    width: 40,
+    width: '9%',
+    minWidth: 36,
+    maxWidth: 44,
     alignItems: 'flex-start',
     justifyContent: 'center',
   },
@@ -128,8 +120,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   sideSpacer: {
-    width: 24,
-    height: 24,
+    width: '100%',
+    aspectRatio: 1,
   },
   center: {
     flex: 1,
@@ -142,14 +134,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   iconButton: {
-    width: 32,
-    height: 32,
+    width: '100%',
+    aspectRatio: 1,
+    maxWidth: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
   backButton: {
-    width: 32,
-    height: 32,
+    width: '100%',
+    aspectRatio: 1,
+    maxWidth: 36,
     borderRadius: 16,
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
     alignItems: 'center',
@@ -159,27 +153,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  logoPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    padding: 10,
-    borderRadius: 100,
-    backgroundColor: COLORS.white,
-  },
-  logoIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoText: {
-    fontSize: 16,
-    fontWeight: '700',
-    fontStyle: 'italic',
-    color: COLORS.primary,
   },
 });

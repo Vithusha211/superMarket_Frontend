@@ -88,9 +88,8 @@ const styles = StyleSheet.create({
     borderRadius: 9999,
   },
   md: {
-    height: 51,
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
   },
   sm: {
     height: 41,

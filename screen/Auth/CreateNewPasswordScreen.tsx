@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
   },
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     paddingTop: 28,
     gap: 24,
   },
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    paddingHorizontal: 20,
+    paddingHorizontal: '4.5%',
     paddingTop: 12,
     backgroundColor: COLORS.white,
   },
