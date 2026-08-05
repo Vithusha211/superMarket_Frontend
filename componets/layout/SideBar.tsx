@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
+  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -12,14 +13,14 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const COLORS = {
-  primary: '#07C187',
-  activeBg: '#E0F7EF',
-  white: '#FFFFFF',
-  text: '#111827',
-  muted: '#9CA3AF',
-  border: '#E5E7EB',
-  backBg: '#F3F4F6',
-  overlay: 'rgba(0, 0, 0, 0.35)',
+  primary: 'rgba(7, 193, 135, 1)',
+  activeBg: 'rgba(224, 247, 239, 1)',
+  white: 'rgba(255, 255, 255, 1)',
+  text: 'rgba(0, 0, 0, 1)',
+  muted: 'rgba(114, 130, 138, 1)',
+  border: 'rgba(229, 231, 235, 1)',
+  backBg: 'rgba(243, 244, 246, 1)',
+  overlayLight: 'rgba(0, 0, 0, 0.35)',
 };
 
 export type SideBarSubCategory = {
@@ -158,7 +159,11 @@ function SideBarContent({
         style={styles.backButton}
         hitSlop={8}
       >
-        <Ionicons name="chevron-back" size={20} color={COLORS.text} />
+        <Image
+          source={require('../../assets/back-icon.png')}
+          style={styles.backIcon}
+          resizeMode="contain"
+        />
       </Pressable>
 
       <ScrollView
@@ -341,7 +346,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: COLORS.overlay,
+    backgroundColor: COLORS.overlayLight,
   },
   container: {
     width: '48.5%',
@@ -362,6 +367,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: '7%',
     marginBottom: '6%',
+  },
+  backIcon: {
+    width: 20,
+    height: 20,
   },
   scrollContent: {
     paddingBottom: '6.5%',

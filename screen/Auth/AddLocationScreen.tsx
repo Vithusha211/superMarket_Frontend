@@ -17,14 +17,14 @@ import Header from '../../componets/layout/Header';
 import InputField from '../../componets/layout/InputField';
 
 const COLORS = {
-  primary: '#07C187',
-  white: '#FFFFFF',
-  text: '#111827',
-  muted: '#9CA3AF',
-  border: '#E5E7EB',
-  inputBg: '#F2F2F3',
-  mapBg: '#E8F5F0',
-  mapRoad: '#FFFFFF',
+  primary: 'rgba(7, 193, 135, 1)',
+  white: 'rgba(255, 255, 255, 1)',
+  text: 'rgba(0, 0, 0, 1)',
+  muted: 'rgba(114, 130, 138, 1)',
+  border: 'rgba(229, 231, 235, 1)',
+  inputBg: 'rgba(242, 242, 243, 1)',
+  mapBg: 'rgba(232, 245, 240, 1)',
+  mapRoad: 'rgba(255, 255, 255, 1)',
   overlay: 'rgba(0, 0, 0, 0.45)',
 };
 
@@ -163,6 +163,7 @@ export default function AddLocationScreen({
                 placeholder="Select"
                 value={label}
                 onPress={openLabelSheet}
+                rightImage={require('../../assets/label-select.png')}
               />
 
               <InputField
@@ -297,23 +298,22 @@ export default function AddLocationScreen({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.primary,
   },
   body: {
     flex: 1,
-    backgroundColor: COLORS.white,
   },
   sheet: {
     flex: 1,
     backgroundColor: COLORS.white,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
+    overflow: 'hidden',
   },
   scrollContent: {
     paddingHorizontal: '4.5%',
     paddingTop: 20,
     gap: 20,
-    flexGrow: 1,
   },
   mapWrap: {
     width: '100%',

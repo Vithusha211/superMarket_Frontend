@@ -284,7 +284,7 @@ export default function App() {
       ) : screen === 'home' ? (
         <HomeScreen
           countryFlag={selectedCountry.flag}
-          onSearchPress={() => setScreen('brands')}
+          onSearchPress={() => setScreen('search')}
           onCategoriesSeeAll={() => setScreen('categories')}
           onBrandsSeeAll={() => setScreen('brands')}
           onOffersSeeAll={() => setScreen('dairy')}

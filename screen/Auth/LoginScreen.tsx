@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
@@ -20,14 +19,13 @@ import Logo from '../../componets/layout/Logo';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
-  white: '#FFFFFF',
-  text: '#111827',
-  muted: '#727878',
+  white: 'rgba(255, 255, 255, 1)',
+  text: 'rgba(0, 0, 0, 1)',
+  muted: 'rgba(114, 130, 138, 1)',
   link: 'rgba(7, 193, 135, 1)',
-  socialBg: '#F2F2F3',
-  border: '#E5E7EB',
-  checkboxBorder: '#D1D5DB',
-  overlay: 'rgba(0, 0, 0, 0.45)',
+  socialBg: 'rgba(255, 255, 255, 1)',
+  border: 'rgba(229, 231, 235, 1)',
+  overlay: 'rgba(114, 130, 138, 1)',
 };
 
 type SocialProvider = 'google' | 'apple' | 'facebook' | 'instagram';
@@ -41,7 +39,6 @@ type LoginScreenProps = {
   onContinue?: (data: {
     email: string;
     password: string;
-    rememberMe: boolean;
   }) => void;
   onForgotPassword?: (email: string) => void;
   onSignUp?: () => void;
@@ -86,7 +83,6 @@ export default function LoginScreen({
   const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);
   const [showForgotPopup, setShowForgotPopup] = useState(false);
@@ -141,7 +137,6 @@ export default function LoginScreen({
     onContinue?.({
       email: email.trim(),
       password,
-      rememberMe,
     });
   };
 
@@ -217,29 +212,6 @@ export default function LoginScreen({
               />
 
               <View style={styles.optionsRow}>
-                <Pressable
-                  accessibilityRole="checkbox"
-                  accessibilityState={{ checked: rememberMe }}
-                  onPress={() => setRememberMe((prev) => !prev)}
-                  style={styles.rememberRow}
-                >
-                  <View
-                    style={[
-                      styles.checkbox,
-                      rememberMe && styles.checkboxChecked,
-                    ]}
-                  >
-                    {rememberMe ? (
-                      <Ionicons
-                        name="checkmark"
-                        size={12}
-                        color={COLORS.white}
-                      />
-                    ) : null}
-                  </View>
-                  <Text style={styles.rememberText}>Remember me</Text>
-                </Pressable>
-
                 <Pressable onPress={openForgotPopup} hitSlop={8}>
                   <Text style={styles.forgotText}>Forgot password?</Text>
                 </Pressable>
@@ -377,6 +349,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 30,
     marginTop: 30,
+    marginBottom: 30,
     marginLeft:20,
     marginRight:20,
   },
@@ -391,31 +364,8 @@ const styles = StyleSheet.create({
   optionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     marginTop: -4,
-  },
-  rememberRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  checkbox: {
-    width: 18,
-    height: 18,
-    borderRadius: 4,
-    borderWidth: 1.5,
-    borderColor: COLORS.checkboxBorder,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.white,
-  },
-  checkboxChecked: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
-  },
-  rememberText: {
-    fontSize: 14,
-    color: COLORS.text,
   },
   forgotText: {
     fontSize: 14,
@@ -423,7 +373,7 @@ const styles = StyleSheet.create({
     color: COLORS.link,
   },
   continueButton: {
-    height: 52,
+    paddingVertical: 14,
     backgroundColor: COLORS.primary,
     marginTop: 4,
   },
@@ -507,7 +457,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   popupButton: {
-    height: 52,
+    paddingVertical: 52,
     backgroundColor: COLORS.primary,
     marginTop: 4,
   },

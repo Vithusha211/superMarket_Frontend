@@ -10,15 +10,14 @@ import {
 import Button from './Button';
 
 const COLORS = {
-  primary: '#10B981',
-  white: '#FFFFFF',
-  text: '#111827',
-  muted: '#6B7280',
-  border: '#076780',
+  primary: 'rgba(7, 193, 135, 1)',
+  white: 'rgba(255, 255, 255, 1)',
+  text: 'rgba(0, 0, 0, 1)',
+  muted: 'rgba(114, 130, 138, 1)',
   overlay: 'rgba(0, 0, 0, 0.45)',
-  noBg: '#F2F2F3',
-  yesBg: '#FF0000',
-  icon: '#076780',
+  noBg: 'rgba(242, 242, 243, 1)',
+  yesBg: 'rgba(255, 0, 0, 1)',
+  icon: 'rgba(7, 103, 128, 1)',
 };
 
 export type PopupVariant = 'confirm' | 'status' | 'action';
@@ -128,7 +127,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.icon,
     padding: '4.5%',
     gap: 16,
     alignItems: 'center',

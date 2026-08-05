@@ -15,13 +15,13 @@ import Button from '../../componets/layout/Button';
 import Header from '../../componets/layout/Header';
 
 const COLORS = {
-  primary: '#07C187',
-  white: '#FFFFFF',
-  text: '#111827',
-  muted: '#9CA3AF',
-  border: '#E5E7EB',
-  pin: '#EF4444',
-  searchBg: '#FFFFFF',
+  primary: 'rgba(7, 193, 135, 1)',
+  white: 'rgba(255, 255, 255, 1)',
+  text: 'rgba(13, 13, 13, 1)',
+  muted: 'rgba(114, 130, 138, 1)',
+  border: 'rgba(229, 231, 235, 1)',
+  pin: 'rgba(236, 28, 36, 1)',
+  searchBg: 'rgba(255, 255, 255, 1)',
 };
 
 const PREVIOUS_ADDRESS = 'Jaffna, Uduvil east, St 123';
@@ -59,8 +59,6 @@ export default function EnterLocationScreen({
     <View style={styles.screen}>
       <Header
         title="Enter your location"
-        showBack
-        onBack={onBack}
         backgroundColor={COLORS.primary}
       />
 
@@ -147,6 +145,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: COLORS.primary,
+    gap: 15,
   },
   flex: {
     flex: 1,

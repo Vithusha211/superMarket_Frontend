@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
+  Image,
+  ImageSourcePropType,
   Pressable,
   StyleSheet,
   Text,
@@ -11,14 +13,14 @@ import {
 } from 'react-native';
 
 const COLORS = {
-  primary: '#10B981',
-  inputBg: '#F2F2F3',
-  label: '#111827',
-  placeholder: '#9CA3AF',
-  text: '#111827',
-  border: '#3B82F6',
-  divider: '#D1D5DB',
-  error: '#EF4444',
+  primary: 'rgba(7, 193, 135, 1)',
+  inputBg: 'rgba(242, 242, 243, 1)',
+  label: 'rgba(17, 24, 39, 1)',
+  placeholder: 'rgba(156, 163, 175, 1)',
+  text: 'rgba(0, 0, 0, 1)',
+  inputFocus: 'rgba(59, 130, 246, 1)',
+  divider: 'rgba(209, 213, 219, 1)',
+  error: 'rgba(239, 68, 68, 1)',
 };
 
 export type InputFieldVariant =
@@ -39,6 +41,7 @@ type InputFieldProps = {
   onCountryPress?: () => void;
   onRightIconPress?: () => void;
   rightIcon?: keyof typeof Ionicons.glyphMap;
+  rightImage?: ImageSourcePropType;
   countryFlag?: string;
   countryCode?: string;
   error?: string;
@@ -58,6 +61,7 @@ export default function InputField({
   onCountryPress,
   onRightIconPress,
   rightIcon,
+  rightImage,
   countryFlag = '🇩🇪',
   countryCode = '+49',
   error,
@@ -83,9 +87,52 @@ export default function InputField({
 
   const resolvedRightIcon =
     rightIcon ??
-    (isSelect ? 'qr-code-outline' : undefined);
+    (isSelect ? 'chevron-down' : undefined);
 
-  const inputContent = (
+  const inputContent = isPhone ? (
+    <View style={styles.phoneRow}>
+      <Pressable
+        style={[
+          styles.phonePrefix,
+          isFocused && !error && styles.phonePrefixFocused,
+          !!error && styles.phonePrefixError,
+        ]}
+        onPress={onCountryPress}
+        hitSlop={6}
+        accessibilityRole="button"
+        accessibilityLabel="Select country code"
+      >
+        <Text style={styles.flagText}>{countryFlag}</Text>
+      </Pressable>
+
+      <View
+        style={[
+          styles.phoneInputContainer,
+          isFocused && !error && styles.inputFocused,
+          !!error && styles.inputError,
+        ]}
+      >
+        <TextInput
+          style={styles.phoneInput}
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor={COLORS.placeholder}
+          keyboardType={keyboardType}
+          editable={editable}
+          onFocus={(event) => {
+            setIsFocused(true);
+            textInputProps.onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setIsFocused(false);
+            textInputProps.onBlur?.(event);
+          }}
+          {...textInputProps}
+        />
+      </View>
+    </View>
+  ) : (
     <View
       style={[
         styles.inputContainer,
@@ -94,20 +141,6 @@ export default function InputField({
         !!error && styles.inputError,
       ]}
     >
-      {isPhone && (
-        <>
-          <Pressable
-            style={styles.phonePrefix}
-            onPress={onCountryPress}
-            hitSlop={6}
-          >
-            <Text style={styles.flagText}>{countryFlag}</Text>
-            <Ionicons name="chevron-down" size={14} color={COLORS.placeholder} />
-          </Pressable>
-          <View style={styles.divider} />
-        </>
-      )}
-
       {isSelect ? (
         <Pressable
           style={styles.selectContent}
@@ -162,17 +195,25 @@ export default function InputField({
         </Pressable>
       )}
 
-      {resolvedRightIcon && !isPassword && (
+      {(rightImage || resolvedRightIcon) && !isPassword && (
         <Pressable
           onPress={onRightIconPress ?? onPress}
           hitSlop={8}
           disabled={!onRightIconPress && !onPress}
         >
-          <Ionicons
-            name={resolvedRightIcon}
-            size={20}
-            color={COLORS.primary}
-          />
+          {rightImage ? (
+            <Image
+              source={rightImage}
+              style={styles.rightImage}
+              resizeMode="contain"
+            />
+          ) : (
+            <Ionicons
+              name={resolvedRightIcon!}
+              size={20}
+              color={COLORS.primary}
+            />
+          )}
         </Pressable>
       )}
     </View>
@@ -201,21 +242,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    minHeight: 51,
+    height: 51,
     width: '100%',
-    paddingHorizontal: '4.5%',
-    paddingVertical: 10,
+    paddingHorizontal: 16,
     borderRadius: 8,
     backgroundColor: COLORS.inputBg,
     borderWidth: 1,
     borderColor: 'transparent',
   },
   textareaContainer: {
+    height: undefined,
     minHeight: 87,
+    paddingVertical: 10,
     alignItems: 'flex-start',
   },
   inputFocused: {
-    borderColor: COLORS.border,
+    borderColor: COLORS.inputFocus,
   },
   inputError: {
     borderColor: COLORS.error,
@@ -226,16 +268,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.text,
     padding: 0,
-    height: '100%',
   },
   textareaInput: {
-    height: '100%',
+    flex: 1,
     textAlignVertical: 'top',
   },
   selectContent: {
     flex: 1,
     justifyContent: 'center',
-    height: '100%',
   },
   inputText: {
     fontSize: 14,
@@ -244,18 +284,54 @@ const styles = StyleSheet.create({
   placeholderText: {
     color: COLORS.placeholder,
   },
-  phonePrefix: {
+  rightImage: {
+    width: 20,
+    height: 20,
+  },
+  phoneRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 8,
+    width: '100%',
+  },
+  phonePrefix: {
+    width: 58,
+    height: 51,
+    borderRadius: 8,
+    backgroundColor: COLORS.inputBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  phonePrefixFocused: {
+    borderColor: COLORS.inputFocus,
+  },
+  phonePrefixError: {
+    borderColor: COLORS.error,
+    borderWidth: 1.5,
+  },
+  phoneInputContainer: {
+    flex: 1,
+    height: 51,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: COLORS.inputBg,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  phoneInput: {
+    flex: 1,
+    fontSize: 14,
+    color: COLORS.text,
+    padding: 0,
+    height: '100%',
   },
   flagText: {
-    fontSize: 18,
-  },
-  divider: {
-    width: 1,
-    height: 24,
-    backgroundColor: COLORS.divider,
+    fontSize: 22,
+    lineHeight: 26,
   },
   errorText: {
     fontSize: 12,
