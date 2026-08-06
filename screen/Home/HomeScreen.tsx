@@ -8,7 +8,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -149,7 +148,6 @@ export default function HomeScreen({
   onTabPress,
 }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
-  const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState<FooterTab>('home');
 
   const handleTabPress = (tab: FooterTab) => {
@@ -185,17 +183,14 @@ export default function HomeScreen({
           </View>
         </View>
 
-        <Pressable style={styles.searchBar} onPress={onSearchPress}>
+        <Pressable
+          style={styles.searchBar}
+          onPress={onSearchPress}
+          accessibilityRole="button"
+          accessibilityLabel="Search"
+        >
           <Ionicons name="search" size={18} color={COLORS.muted} />
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Search"
-            placeholderTextColor={COLORS.muted}
-            style={styles.searchInput}
-            onFocus={onSearchPress}
-            editable={!onSearchPress}
-          />
+          <Text style={styles.searchPlaceholder}>Search</Text>
         </Pressable>
       </View>
 
@@ -219,7 +214,11 @@ export default function HomeScreen({
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Shop by Categories</Text>
             <Pressable onPress={onCategoriesSeeAll} hitSlop={8}>
-              <Text style={styles.seeAll}>See all</Text>
+              <Image
+                source={require('../../assets/home/see-all.png')}
+                style={styles.seeAllIcon}
+                resizeMode="contain"
+              />
             </Pressable>
           </View>
           <ScrollView
@@ -233,14 +232,16 @@ export default function HomeScreen({
                 style={styles.categoryItem}
                 onPress={() => onCategoryPress?.(item.id)}
               >
-                <View style={styles.categoryCircle}>
+                <View style={styles.categoryBox}>
                   <Image
                     source={item.image}
                     style={styles.categoryImage}
-                    resizeMode="contain"
+                    resizeMode="cover"
                   />
                 </View>
-                <Text style={styles.categoryLabel}>{item.label}</Text>
+                <Text style={styles.categoryLabel} numberOfLines={2}>
+                  {item.label}
+                </Text>
               </Pressable>
             ))}
           </ScrollView>
@@ -250,7 +251,11 @@ export default function HomeScreen({
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Shop by Brands</Text>
             <Pressable onPress={onBrandsSeeAll} hitSlop={8}>
-              <Text style={styles.seeAll}>See all</Text>
+              <Image
+                source={require('../../assets/home/see-all.png')}
+                style={styles.seeAllIcon}
+                resizeMode="contain"
+              />
             </Pressable>
           </View>
           <ScrollView
@@ -264,7 +269,7 @@ export default function HomeScreen({
                 style={styles.brandItem}
                 onPress={() => onBrandPress?.(item.id)}
               >
-                <View style={styles.brandCircle}>
+                <View style={styles.brandBox}>
                   <Image
                     source={item.image}
                     style={styles.brandImage}
@@ -283,7 +288,11 @@ export default function HomeScreen({
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Best Offers</Text>
             <Pressable onPress={onOffersSeeAll} hitSlop={8}>
-              <Text style={styles.seeAll}>See all</Text>
+              <Image
+                source={require('../../assets/home/see-all.png')}
+                style={styles.seeAllIcon}
+                resizeMode="contain"
+              />
             </Pressable>
           </View>
           <ScrollView
@@ -384,19 +393,18 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     width: '100%',
-    minHeight: 48,
-    borderRadius: 12,
+    height: 51,
+    borderRadius: 8,
     backgroundColor: COLORS.searchBg,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingHorizontal: '3.5%',
+    paddingHorizontal: 16,
   },
-  searchInput: {
+  searchPlaceholder: {
     flex: 1,
     fontSize: 15,
-    color: COLORS.text,
-    paddingVertical: 0,
+    color: COLORS.muted,
   },
   sheet: {
     flex: 1,
@@ -429,39 +437,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: '4.5%',
+    paddingHorizontal: 8,
     marginBottom: 4,
   },
-  seeAll: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.primary,
+  seeAllIcon: {
+    width: 21,
+    height: 21,
   },
   hList: {
-    paddingHorizontal: '4.5%',
+    paddingHorizontal: 8,
     gap: 8,
   },
   categoryItem: {
-    width: '24%',
-    minWidth: 88,
-    maxWidth: 120,
+    width: 126,
     alignItems: 'center',
-    gap: 8,
+    gap: 4,
   },
-  categoryCircle: {
-    width: '100%',
-    aspectRatio: 1,
-    borderRadius: 999,
+  categoryBox: {
+    width: 126,
+    height: 100,
+    borderRadius: 12,
     backgroundColor: COLORS.white,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
     overflow: 'hidden',
   },
   categoryImage: {
-    width: '85%',
-    height: '85%',
+    width: '100%',
+    height: '100%',
   },
   categoryLabel: {
     fontSize: 12,
@@ -469,23 +470,22 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     textAlign: 'center',
     lineHeight: 16,
+    width: '100%',
   },
   brandItem: {
-    width: '24%',
-    minWidth: 88,
-    maxWidth: 120,
+    width: 126,
     alignItems: 'center',
     gap: 4,
   },
-  brandCircle: {
-    width: '68%',
-    aspectRatio: 1,
-    borderRadius: 999,
-    backgroundColor: COLORS.brandCircle,
+  brandBox: {
+    width: 126,
+    height: 100,
+    borderRadius: 12,
+    backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-    padding: '8%',
+    padding: 12,
   },
   brandImage: {
     width: '100%',
@@ -498,9 +498,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   offerCard: {
-    width: '36%',
-    minWidth: 140,
-    maxWidth: 180,
+    width: 126,
   },
   footerWrap: {
     position: 'absolute',

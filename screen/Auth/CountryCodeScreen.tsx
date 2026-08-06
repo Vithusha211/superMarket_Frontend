@@ -11,12 +11,12 @@ import Button from '../../componets/layout/Button';
 import Header from '../../componets/layout/Header';
 
 const COLORS = {
-  primary: '#07C187',
-  white: '#FFFFFF',
-  text: '#111827',
-  muted: '#9CA3AF',
-  border: '#E5E7EB',
-  selectedBg: '#F0FDF8',
+  primary: 'rgba(7, 193, 135, 1)',
+  white: 'rgba(255, 255, 255, 1)',
+  text: 'rgba(0, 0, 0, 1)',
+  muted: 'rgba(114, 130, 138, 1)',
+  border: 'rgba(114, 130, 138, 1)',
+  selectedBg: 'rgba(255, 255, 255, 1)',
 };
 
 export type CountryCodeOption = {
@@ -59,6 +59,7 @@ export default function CountryCodeScreen({
       <Header
         title="Select country code"
         showBack
+        titleAlign="left"
         onBack={onBack}
         backgroundColor={COLORS.primary}
       />
@@ -142,7 +143,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.white,
     backgroundColor: COLORS.white,
     gap: 10,
   },
@@ -175,18 +176,18 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   flag: {
-    fontSize: 22,
+    fontSize: 12,
   },
   label: {
-    fontSize: 15,
+    fontSize: 12,
     fontWeight: '500',
     color: COLORS.text,
     flexShrink: 1,
   },
   code: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
-    color: COLORS.muted,
+    color: COLORS.text,
   },
   footer: {
     paddingHorizontal: '4.5%',
@@ -194,7 +195,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   saveButton: {
-    height: 52,
+    paddingVertical: 14,
     backgroundColor: COLORS.primary,
   },
   saveText: {

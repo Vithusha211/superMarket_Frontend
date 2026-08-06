@@ -8,10 +8,10 @@ import {
 } from 'react-native';
 
 const COLORS = {
-  primary: '#10B981',
-  white: '#FFFFFF',
-  inactive: '#9CA3AF',
-  border: '#E5E7EB',
+  primary: 'rgba(7, 193, 135, 1)',
+  white: 'rgba(255, 255, 255, 1)',
+  inactive: 'rgba(156, 163, 175, 1)',
+  border: 'rgba(229, 231, 235, 1)',
 };
 
 export type FooterTab = 'home' | 'orders' | 'cart' | 'profile';
@@ -19,6 +19,7 @@ export type FooterTab = 'home' | 'orders' | 'cart' | 'profile';
 type TabConfig = {
   key: FooterTab;
   icon: ImageSourcePropType;
+  activeIcon?: ImageSourcePropType;
   label: string;
 };
 
@@ -26,21 +27,25 @@ const TABS: TabConfig[] = [
   {
     key: 'home',
     icon: require('../../assets/footer/home.png'),
+    activeIcon: require('../../assets/footer/home-active.png'),
     label: 'Home',
-  },
-  {
-    key: 'orders',
-    icon: require('../../assets/footer/orders.png'),
-    label: 'Orders',
   },
   {
     key: 'cart',
     icon: require('../../assets/footer/cart.png'),
+    activeIcon: require('../../assets/footer/cart-active.png'),
     label: 'Cart',
+  },
+  {
+    key: 'orders',
+    icon: require('../../assets/footer/orders.png'),
+    activeIcon: require('../../assets/footer/orders-active.png'),
+    label: 'Orders',
   },
   {
     key: 'profile',
     icon: require('../../assets/footer/profile.png'),
+    activeIcon: require('../../assets/footer/profile-active.png'),
     label: 'Profile',
   },
 ];
@@ -56,6 +61,7 @@ export default function Footer({ activeTab, onTabPress, style }: FooterProps) {
     <View style={[styles.container, style]}>
       {TABS.map((tab) => {
         const isActive = activeTab === tab.key;
+        const useFilledActive = isActive && !!tab.activeIcon;
 
         return (
           <Pressable
@@ -66,12 +72,14 @@ export default function Footer({ activeTab, onTabPress, style }: FooterProps) {
             onPress={() => onTabPress(tab.key)}
             style={styles.tab}
           >
-            <View style={[styles.iconWrap, isActive && styles.iconWrapActive]}>
+            <View style={styles.iconWrap}>
               <Image
-                source={tab.icon}
+                source={useFilledActive ? tab.activeIcon! : tab.icon}
                 style={[
                   styles.icon,
-                  { tintColor: isActive ? COLORS.white : COLORS.inactive },
+                  !useFilledActive && {
+                    tintColor: isActive ? COLORS.primary : COLORS.inactive,
+                  },
                 ]}
                 resizeMode="contain"
               />
@@ -90,11 +98,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     minHeight: 68,
-    paddingTop: '4.5%',
-    paddingBottom: '4.5%',
+    paddingTop: 16,
+    paddingBottom: 16,
     paddingLeft: '6.8%',
     paddingRight: '7%',
     backgroundColor: COLORS.white,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
   },
@@ -107,12 +117,6 @@ const styles = StyleSheet.create({
     height: 28,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  iconWrapActive: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: COLORS.primary,
   },
   icon: {
     width: '100%',

@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useMemo, useRef, useState } from 'react';
 import {
   FlatList,
+  Image,
   ImageSourcePropType,
   KeyboardAvoidingView,
   Platform,
@@ -197,7 +198,11 @@ export default function SearchScreen({
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
         <View style={styles.searchRow}>
           <Pressable style={styles.backChip} onPress={onBack} hitSlop={8}>
-            <Ionicons name="chevron-back" size={20} color={COLORS.white} />
+            <Image
+              source={require('../../assets/back-icon.png')}
+              style={styles.backIcon}
+              resizeMode="contain"
+            />
           </Pressable>
 
           <View style={styles.searchBar}>
@@ -365,6 +370,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.25)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  backIcon: {
+    width: 20,
+    height: 20,
   },
   searchBar: {
     flex: 1,

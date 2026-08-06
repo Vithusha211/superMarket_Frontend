@@ -13,13 +13,13 @@ import Button from '../../componets/layout/Button';
 import Header from '../../componets/layout/Header';
 
 const COLORS = {
-  primary: '#07C187',
-  white: '#FFFFFF',
-  text: '#111827',
-  muted: '#9CA3AF',
-  border: '#E5E7EB',
-  bannerBg: '#E8F8F2',
-  link: '#07C187',
+  primary: 'rgba(7, 193, 135, 1)',
+  white: 'rgba(255, 255, 255, 1)',
+  text: 'rgba(13, 13, 13, 1)',
+  muted: 'rgba(114, 130, 138, 1)',
+  border: 'rgba(255, 255, 255, 1)',
+  bannerBg: 'rgba(255, 255, 255, 1)',
+  link: 'rgba(7, 193, 135, 1)',
 };
 
 export type SavedAddress = {

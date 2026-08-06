@@ -13,16 +13,15 @@ import Button from '../../componets/layout/Button';
 import Header from '../../componets/layout/Header';
 
 const COLORS = {
-  primary: '#07C187',
-  white: '#FFFFFF',
-  text: '#0D0D0D',
-  muted: '#72828A',
-  timer: '#F97316',
-  inputBg: '#F2F2F3',
-  inputBorder: '#E5E7EB',
-  disabled: '#72828A',
+  primary: 'rgba(7, 193, 135, 1)',
+  white: 'rgba(255, 255, 255, 1)',
+  text: 'rgba(13, 13, 13, 1)',
+  muted: 'rgba(114, 130, 138, 1)',
+  inputBg: 'rgba(242, 242, 243, 1)',
+  inputBorder: 'rgba(229, 231, 235, 1)',
+  disabled: 'rgba(114, 130, 138, 1)',
 };
-
+ 
 const OTP_LENGTH = 6;
 const DEFAULT_SECONDS = 179;
 
@@ -137,12 +136,12 @@ export default function OTPScreen({
         backgroundColor={COLORS.primary}
       />
 
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={insets.top + 56}
-      >
-        <View style={styles.sheet}>
+      <View style={styles.sheet}>
+        <KeyboardAvoidingView
+          style={styles.flex}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={insets.top + 56}
+        >
           <View style={styles.content}>
             <Text style={styles.title}>Enter your OTP number</Text>
             <Text style={styles.subtitle}>
@@ -221,8 +220,8 @@ export default function OTPScreen({
               textStyle={styles.verifyText}
             />
           </View>
-        </View>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </View>
     </View>
   );
 }
@@ -234,23 +233,26 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
+    justifyContent: 'space-between',
   },
   sheet: {
     flex: 1,
+    width: '100%',
     backgroundColor: COLORS.white,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    justifyContent: 'space-between',
+    overflow: 'hidden',
   },
   content: {
     paddingHorizontal: '4.5%',
-    paddingTop: 28,
+    paddingTop: 20,
     gap: 12,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '500',
     color: COLORS.text,
+    gap:16,
   },
   subtitle: {
     fontSize: 14,
@@ -284,10 +286,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.text,
     letterSpacing: 0.3,
+    gap:8,
   },
   timerValue: {
     fontWeight: '500',
-    color: COLORS.timer,
+    color: COLORS.text,
   },
   timerExpired: {
     color: COLORS.muted,

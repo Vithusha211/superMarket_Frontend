@@ -12,9 +12,9 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const COLORS = {
-  primary: '#07C187',
-  white: '#FFFFFF',
-  badge: '#EF4444',
+  primary: 'rgba(7, 193, 135, 1)',
+  white: 'rgba(255, 255, 255, 1)',
+  badge: 'rgba(239, 68, 68, 1)',
 };
 
 const CART_ICON = require('../../assets/footer/floating-cart.png');

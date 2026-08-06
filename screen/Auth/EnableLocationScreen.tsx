@@ -1,6 +1,5 @@
 import {
   Image,
-  Pressable,
   StyleSheet,
   Text,
   View,
@@ -10,10 +9,10 @@ import Button from '../../componets/layout/Button';
 import Header from '../../componets/layout/Header';
 
 const COLORS = {
-  primary: '#07C187',
-  white: '#FFFFFF',
-  text: '#111827',
-  muted: '#9CA3AF',
+  primary: 'rgba(7, 193, 135, 1)',
+  white: 'rgba(255, 255, 255, 1)',
+  text: 'rgba(13, 13, 13, 1)',
+  muted: 'rgba(114, 130, 138, 1)',
 };
 
 type EnableLocationScreenProps = {
@@ -66,12 +65,16 @@ export default function EnableLocationScreen({
             title="Allow Google Maps"
             onPress={onAllowMaps}
             containerStyle={styles.primaryButton}
-            textStyle={styles.primaryButtonText}
+            textStyle={styles.buttonText}
           />
 
-          <Pressable onPress={onSetManually} hitSlop={8}>
-            <Text style={styles.manualText}>Set Manually</Text>
-          </Pressable>
+          <Button
+            title="Set Manually"
+            variant="outline"
+            onPress={onSetManually}
+            containerStyle={styles.outlineButton}
+            textStyle={styles.buttonText}
+          />
         </View>
       </View>
     </View>
@@ -82,6 +85,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: COLORS.primary,
+    gap:15,
   },
   sheet: {
     flex: 1,
@@ -95,7 +99,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 28,
+    gap: 20,
     paddingTop: 24,
   },
   illustration: {
@@ -111,11 +115,10 @@ const styles = StyleSheet.create({
   },
   copy: {
     alignItems: 'center',
-    gap: 10,
     paddingHorizontal: 12,
   },
   title: {
-    fontSize: 22,
+    fontSize: 16,
     fontWeight: '700',
     color: COLORS.text,
     textAlign: 'center',
@@ -127,23 +130,25 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   actions: {
-    gap: 14,
-    alignItems: 'center',
+    gap: 20,
+    width: '100%',
     paddingTop: 12,
   },
   primaryButton: {
     width: '100%',
-    height: 52,
+    paddingVertical: 14,
     backgroundColor: COLORS.primary,
   },
-  primaryButtonText: {
+  outlineButton: {
+    width: '100%',
+    paddingVertical: 14,
+    backgroundColor: COLORS.white,
+    borderRadius: 100,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+  },
+  buttonText: {
     fontSize: 16,
     fontWeight: '500',
-  },
-  manualText: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: COLORS.primary,
-    textAlign: 'center',
   },
 });

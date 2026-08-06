@@ -11,9 +11,8 @@ import {
 } from 'react-native';
 
 const COLORS = {
-  primary: '#10B981',
-  white: '#FFFFFF',
-  label: '#111827',
+  primary: 'rgba(7, 193, 135, 1)',
+  white: 'rgba(255, 255, 255, 1)',
 };
 
 export type ButtonVariant = 'primary' | 'outline' | 'text';
@@ -89,6 +88,7 @@ const styles = StyleSheet.create({
   },
   md: {
     width: '100%',
+    height: 52,
     paddingHorizontal: '4.5%',
   },
   sm: {
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   outline: {
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.white,
     borderWidth: 1,
     borderColor: COLORS.primary,
   },

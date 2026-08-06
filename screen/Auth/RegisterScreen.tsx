@@ -276,7 +276,6 @@ const styles = StyleSheet.create({
   },
   headerCopy: {
     alignItems: 'center',
-    // gap: 8,
     paddingHorizontal: '5.5%',
   },
   headerTitle: {
@@ -284,6 +283,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.white,
     textAlign: 'center',
+   
   },
   headerSubtitle: {
     fontSize: 14,
@@ -295,9 +295,11 @@ const styles = StyleSheet.create({
   sheet: {
     flex: 1,
     backgroundColor: COLORS.white,
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
+    borderRadius: 30,
     marginTop: -8,
+    marginLeft: 20,
+    marginRight: 20,
+    
   },
   scrollContent: {
     paddingHorizontal: '4.5%',
@@ -308,7 +310,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   nextButton: {
-    height: 52,
+    paddingVertical: 14,
     backgroundColor: COLORS.primary,
     marginTop: 8,
   },
@@ -322,7 +324,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.muted,
     letterSpacing: 0.3,
     textAlign: 'center',
   },
