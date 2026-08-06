@@ -121,8 +121,10 @@ const OFFERS: OfferItem[] = [
 type HomeScreenProps = {
   addressLabel?: string;
   countryFlag?: string;
+  notificationCount?: number;
   onSearchPress?: () => void;
   onLocationPress?: () => void;
+  onNotificationPress?: () => void;
   onCategoryPress?: (id: string) => void;
   onCategoriesSeeAll?: () => void;
   onBrandPress?: (id: string) => void;
@@ -134,10 +136,11 @@ type HomeScreenProps = {
 };
 
 export default function HomeScreen({
-  addressLabel = 'Deliver to 25, New York',
+  addressLabel = '123 Main St, New York',
   countryFlag = '🇩🇪',
   onSearchPress,
   onLocationPress,
+  onNotificationPress,
   onCategoryPress,
   onCategoriesSeeAll,
   onBrandPress,
@@ -166,8 +169,8 @@ export default function HomeScreen({
             onPress={onLocationPress}
             hitSlop={6}
           >
-            <View style={styles.iconChip}>
-              <Ionicons name="location" size={16} color={COLORS.white} />
+            <View style={styles.headerChip}>
+              <Ionicons name="location-outline" size={18} color={COLORS.white} />
             </View>
             <View style={styles.locationCopy}>
               <Text style={styles.deliverLabel}>Deliver to</Text>
@@ -175,11 +178,25 @@ export default function HomeScreen({
                 {addressLabel.replace(/^Deliver to\s*/i, '')}
               </Text>
             </View>
-            <Ionicons name="chevron-down" size={16} color={COLORS.white} />
           </Pressable>
 
-          <View style={styles.flagChip}>
-            <Text style={styles.flagText}>{countryFlag}</Text>
+          <View style={styles.headerActions}>
+            <View style={styles.flagChip}>
+              <Text style={styles.flagText}>{countryFlag}</Text>
+            </View>
+            <Pressable
+              style={styles.headerChip}
+              onPress={onNotificationPress}
+              hitSlop={6}
+              accessibilityRole="button"
+              accessibilityLabel="Notifications"
+            >
+              <Ionicons
+                name="notifications-outline"
+                size={18}
+                color={COLORS.white}
+              />
+            </Pressable>
           </View>
         </View>
 
@@ -354,15 +371,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  iconChip: {
-    width: '7.5%',
-    aspectRatio: 1,
-    maxWidth: 36,
-    minWidth: 28,
+  headerChip: {
+    width: 32,
+    height: 32,
     borderRadius: 16,
-    backgroundColor: COLORS.chipBg,
+    backgroundColor: 'rgba(255, 255, 255, 0.28)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   locationCopy: {
     flex: 1,
@@ -379,10 +399,8 @@ const styles = StyleSheet.create({
     color: COLORS.white,
   },
   flagChip: {
-    width: '7.5%',
-    aspectRatio: 1,
-    maxWidth: 36,
-    minWidth: 28,
+    width: 32,
+    height: 32,
     borderRadius: 16,
     backgroundColor: COLORS.chipBg,
     alignItems: 'center',

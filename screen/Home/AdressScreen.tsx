@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -7,19 +8,17 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import Button from '../../componets/layout/Button';
-import Header from '../../componets/layout/Header';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
   white: 'rgba(255, 255, 255, 1)',
   text: 'rgba(13, 13, 13, 1)',
   muted: 'rgba(114, 130, 138, 1)',
-  border: 'rgba(255, 255, 255, 1)',
-  bannerBg: 'rgba(255, 255, 255, 1)',
-  link: 'rgba(7, 193, 135, 1)',
+  border: 'rgba(229, 231, 235, 1)',
+  overlay: 'rgba(0, 0, 0, 0.45)',
+  radioIdle: 'rgba(209, 213, 219, 1)',
 };
 
 export type SavedAddress = {
@@ -29,40 +28,36 @@ export type SavedAddress = {
 };
 
 type AddressScreenProps = {
-  /** 'change' = from cart; 'add' = adding from cart address list */
-  mode?: 'change' | 'add';
+  visible?: boolean;
   addresses?: SavedAddress[];
   initialSelectedId?: string;
-  deliveringTo?: string;
   onBack?: () => void;
   onSave?: (address: SavedAddress) => void;
   onAddNew?: () => void;
-  onChangeBanner?: () => void;
 };
 
 const DEFAULT_ADDRESSES: SavedAddress[] = [
   {
     id: 'home',
     label: 'Home',
-    line: 'Jaffna town, NY 122 North',
+    line: 'Jaffna town, st 123, North',
   },
   {
     id: 'office',
     label: 'Office',
-    line: 'Jaffna town, NY 122 North',
+    line: 'Jaffna town, st 123, North',
   },
   {
-    id: 'mum',
-    label: 'Mum',
-    line: 'Jaffna town, NY 122 North',
+    id: 'work',
+    label: 'Work',
+    line: 'Jaffna town, st 123, North',
   },
 ];
 
 export default function AddressScreen({
-  mode = 'change',
+  visible = true,
   addresses = DEFAULT_ADDRESSES,
-  initialSelectedId = 'office',
-  deliveringTo = 'Jaffna town, NY 122 North',
+  initialSelectedId = 'home',
   onBack,
   onSave,
   onAddNew,
@@ -74,37 +69,31 @@ export default function AddressScreen({
     addresses.find((item) => item.id === selectedId) ?? addresses[0];
 
   return (
-    <View style={styles.screen}>
-      <StatusBar style="light" />
-      <Header
-        title="My Cart"
-        showBack
-        onBack={onBack}
-        backgroundColor={COLORS.primary}
-      />
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      statusBarTranslucent
+      onRequestClose={onBack}
+    >
+      <View style={styles.overlay}>
+        <Pressable style={styles.backdrop} onPress={onBack} />
 
-      <View style={styles.sheet}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[
-            styles.scrollContent,
-            { paddingBottom: Math.max(insets.bottom, 16) + 100 },
+        <View
+          style={[
+            styles.sheet,
+            { paddingBottom: Math.max(insets.bottom, 16) },
           ]}
         >
-          <View style={styles.banner}>
-            <View style={styles.bannerLeft}>
-              <Ionicons name="location" size={18} color={COLORS.primary} />
-              <Text style={styles.bannerText} numberOfLines={2}>
-                Delivering to {deliveringTo}
-              </Text>
-            </View>
-          </View>
+          <Text style={styles.title}>Address</Text>
 
-          <Text style={styles.sectionTitle}>Address</Text>
-
-          <View style={styles.list}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.list}
+          >
             {addresses.map((item) => {
               const active = item.id === selectedId;
+
               return (
                 <Pressable
                   key={item.id}
@@ -121,118 +110,102 @@ export default function AddressScreen({
                   >
                     {active ? <View style={styles.radioInner} /> : null}
                   </View>
+
                   <View style={styles.addressCopy}>
-                    <Text style={styles.addressLabel}>{item.label}</Text>
-                    <Text style={styles.addressLine} numberOfLines={2}>
-                      {item.line}
+                    <Text
+                      style={[
+                        styles.addressLabel,
+                        active && styles.addressLabelActive,
+                      ]}
+                    >
+                      {item.label}
                     </Text>
+                    <View style={styles.lineRow}>
+                      <Ionicons
+                        name="location-outline"
+                        size={14}
+                        color={COLORS.text}
+                      />
+                      <Text style={styles.addressLine} numberOfLines={2}>
+                        {item.line}
+                      </Text>
+                    </View>
                   </View>
                 </Pressable>
               );
             })}
+          </ScrollView>
+
+          <View style={styles.actions}>
+            <Button
+              title="Add new address"
+              variant="outline"
+              onPress={onAddNew}
+              containerStyle={styles.addButton}
+              textStyle={styles.addButtonText}
+            />
+            <Button
+              title="Save"
+              onPress={() => selected && onSave?.(selected)}
+              containerStyle={styles.saveButton}
+              textStyle={styles.saveText}
+            />
           </View>
-
-          <Button
-            title="Add New Address"
-            variant="outline"
-            onPress={onAddNew}
-            containerStyle={styles.addButton}
-            textStyle={styles.addButtonText}
-          />
-        </ScrollView>
-
-        <View
-          style={[
-            styles.footer,
-            { paddingBottom: Math.max(insets.bottom, 16) },
-          ]}
-        >
-          <Button
-            title="SAVE"
-            onPress={() => selected && onSave?.(selected)}
-            containerStyle={styles.saveButton}
-            textStyle={styles.saveText}
-          />
         </View>
       </View>
-    </View>
+    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
+  overlay: {
     flex: 1,
-    backgroundColor: COLORS.primary,
+    justifyContent: 'flex-end',
+    backgroundColor: COLORS.overlay,
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
   },
   sheet: {
-    flex: 1,
     backgroundColor: COLORS.white,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-  },
-  scrollContent: {
-    width: '100%',
-    paddingHorizontal: '4.5%',
-    paddingTop: '4%',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    maxHeight: '75%',
     gap: 16,
   },
-  banner: {
-    width: '100%',
-    minHeight: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 10,
-    paddingVertical: '2.5%',
-    paddingHorizontal: '3.5%',
-    borderRadius: 10,
-    backgroundColor: COLORS.bannerBg,
-  },
-  bannerLeft: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  bannerText: {
-    flex: 1,
-    fontSize: 13,
-    fontWeight: '500',
-    color: COLORS.text,
-  },
-  sectionTitle: {
-    fontSize: 16,
+  title: {
+    fontSize: 18,
     fontWeight: '700',
     color: COLORS.text,
   },
   list: {
-    width: '100%',
-    gap: 10,
+    gap: 12,
+    paddingBottom: 4,
   },
   addressRow: {
     width: '100%',
-    minHeight: 64,
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: '3.5%',
-    paddingVertical: '3%',
-    paddingHorizontal: '3.5%',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    alignItems: 'flex-start',
+    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: 'transparent',
     backgroundColor: COLORS.white,
   },
   addressRowActive: {
     borderColor: COLORS.primary,
   },
   radioOuter: {
-    width: '5.5%',
-    aspectRatio: 1,
-    maxWidth: 22,
-    minWidth: 18,
-    borderRadius: 999,
+    width: 20,
+    height: 20,
+    marginTop: 2,
+    borderRadius: 10,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.radioIdle,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -240,49 +213,56 @@ const styles = StyleSheet.create({
     borderColor: COLORS.primary,
   },
   radioInner: {
-    width: '55%',
-    aspectRatio: 1,
-    borderRadius: 999,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     backgroundColor: COLORS.primary,
   },
   addressCopy: {
     flex: 1,
-    gap: 4,
+    gap: 6,
   },
   addressLabel: {
     fontSize: 14,
-    fontWeight: '700',
-    color: COLORS.text,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+  addressLabelActive: {
+    color: COLORS.primary,
+  },
+  lineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   addressLine: {
+    flex: 1,
     fontSize: 13,
-    color: COLORS.muted,
+    color: COLORS.text,
+  },
+  actions: {
+    gap: 12,
+    paddingTop: 4,
   },
   addButton: {
     width: '100%',
-    minHeight: 48,
+    height: 52,
     borderColor: COLORS.primary,
     backgroundColor: COLORS.white,
   },
   addButtonText: {
     color: COLORS.primary,
     fontWeight: '600',
-  },
-  footer: {
-    width: '100%',
-    paddingHorizontal: '4.5%',
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    backgroundColor: COLORS.white,
+    fontSize: 15,
   },
   saveButton: {
     width: '100%',
-    minHeight: 52,
+    height: 52,
     backgroundColor: COLORS.primary,
   },
   saveText: {
     fontSize: 16,
     fontWeight: '700',
+    color: COLORS.white,
   },
 });

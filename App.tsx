@@ -90,6 +90,8 @@ export default function App() {
   const [languageReturnTo, setLanguageReturnTo] = useState<AppScreen>('welcome');
   const [passwordReturnTo, setPasswordReturnTo] =
     useState<AppScreen>('forgotPassword');
+  const [addressSelectReturnTo, setAddressSelectReturnTo] =
+    useState<AppScreen>('cart');
   const [selectedBrand, setSelectedBrand] = useState({
     id: 'maliban',
     label: 'Maliban',
@@ -281,25 +283,71 @@ export default function App() {
           }}
         />
       ) : screen === 'addressSelect' ? (
-        <AddressScreen
-          mode={addressFlow === 'addFromSelect' ? 'add' : 'change'}
-          deliveringTo={deliveryAddress}
-          onBack={() => setScreen('cart')}
-          onSave={(address: SavedAddress) => {
-            setDeliveryAddress(address.line);
-            setScreen('cart');
-          }}
-          onAddNew={() => {
-            setAddressFlow('addFromSelect');
-            setScreen('addLocation');
-          }}
-        />
+        <>
+          {addressSelectReturnTo === 'cart' ? (
+            <CartScreen
+              address={deliveryAddress}
+              onBack={() => setScreen(cartReturnTo)}
+              onChangeAddress={() => {}}
+              onProceed={() => setScreen('payment')}
+              onTabPress={(tab) => {
+                if (tab === 'home') setScreen('home');
+                if (tab === 'cart') setScreen('cart');
+                if (tab === 'profile') setScreen('account');
+              }}
+            />
+          ) : addressSelectReturnTo === 'account' ? (
+            <ProfileScreen
+              onTabPress={(tab) => {
+                if (tab === 'home') setScreen('home');
+                if (tab === 'cart') {
+                  setCartReturnTo('account');
+                  setScreen('cart');
+                }
+                if (tab === 'profile') setScreen('account');
+              }}
+              onLogoutConfirm={() => setScreen('home')}
+            />
+          ) : (
+            <HomeScreen
+              countryFlag={selectedCountry.flag}
+              addressLabel={deliveryAddress}
+              onSearchPress={() => setScreen('search')}
+              onTabPress={(tab) => {
+                if (tab === 'cart') {
+                  setCartReturnTo('home');
+                  setScreen('cart');
+                }
+                if (tab === 'home') setScreen('home');
+                if (tab === 'profile') setScreen('account');
+              }}
+            />
+          )}
+          <AddressScreen
+            visible
+            onBack={() => setScreen(addressSelectReturnTo)}
+            onSave={(address: SavedAddress) => {
+              setDeliveryAddress(address.line);
+              setScreen(addressSelectReturnTo);
+            }}
+            onAddNew={() => {
+              setAddressFlow('addFromSelect');
+              setScreen('addLocation');
+            }}
+          />
+        </>
       ) : screen === 'getStarted' ? (
         <GetStartedScreen onContinue={() => setScreen('home')} />
       ) : screen === 'home' ? (
         <HomeScreen
           countryFlag={selectedCountry.flag}
+          addressLabel={deliveryAddress}
           onSearchPress={() => setScreen('search')}
+          onLocationPress={() => {
+            setAddressFlow('change');
+            setAddressSelectReturnTo('home');
+            setScreen('addressSelect');
+          }}
           onCategoriesSeeAll={() => setScreen('categories')}
           onBrandsSeeAll={() => setScreen('brands')}
           onOffersSeeAll={() => setScreen('dairy')}
@@ -347,6 +395,7 @@ export default function App() {
           onMenuPress={(action) => {
             if (action === 'address') {
               setAddressFlow('change');
+              setAddressSelectReturnTo('account');
               setScreen('addressSelect');
             }
             if (action === 'language') {
@@ -548,6 +597,7 @@ export default function App() {
           onBack={() => setScreen(cartReturnTo)}
           onChangeAddress={() => {
             setAddressFlow('change');
+            setAddressSelectReturnTo('cart');
             setScreen('addressSelect');
           }}
           onProceed={() => setScreen('payment')}

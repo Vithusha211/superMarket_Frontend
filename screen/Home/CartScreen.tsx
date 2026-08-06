@@ -151,10 +151,15 @@ export default function CartScreen({
         >
           <View style={styles.addressCard}>
             <View style={styles.addressLeft}>
-              <Ionicons name="location" size={18} color={COLORS.primary} />
-              <Text style={styles.addressText} numberOfLines={1}>
-                {address}
-              </Text>
+              <View style={styles.addressIconWrap}>
+                <Ionicons name="location" size={16} color={COLORS.primary} />
+              </View>
+              <View style={styles.addressCopy}>
+                <Text style={styles.deliverLabel}>Deliver to</Text>
+                <Text style={styles.addressText} numberOfLines={1}>
+                  {address}
+                </Text>
+              </View>
             </View>
             <Pressable onPress={onChangeAddress} hitSlop={8}>
               <Text style={styles.changeText}>Change</Text>
@@ -258,12 +263,10 @@ const styles = StyleSheet.create({
   },
   addressCard: {
     width: '100%',
-    minHeight: 48,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.cardBorder,
+    minHeight: 56,
+    borderRadius: 12,
     backgroundColor: COLORS.white,
-    paddingHorizontal: '3.5%',
+    paddingHorizontal: 12,
     paddingVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
@@ -274,17 +277,33 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
+  },
+  addressIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(7, 193, 135, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addressCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  deliverLabel: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: COLORS.text,
   },
   addressText: {
-    flex: 1,
-    fontSize: 13,
-    color: COLORS.text,
+    fontSize: 12,
+    color: COLORS.muted,
   },
   changeText: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.link,
+    color: COLORS.primary,
   },
   list: {
     width: '100%',
