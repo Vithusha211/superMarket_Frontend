@@ -36,6 +36,7 @@ import OTPScreen from './screen/Auth/OTPScreen';
 import RegisterScreen from './screen/Auth/RegisterScreen';
 import SplashScreen from './screen/Auth/SplashScreen';
 import WelcomeScreen from './screen/Auth/WelcomeScreen';
+import ProfileScreen from './screen/Profile/Profile';
 
 type AppScreen =
   | 'splash'
@@ -65,7 +66,8 @@ type AppScreen =
   | 'payment'
   | 'invoice'
   | 'forgotPassword'
-  | 'createNewPassword';
+  | 'createNewPassword'
+  | 'account';
 
 /** Where address/add-location should return after finish */
 type AddressFlow = 'onboarding' | 'change' | 'addFromSelect';
@@ -85,6 +87,9 @@ export default function App() {
   const [cartReturnTo, setCartReturnTo] = useState<AppScreen>('home');
   const [menuReturnTo, setMenuReturnTo] = useState<AppScreen>('dairy');
   const [brandReturnTo, setBrandReturnTo] = useState<AppScreen>('menu');
+  const [languageReturnTo, setLanguageReturnTo] = useState<AppScreen>('welcome');
+  const [passwordReturnTo, setPasswordReturnTo] =
+    useState<AppScreen>('forgotPassword');
   const [selectedBrand, setSelectedBrand] = useState({
     id: 'maliban',
     label: 'Maliban',
@@ -175,9 +180,16 @@ export default function App() {
   return (
     <SafeAreaProvider>
       {screen === 'splash' ? (
-        <SplashScreen onPress={() => setScreen('language')} />
+        <SplashScreen
+          onPress={() => {
+            setLanguageReturnTo('welcome');
+            setScreen('language');
+          }}
+        />
       ) : screen === 'language' ? (
-        <LanguageSelectScreen onSelect={() => setScreen('welcome')} />
+        <LanguageSelectScreen
+          onSelect={() => setScreen(languageReturnTo)}
+        />
       ) : screen === 'onboarding' ? (
         <OnboardingScreen
           onSkip={() => setScreen('welcome')}
@@ -201,12 +213,15 @@ export default function App() {
         <ForgotPasswordScreen
           email={forgotEmail}
           onBack={() => setScreen('login')}
-          onVerify={() => setScreen('createNewPassword')}
+          onVerify={() => {
+            setPasswordReturnTo('forgotPassword');
+            setScreen('createNewPassword');
+          }}
           onResend={() => {}}
         />
       ) : screen === 'createNewPassword' ? (
         <CreateNewPasswordScreen
-          onBack={() => setScreen('forgotPassword')}
+          onBack={() => setScreen(passwordReturnTo)}
           onResetSuccess={() => setScreen('login')}
         />
       ) : screen === 'countryCode' ? (
@@ -315,7 +330,35 @@ export default function App() {
             }
             if (tab === 'orders') setScreen('categories');
             if (tab === 'home') setScreen('home');
+            if (tab === 'profile') setScreen('account');
           }}
+        />
+      ) : screen === 'account' ? (
+        <ProfileScreen
+          onTabPress={(tab) => {
+            if (tab === 'home') setScreen('home');
+            if (tab === 'cart') {
+              setCartReturnTo('account');
+              setScreen('cart');
+            }
+            if (tab === 'orders') setScreen('categories');
+            if (tab === 'profile') setScreen('account');
+          }}
+          onMenuPress={(action) => {
+            if (action === 'address') {
+              setAddressFlow('change');
+              setScreen('addressSelect');
+            }
+            if (action === 'language') {
+              setLanguageReturnTo('account');
+              setScreen('language');
+            }
+            if (action === 'changePassword') {
+              setPasswordReturnTo('account');
+              setScreen('createNewPassword');
+            }
+          }}
+          onLogoutConfirm={() => setScreen('home')}
         />
       ) : screen === 'categories' ? (
         <CategoryScreen
@@ -511,6 +554,7 @@ export default function App() {
           onTabPress={(tab) => {
             if (tab === 'home') setScreen('home');
             if (tab === 'cart') setScreen('cart');
+            if (tab === 'profile') setScreen('account');
           }}
         />
       ) : screen === 'payment' ? (
