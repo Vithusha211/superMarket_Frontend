@@ -14,6 +14,7 @@ import Button from '../../componets/layout/Button';
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
   white: 'rgba(255, 255, 255, 1)',
+  black: 'rgba(0, 0, 0, 1)',
   text: 'rgba(13, 13, 13, 1)',
   muted: 'rgba(114, 130, 138, 1)',
   border: 'rgba(229, 231, 235, 1)',
@@ -31,6 +32,8 @@ type AddressScreenProps = {
   visible?: boolean;
   addresses?: SavedAddress[];
   initialSelectedId?: string;
+  /** Delivery flows pick an address; the profile flow only adds one. */
+  showSave?: boolean;
   onBack?: () => void;
   onSave?: (address: SavedAddress) => void;
   onAddNew?: () => void;
@@ -58,6 +61,7 @@ export default function AddressScreen({
   visible = true,
   addresses = DEFAULT_ADDRESSES,
   initialSelectedId = 'home',
+  showSave = true,
   onBack,
   onSave,
   onAddNew,
@@ -137,19 +141,30 @@ export default function AddressScreen({
           </ScrollView>
 
           <View style={styles.actions}>
-            <Button
-              title="Add new address"
-              variant="outline"
-              onPress={onAddNew}
-              containerStyle={styles.addButton}
-              textStyle={styles.addButtonText}
-            />
-            <Button
-              title="Save"
-              onPress={() => selected && onSave?.(selected)}
-              containerStyle={styles.saveButton}
-              textStyle={styles.saveText}
-            />
+            {showSave ? (
+              <>
+                <Button
+                  title="Add new address"
+                  variant="outline"
+                  onPress={onAddNew}
+                  containerStyle={styles.addButton}
+                  textStyle={styles.addButtonText}
+                />
+                <Button
+                  title="Save"
+                  onPress={() => selected && onSave?.(selected)}
+                  containerStyle={styles.saveButton}
+                  textStyle={styles.saveText}
+                />
+              </>
+            ) : (
+              <Button
+                title="Add new address"
+                onPress={onAddNew}
+                containerStyle={styles.saveButton}
+                textStyle={styles.saveText}
+              />
+            )}
           </View>
         </View>
       </View>
@@ -176,12 +191,14 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.text,
+    fontSize: 14,
+    fontWeight: '500',
+    lineHeight: 21,
+    color: COLORS.black,
+    textAlign: 'center',
   },
   list: {
-    gap: 12,
+    gap: 10,
     paddingBottom: 4,
   },
   addressRow: {
@@ -237,8 +254,10 @@ const styles = StyleSheet.create({
   },
   addressLine: {
     flex: 1,
-    fontSize: 13,
-    color: COLORS.text,
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 21,
+    color: COLORS.black,
   },
   actions: {
     gap: 12,
@@ -258,11 +277,12 @@ const styles = StyleSheet.create({
   saveButton: {
     width: '100%',
     height: 52,
+    borderRadius: 100,
     backgroundColor: COLORS.primary,
   },
   saveText: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '500',
     color: COLORS.white,
   },
 });

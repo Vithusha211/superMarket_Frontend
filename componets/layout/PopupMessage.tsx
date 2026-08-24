@@ -98,12 +98,17 @@ export default function PopupMessage({
 
           {variant === 'action' && (
             <>
-              {title ? <Text style={styles.title}>{title}</Text> : null}
-              <Text style={styles.description}>{message}</Text>
+              <View style={styles.actionCopy}>
+                {title ? (
+                  <Text style={styles.actionTitle}>{title}</Text>
+                ) : null}
+                <Text style={styles.actionMessage}>{message}</Text>
+              </View>
               <Button
                 title={actionLabel}
                 onPress={onAction}
                 containerStyle={styles.actionButton}
+                textStyle={styles.actionButtonText}
               />
             </>
           )}
@@ -198,7 +203,36 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
+  actionCopy: {
+    width: '100%',
+    gap: 4,
+    alignItems: 'center',
+  },
+  actionTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    lineHeight: 21,
+    letterSpacing: 0.3,
+    color: COLORS.text,
+    textAlign: 'center',
+  },
+  actionMessage: {
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 21,
+    letterSpacing: 0.3,
+    color: COLORS.muted,
+    textAlign: 'center',
+  },
   actionButton: {
-    marginTop: 10,
+    width: '100%',
+    height: 52,
+    borderRadius: 100,
+    backgroundColor: COLORS.primary,
+  },
+  actionButtonText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: COLORS.white,
   },
 });

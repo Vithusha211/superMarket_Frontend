@@ -18,6 +18,7 @@ import ProductScreen, {
 import CartScreen from './screen/Home/CartScreen';
 import PaymentScreen from './screen/Home/PaymentScreen';
 import InvoiceScreen from './screen/Home/InvoiceScreen';
+import OrderHistoryScreen from './screen/Home/OrderHistoryScreen';
 import AddressScreen, { SavedAddress } from './screen/Home/AdressScreen';
 import MenuScreen from './screen/Home/MenuScreen';
 import BrandScreen, {
@@ -25,6 +26,9 @@ import BrandScreen, {
   MALIBAN_PRODUCTS,
 } from './screen/Home/BrandScreen';
 import BrandsScreen from './screen/Home/BrandsScreen';
+import BestOffersScreen, {
+  OfferProduct,
+} from './screen/Home/BestOffersScreen';
 import CategoryScreen from './screen/Home/CategoryScreen';
 import FruitsVegetablesScreen, {
   FruitProduct,
@@ -37,6 +41,22 @@ import RegisterScreen from './screen/Auth/RegisterScreen';
 import SplashScreen from './screen/Auth/SplashScreen';
 import WelcomeScreen from './screen/Auth/WelcomeScreen';
 import ProfileScreen from './screen/Profile/Profile';
+import PersonalInformationScreen from './screen/Profile/PersonalInformation';
+import ImageCropScreen from './screen/Profile/ImageCropScreen';
+import EditPhoneNumberScreen, {
+  VerificationChannel,
+} from './screen/Profile/EditPhoneNumberScreen';
+import ChangePasswordScreen from './screen/Profile/ChangePasswordScreen';
+import DeleteAccountScreen from './screen/Profile/DeleteAccountScreen';
+import HelpCenterScreen from './screen/Profile/HelpCenterScreen';
+import InformationScreen, {
+  InformationPage,
+} from './screen/Profile/InformationScreen';
+import LanguageSheet, {
+  PROFILE_LANGUAGES,
+} from './screen/Profile/LanguageSheet';
+import { ImageSourcePropType } from 'react-native';
+import { ToastProvider, useToast } from './context/ToastContext';
 
 type AppScreen =
   | 'splash'
@@ -57,6 +77,7 @@ type AppScreen =
   | 'search'
   | 'categories'
   | 'brands'
+  | 'bestOffers'
   | 'dairy'
   | 'fruits'
   | 'menu'
@@ -65,15 +86,27 @@ type AppScreen =
   | 'cart'
   | 'payment'
   | 'invoice'
+  | 'orderHistory'
   | 'forgotPassword'
   | 'createNewPassword'
-  | 'account';
-
+  | 'account'
+  | 'personalInformation'
+  | 'editPhoneNumber'
+  | 'editPhoneOtp'
+  | 'changePassword'
+  | 'changePasswordOtp'
+  | 'deleteAccount'
+  | 'helpCenter'
+  | 'information'
+  | 'imageCrop';
 /** Where address/add-location should return after finish */
 type AddressFlow = 'onboarding' | 'change' | 'addFromSelect';
 
-export default function App() {
+function AppContent() {
+  const { showSuccess, showError } = useToast();
   const [screen, setScreen] = useState<AppScreen>('splash');
+  const [informationPage, setInformationPage] =
+    useState<InformationPage>('About us');
   const [signupEmail, setSignupEmail] = useState('user@gmail.com');
   const [signupPhone, setSignupPhone] = useState('1234565657');
   const [forgotEmail, setForgotEmail] = useState('');
@@ -90,8 +123,27 @@ export default function App() {
   const [languageReturnTo, setLanguageReturnTo] = useState<AppScreen>('welcome');
   const [passwordReturnTo, setPasswordReturnTo] =
     useState<AppScreen>('forgotPassword');
+  const [profilePasswordOtpReturnTo, setProfilePasswordOtpReturnTo] =
+    useState<AppScreen>('changePassword');
   const [addressSelectReturnTo, setAddressSelectReturnTo] =
     useState<AppScreen>('cart');
+  const [invoiceReturnTo, setInvoiceReturnTo] =
+    useState<AppScreen>('home');
+  const [appLanguage, setAppLanguage] = useState(PROFILE_LANGUAGES[1]);
+  const [showLanguageSheet, setShowLanguageSheet] = useState(false);
+  const [profileAvatar, setProfileAvatar] = useState<
+    ImageSourcePropType | undefined
+  >(undefined);
+  const [accountPhone, setAccountPhone] = useState('0775512445');
+  const [pendingPhone, setPendingPhone] = useState('0775512445');
+  const [phoneVerificationChannel, setPhoneVerificationChannel] =
+    useState<VerificationChannel>('email');
+  const [countryCodeReturnTo, setCountryCodeReturnTo] = useState<
+    'signup' | 'editPhoneNumber'
+  >('signup');
+  const [cropImage, setCropImage] = useState<ImageSourcePropType>(
+    require('./assets/profile/personal/crop-sample.png'),
+  );
   const [selectedBrand, setSelectedBrand] = useState({
     id: 'maliban',
     label: 'Maliban',
@@ -151,6 +203,11 @@ export default function App() {
       setScreen('getStarted');
       return;
     }
+    // Profile address flow (Figma: Save → My profile)
+    if (addressSelectReturnTo === 'account') {
+      setScreen('account');
+      return;
+    }
     // Cart change / Add New Address (Figma: Save → Cart)
     setScreen('cart');
   };
@@ -180,7 +237,7 @@ export default function App() {
   };
 
   return (
-    <SafeAreaProvider>
+    <>
       {screen === 'splash' ? (
         <SplashScreen
           onPress={() => {
@@ -190,7 +247,13 @@ export default function App() {
         />
       ) : screen === 'language' ? (
         <LanguageSelectScreen
-          onSelect={() => setScreen(languageReturnTo)}
+          onSelect={(language) => {
+            const match = PROFILE_LANGUAGES.find(
+              (item) => item.id === language.id,
+            );
+            if (match) setAppLanguage(match);
+            setScreen(languageReturnTo);
+          }}
         />
       ) : screen === 'onboarding' ? (
         <OnboardingScreen
@@ -205,7 +268,10 @@ export default function App() {
       ) : screen === 'login' ? (
         <LoginScreen
           onSignUp={() => setScreen('signup')}
-          onContinue={() => setScreen('home')}
+          onContinue={() => {
+            showSuccess('Welcome back!');
+            setScreen('home');
+          }}
           onForgotPassword={(email) => {
             setForgotEmail(email);
             setScreen('forgotPassword');
@@ -224,15 +290,68 @@ export default function App() {
       ) : screen === 'createNewPassword' ? (
         <CreateNewPasswordScreen
           onBack={() => setScreen(passwordReturnTo)}
-          onResetSuccess={() => setScreen('login')}
+          onResetSuccess={() => {
+            showSuccess('Password reset successfully.');
+            setScreen('login');
+          }}
+        />
+      ) : screen === 'changePassword' ? (
+        <ChangePasswordScreen
+          email={signupEmail}
+          onBack={() => setScreen('account')}
+          onForgotPassword={() => {
+            setProfilePasswordOtpReturnTo('changePassword');
+            setScreen('changePasswordOtp');
+          }}
+          onResetSuccess={() => {
+            showSuccess('Password changed successfully.');
+            setScreen('account');
+          }}
+        />
+      ) : screen === 'deleteAccount' ? (
+        <DeleteAccountScreen
+          email={signupEmail}
+          onBack={() => setScreen('account')}
+          onForgotPassword={() => {
+            setProfilePasswordOtpReturnTo('deleteAccount');
+            setScreen('changePasswordOtp');
+          }}
+          onDeleted={() => {
+            showSuccess('Your account has been deleted.');
+            setScreen('login');
+          }}
+        />
+      ) : screen === 'helpCenter' ? (
+        <HelpCenterScreen
+          initialName="Kishana Aloe"
+          initialEmail="example@gmail.com"
+          onBack={() => setScreen('account')}
+          onSend={() => setScreen('account')}
+        />
+      ) : screen === 'information' ? (
+        <InformationScreen
+          page={informationPage}
+          onBack={() => setScreen('account')}
+        />
+      ) : screen === 'changePasswordOtp' ? (
+        <OTPScreen
+          variant="email"
+          title="Forgot password"
+          email={signupEmail}
+          onBack={() => setScreen(profilePasswordOtpReturnTo)}
+          onVerify={() => {
+            setPasswordReturnTo('changePasswordOtp');
+            setScreen('createNewPassword');
+          }}
+          onResend={() => {}}
         />
       ) : screen === 'countryCode' ? (
         <CountryCodeScreen
           initialId={selectedCountry.id}
-          onBack={() => setScreen('signup')}
+          onBack={() => setScreen(countryCodeReturnTo)}
           onSave={(country) => {
             setSelectedCountry(country);
-            setScreen('signup');
+            setScreen(countryCodeReturnTo);
           }}
         />
       ) : screen === 'emailOtp' ? (
@@ -279,6 +398,7 @@ export default function App() {
             if (line) {
               setDeliveryAddress(line);
             }
+            showSuccess('Address saved successfully.');
             finishAddLocation();
           }}
         />
@@ -286,24 +406,38 @@ export default function App() {
         <>
           {addressSelectReturnTo === 'cart' ? (
             <CartScreen
+              items={cartCount === 0 ? [] : undefined}
               address={deliveryAddress}
               onBack={() => setScreen(cartReturnTo)}
               onChangeAddress={() => {}}
-              onProceed={() => setScreen('payment')}
+              onProceed={() => {
+                if (cartCount === 0) {
+                  showError('Your cart is empty. Add a product first.');
+                  return;
+                }
+                setScreen('payment');
+              }}
+              onItemsChange={(items) =>
+                setCartCount(items.reduce((total, item) => total + item.qty, 0))
+              }
               onTabPress={(tab) => {
                 if (tab === 'home') setScreen('home');
                 if (tab === 'cart') setScreen('cart');
+                if (tab === 'orders') setScreen('orderHistory');
                 if (tab === 'profile') setScreen('account');
               }}
             />
           ) : addressSelectReturnTo === 'account' ? (
             <ProfileScreen
+              phone={accountPhone}
+              language={appLanguage.label}
               onTabPress={(tab) => {
                 if (tab === 'home') setScreen('home');
                 if (tab === 'cart') {
                   setCartReturnTo('account');
                   setScreen('cart');
                 }
+                if (tab === 'orders') setScreen('orderHistory');
                 if (tab === 'profile') setScreen('account');
               }}
               onLogoutConfirm={() => setScreen('home')}
@@ -318,6 +452,7 @@ export default function App() {
                   setCartReturnTo('home');
                   setScreen('cart');
                 }
+                if (tab === 'orders') setScreen('orderHistory');
                 if (tab === 'home') setScreen('home');
                 if (tab === 'profile') setScreen('account');
               }}
@@ -325,14 +460,16 @@ export default function App() {
           )}
           <AddressScreen
             visible
+            showSave={addressSelectReturnTo !== 'account'}
             onBack={() => setScreen(addressSelectReturnTo)}
             onSave={(address: SavedAddress) => {
               setDeliveryAddress(address.line);
+              showSuccess('Address saved successfully.');
               setScreen(addressSelectReturnTo);
             }}
             onAddNew={() => {
               setAddressFlow('addFromSelect');
-              setScreen('addLocation');
+              setScreen('address');
             }}
           />
         </>
@@ -350,7 +487,7 @@ export default function App() {
           }}
           onCategoriesSeeAll={() => setScreen('categories')}
           onBrandsSeeAll={() => setScreen('brands')}
-          onOffersSeeAll={() => setScreen('dairy')}
+          onOffersSeeAll={() => setScreen('bestOffers')}
           onCategoryPress={openCategory}
           onBrandPress={(id) =>
             openBrand('home', {
@@ -370,44 +507,144 @@ export default function App() {
               discount: 20,
             })
           }
-          onAddProduct={() => setCartCount((c) => c + 1)}
+          onAddProduct={() => {
+            setCartCount((c) => c + 1);
+            showSuccess('Product added to cart.');
+          }}
           onTabPress={(tab) => {
             if (tab === 'cart') {
               setCartReturnTo('home');
               setScreen('cart');
             }
-            if (tab === 'orders') setScreen('categories');
+            if (tab === 'orders') setScreen('orderHistory');
             if (tab === 'home') setScreen('home');
             if (tab === 'profile') setScreen('account');
           }}
         />
       ) : screen === 'account' ? (
-        <ProfileScreen
-          onTabPress={(tab) => {
-            if (tab === 'home') setScreen('home');
-            if (tab === 'cart') {
-              setCartReturnTo('account');
-              setScreen('cart');
+        <>
+          <ProfileScreen
+            phone={accountPhone}
+            language={appLanguage.label}
+            onTabPress={(tab) => {
+              if (tab === 'home') setScreen('home');
+              if (tab === 'cart') {
+                setCartReturnTo('account');
+                setScreen('cart');
+              }
+              if (tab === 'orders') setScreen('orderHistory');
+              if (tab === 'profile') setScreen('account');
+            }}
+            onMenuPress={(action) => {
+              if (action === 'profile') {
+                setScreen('personalInformation');
+              }
+              if (action === 'address') {
+                setAddressFlow('change');
+                setAddressSelectReturnTo('account');
+                setScreen('addressSelect');
+              }
+              if (action === 'language') {
+                setShowLanguageSheet(true);
+              }
+              if (action === 'changePassword') {
+                setScreen('changePassword');
+              }
+              if (action === 'deleteAccount') {
+                setScreen('deleteAccount');
+              }
+              if (action === 'helpCenter') {
+                setScreen('helpCenter');
+              }
+              if (action === 'aboutUs') {
+                setInformationPage('About us');
+                setScreen('information');
+              }
+              if (action === 'privacyPolicy') {
+                setInformationPage('Privacy Policy');
+                setScreen('information');
+              }
+              if (action === 'termsOfService') {
+                setInformationPage('Terms of Service');
+                setScreen('information');
+              }
+            }}
+            onLogoutConfirm={() => setScreen('home')}
+          />
+
+          <LanguageSheet
+            visible={showLanguageSheet}
+            selectedId={appLanguage.id}
+            onClose={() => setShowLanguageSheet(false)}
+            onSelect={(language) => {
+              setAppLanguage(language);
+              setShowLanguageSheet(false);
+              setScreen('account');
+            }}
+          />
+        </>
+      ) : screen === 'personalInformation' ? (
+        <PersonalInformationScreen
+          avatar={profileAvatar}
+          phone={accountPhone}
+          onBack={() => setScreen('account')}
+          onFieldPress={(fieldId) => {
+            if (fieldId === 'phone') {
+              setPendingPhone(accountPhone);
+              setScreen('editPhoneNumber');
             }
-            if (tab === 'orders') setScreen('categories');
-            if (tab === 'profile') setScreen('account');
           }}
-          onMenuPress={(action) => {
-            if (action === 'address') {
-              setAddressFlow('change');
-              setAddressSelectReturnTo('account');
-              setScreen('addressSelect');
-            }
-            if (action === 'language') {
-              setLanguageReturnTo('account');
-              setScreen('language');
-            }
-            if (action === 'changePassword') {
-              setPasswordReturnTo('account');
-              setScreen('createNewPassword');
-            }
+          onPickCamera={() => {
+            setCropImage(
+              require('./assets/profile/personal/crop-sample.png'),
+            );
+            setScreen('imageCrop');
           }}
-          onLogoutConfirm={() => setScreen('home')}
+          onPickGallery={() => {
+            setCropImage(
+              require('./assets/profile/personal/crop-sample.png'),
+            );
+            setScreen('imageCrop');
+          }}
+          onRemoveProfile={() => setProfileAvatar(undefined)}
+        />
+      ) : screen === 'editPhoneNumber' ? (
+        <EditPhoneNumberScreen
+          phone={pendingPhone}
+          countryFlag={selectedCountry.flag}
+          countryCode={selectedCountry.code}
+          onBack={() => setScreen('personalInformation')}
+          onCountryPress={() => {
+            setCountryCodeReturnTo('editPhoneNumber');
+            setScreen('countryCode');
+          }}
+          onNext={(phone, channel) => {
+            setPendingPhone(phone);
+            setPhoneVerificationChannel(channel);
+            setScreen('editPhoneOtp');
+          }}
+        />
+      ) : screen === 'editPhoneOtp' ? (
+        <OTPScreen
+          variant={phoneVerificationChannel}
+          title="Edit Phone number"
+          email={signupEmail}
+          phone={`${selectedCountry.code}${pendingPhone}`}
+          onBack={() => setScreen('editPhoneNumber')}
+          onVerify={() => {
+            setAccountPhone(pendingPhone);
+            setScreen('personalInformation');
+          }}
+          onResend={() => {}}
+        />
+      ) : screen === 'imageCrop' ? (
+        <ImageCropScreen
+          image={cropImage}
+          onCancel={() => setScreen('personalInformation')}
+          onDone={(image) => {
+            setProfileAvatar(image);
+            setScreen('personalInformation');
+          }}
         />
       ) : screen === 'categories' ? (
         <CategoryScreen
@@ -421,6 +658,30 @@ export default function App() {
             openBrand('brands', { id: brand.id, label: brand.name })
           }
         />
+      ) : screen === 'bestOffers' ? (
+        <BestOffersScreen
+          onBack={() => setScreen('home')}
+          onMenuPress={() => {
+            setMenuReturnTo('bestOffers');
+            setMenuCategoryId('dairy');
+            setMenuSubCategoryId('milk');
+            setScreen('menu');
+          }}
+          onProductPress={(product: OfferProduct) =>
+            openProduct('bestOffers', {
+              id: product.id,
+              title: product.name,
+              category: product.brand,
+              price: product.price,
+              description: product.description,
+              image: product.image,
+            })
+          }
+          onAddProduct={() => {
+            setCartCount((c) => c + 1);
+            showSuccess('Product added to cart.');
+          }}
+        />
       ) : screen === 'search' ? (
         <SearchScreen
           onBack={() => setScreen('home')}
@@ -433,7 +694,10 @@ export default function App() {
               image: require('./assets/search/product-ambewela.png'),
             })
           }
-          onAddProduct={() => setCartCount((c) => c + 1)}
+          onAddProduct={() => {
+            setCartCount((c) => c + 1);
+            showSuccess('Product added to cart.');
+          }}
         />
       ) : screen === 'dairy' ? (
         <DairyScreen
@@ -455,7 +719,10 @@ export default function App() {
               image: product.image,
             })
           }
-          onAddProduct={() => setCartCount((c) => c + 1)}
+          onAddProduct={() => {
+            setCartCount((c) => c + 1);
+            showSuccess('Product added to cart.');
+          }}
         />
       ) : screen === 'fruits' ? (
         <FruitsVegetablesScreen
@@ -478,7 +745,10 @@ export default function App() {
               image: product.image,
             })
           }
-          onAddProduct={() => setCartCount((c) => c + 1)}
+          onAddProduct={() => {
+            setCartCount((c) => c + 1);
+            showSuccess('Product added to cart.');
+          }}
         />
       ) : screen === 'menu' ? (
         <MenuScreen
@@ -542,9 +812,10 @@ export default function App() {
             setCartReturnTo('product');
             setScreen('cart');
           }}
-          onAddToCart={(_product: ProductDetail, quantity: number) =>
-            setCartCount((c) => c + quantity)
-          }
+          onAddToCart={(_product: ProductDetail, quantity: number) => {
+            setCartCount((c) => c + quantity);
+            showSuccess('Product added to cart.');
+          }}
           onRelatedPress={(id) => {
             const relatedMap: Record<string, Partial<ProductDetail>> = {
               'chocolate-milk': {
@@ -593,6 +864,7 @@ export default function App() {
         />
       ) : screen === 'cart' ? (
         <CartScreen
+          items={cartCount === 0 ? [] : undefined}
           address={deliveryAddress}
           onBack={() => setScreen(cartReturnTo)}
           onChangeAddress={() => {
@@ -600,10 +872,20 @@ export default function App() {
             setAddressSelectReturnTo('cart');
             setScreen('addressSelect');
           }}
-          onProceed={() => setScreen('payment')}
+          onProceed={() => {
+            if (cartCount === 0) {
+              showError('Your cart is empty. Add a product first.');
+              return;
+            }
+            setScreen('payment');
+          }}
+          onItemsChange={(items) =>
+            setCartCount(items.reduce((total, item) => total + item.qty, 0))
+          }
           onTabPress={(tab) => {
             if (tab === 'home') setScreen('home');
             if (tab === 'cart') setScreen('cart');
+            if (tab === 'orders') setScreen('orderHistory');
             if (tab === 'profile') setScreen('account');
           }}
         />
@@ -611,21 +893,48 @@ export default function App() {
         <PaymentScreen
           subtotal={cartSubtotal}
           onBack={() => setScreen('cart')}
-          onPay={() => setScreen('invoice')}
+          onPay={() => {
+            showSuccess('Payment successful.');
+            setInvoiceReturnTo('home');
+            setScreen('invoice');
+          }}
+        />
+      ) : screen === 'orderHistory' ? (
+        <OrderHistoryScreen
+          onBack={() => setScreen('home')}
+          onOrderPress={() => {
+            setInvoiceReturnTo('orderHistory');
+            setScreen('invoice');
+          }}
+          onTabPress={(tab) => {
+            if (tab === 'home') setScreen('home');
+            if (tab === 'cart') {
+              setCartReturnTo('orderHistory');
+              setScreen('cart');
+            }
+            if (tab === 'orders') setScreen('orderHistory');
+            if (tab === 'profile') setScreen('account');
+          }}
         />
       ) : screen === 'invoice' ? (
         <InvoiceScreen
           deliveryLocation={deliveryAddress}
           subtotal={cartSubtotal}
-          onBack={() => setScreen('home')}
-          onDownload={() => setScreen('home')}
+          onBack={() => setScreen(invoiceReturnTo)}
+          onDownload={() => {
+            showSuccess('Invoice downloaded successfully.');
+            setScreen(invoiceReturnTo);
+          }}
         />
       ) : (
         <RegisterScreen
           countryFlag={selectedCountry.flag}
           countryCode={selectedCountry.code}
           onSignIn={() => setScreen('login')}
-          onCountryPress={() => setScreen('countryCode')}
+          onCountryPress={() => {
+            setCountryCodeReturnTo('signup');
+            setScreen('countryCode');
+          }}
           onNext={(data) => {
             setSignupEmail(data.email);
             setSignupPhone(data.phone);
@@ -633,6 +942,16 @@ export default function App() {
           }}
         />
       )}
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
     </SafeAreaProvider>
   );
 }

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Image,
   ImageSourcePropType,
@@ -26,6 +26,7 @@ const COLORS = {
   danger: '#EF4444',
   link: '#2563EB',
   imageBg: '#F3F4F6',
+  disabled: 'rgba(114, 130, 138, 1)',
 };
 
 export type CartItem = {
@@ -85,7 +86,6 @@ type CartScreenProps = {
 export default function CartScreen({
   items: controlledItems,
   address = '102 St Marks Pl, New York',
-  onBack,
   onChangeAddress,
   onProceed,
   onTabPress,
@@ -97,6 +97,12 @@ export default function CartScreen({
   const [items, setItems] = useState<CartItem[]>(
     controlledItems ?? DEFAULT_ITEMS,
   );
+
+  useEffect(() => {
+    if (controlledItems) {
+      setItems(controlledItems);
+    }
+  }, [controlledItems]);
 
   const updateItems = (next: CartItem[]) => {
     setItems(next);
@@ -112,6 +118,7 @@ export default function CartScreen({
       ),
     [items],
   );
+  const isEmpty = items.length === 0;
 
   const changeQty = (id: string, delta: number) => {
     updateItems(
@@ -127,15 +134,13 @@ export default function CartScreen({
     updateItems(items.filter((item) => item.id !== id));
   };
 
-  const thumbSize = isTablet ? '14%' : '18%';
+  const thumbSize = isTablet ? '14%' : '28%';
 
   return (
     <View style={styles.screen}>
       <StatusBar style="light" />
       <Header
         title="My Cart"
-        showBack
-        onBack={onBack}
         backgroundColor={COLORS.primary}
       />
 
@@ -166,54 +171,70 @@ export default function CartScreen({
             </Pressable>
           </View>
 
-          <View style={styles.list}>
-            {items.map((item) => (
-              <View key={item.id} style={styles.itemRow}>
-                <View style={[styles.thumb, { width: thumbSize }]}>
-                  <Image
-                    source={item.image}
-                    style={styles.thumbImage}
-                    resizeMode="contain"
-                  />
-                </View>
+          <Text style={styles.orderTitle}>Order list</Text>
 
-                <View style={styles.itemInfo}>
-                  <Text style={styles.itemName} numberOfLines={1}>
-                    {item.name}
-                  </Text>
-                  <Text style={styles.itemMeta}>{item.quantityLabel}</Text>
-                  <Text style={styles.itemPrice}>
-                    $ {item.price.toFixed(2)}
-                  </Text>
-                </View>
-
-                <View style={styles.itemActions}>
-                  <Pressable onPress={() => removeItem(item.id)} hitSlop={8}>
+          {isEmpty ? (
+            <View style={styles.emptyState}>
+              <Image
+                source={require('../../assets/cart/empty-cart.png')}
+                style={styles.emptyIcon}
+                resizeMode="contain"
+              />
+              <View style={styles.emptyCopy}>
+                <Text style={styles.emptyTitle}>Your cart is empty</Text>
+                <Text style={styles.emptySubtitle}>Add your items !</Text>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.list}>
+              {items.map((item) => (
+                <View key={item.id} style={styles.itemRow}>
+                  <View style={[styles.thumb, { width: thumbSize }]}>
                     <Image
-                      source={require('../../assets/cart/delete.png')}
-                      style={styles.deleteIcon}
+                      source={item.image}
+                      style={styles.thumbImage}
                       resizeMode="contain"
                     />
-                  </Pressable>
-                  <View style={styles.qtyControls}>
-                    <Pressable
-                      style={styles.qtyBtn}
-                      onPress={() => changeQty(item.id, -1)}
-                    >
-                      <Ionicons name="remove" size={14} color={COLORS.text} />
+                  </View>
+
+                  <View style={styles.itemInfo}>
+                    <Text style={styles.itemName} numberOfLines={1}>
+                      {item.name}
+                    </Text>
+                    <Text style={styles.itemMeta}>{item.quantityLabel}</Text>
+                    <Text style={styles.itemPrice}>
+                      $ {item.price.toFixed(2)}
+                    </Text>
+                  </View>
+
+                  <View style={styles.itemActions}>
+                    <Pressable onPress={() => removeItem(item.id)} hitSlop={8}>
+                      <Image
+                        source={require('../../assets/cart/delete.png')}
+                        style={styles.deleteIcon}
+                        resizeMode="contain"
+                      />
                     </Pressable>
-                    <Text style={styles.qtyValue}>{item.qty}</Text>
-                    <Pressable
-                      style={styles.qtyBtn}
-                      onPress={() => changeQty(item.id, 1)}
-                    >
-                      <Ionicons name="add" size={14} color={COLORS.text} />
-                    </Pressable>
+                    <View style={styles.qtyControls}>
+                      <Pressable
+                        style={styles.qtyBtn}
+                        onPress={() => changeQty(item.id, -1)}
+                      >
+                        <Ionicons name="remove" size={14} color={COLORS.text} />
+                      </Pressable>
+                      <Text style={styles.qtyValue}>{item.qty}</Text>
+                      <Pressable
+                        style={styles.qtyBtn}
+                        onPress={() => changeQty(item.id, 1)}
+                      >
+                        <Ionicons name="add" size={14} color={COLORS.text} />
+                      </Pressable>
+                    </View>
                   </View>
                 </View>
-              </View>
-            ))}
-          </View>
+              ))}
+            </View>
+          )}
         </ScrollView>
 
         <View
@@ -228,8 +249,12 @@ export default function CartScreen({
           </View>
           <Button
             title="Proceed order"
-            onPress={onProceed}
-            containerStyle={styles.proceedButton}
+            onPress={isEmpty ? undefined : onProceed}
+            disabled={isEmpty}
+            containerStyle={[
+              styles.proceedButton,
+              isEmpty && styles.proceedButtonDisabled,
+            ]}
             textStyle={styles.proceedText}
           />
           <Footer
@@ -256,15 +281,18 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   scrollContent: {
+    flexGrow: 1,
     width: '100%',
     paddingHorizontal: '4.5%',
     paddingTop: '4%',
-    gap: 16,
+    gap: 10,
   },
   addressCard: {
     width: '100%',
     minHeight: 56,
-    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    borderRadius: 8,
     backgroundColor: COLORS.white,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -305,19 +333,52 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.primary,
   },
+  orderTitle: {
+    width: '100%',
+    fontSize: 14,
+    fontWeight: '500',
+    lineHeight: 21,
+    color: COLORS.text,
+  },
+  emptyState: {
+    flex: 1,
+    minHeight: 300,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 24,
+  },
+  emptyIcon: {
+    width: 100,
+    height: 100,
+  },
+  emptyCopy: {
+    marginTop: 20,
+    gap: 4,
+    alignItems: 'center',
+  },
+  emptyTitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    lineHeight: 14,
+    color: COLORS.muted,
+  },
+  emptySubtitle: {
+    fontSize: 12,
+    fontWeight: '400',
+    lineHeight: 12,
+    color: COLORS.muted,
+  },
   list: {
     width: '100%',
-    gap: 12,
+    gap: 10,
   },
   itemRow: {
     width: '100%',
-    minHeight: 90,
+    minHeight: 120,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: COLORS.border,
     backgroundColor: COLORS.white,
-    paddingHorizontal: '3%',
-    paddingVertical: 10,
+    paddingHorizontal: 0,
+    paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
@@ -409,6 +470,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 50,
     backgroundColor: COLORS.primary,
+  },
+  proceedButtonDisabled: {
+    backgroundColor: COLORS.disabled,
   },
   proceedText: {
     fontSize: 15,
