@@ -101,7 +101,7 @@ export default function Header({
                 ))}
             </View>
 
-            <View style={styles.center}>
+            <View style={styles.center} pointerEvents="none">
               {showLogo ? (
                 <Logo height={36} />
               ) : title ? (
@@ -131,33 +131,36 @@ const styles = StyleSheet.create({
     paddingBottom: '3.5%',
   },
   row: {
+    position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     minHeight: 40,
   },
   side: {
-    width: '9%',
-    minWidth: 36,
-    maxWidth: 44,
+    width: 40,
     alignItems: 'flex-start',
     justifyContent: 'center',
+    zIndex: 2,
   },
   sideRight: {
     alignItems: 'flex-end',
   },
   sideSpacer: {
-    width: '100%',
-    aspectRatio: 1,
+    width: 36,
+    height: 36,
   },
   center: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 48,
   },
   title: {
     fontSize: 18,
     fontWeight: '700',
     textAlign: 'center',
+    width: '100%',
   },
   rowLeft: {
     flex: 1,

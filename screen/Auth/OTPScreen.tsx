@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: '4.5%',
     paddingTop: 20,
-    gap: 12,
+    gap: 15,
   },
   title: {
     fontSize: 16,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
   otpBoxFilled: {
-    borderColor: COLORS.primary,
+    borderColor: COLORS.muted,
   },
   timerText: {
     fontSize: 14,

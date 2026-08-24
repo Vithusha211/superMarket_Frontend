@@ -1,7 +1,10 @@
+import { Ionicons } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,38 +17,60 @@ import InputField from '../../componets/layout/InputField';
 import PopupMessage from '../../componets/layout/PopupMessage';
 
 const COLORS = {
-  primary: '#07C187',
-  white: '#FFFFFF',
-  text: '#111827',
-  muted: '#72828A',
+  primary: 'rgba(7, 193, 135, 1)',
+  white: 'rgba(255, 255, 255, 1)',
+  text: 'rgba(0, 0, 0, 1)',
+  muted: 'rgba(114, 130, 138, 1)',
 };
 
 type FormErrors = {
+  currentPassword?: string;
   password?: string;
   confirmPassword?: string;
 };
 
-type CreateNewPasswordScreenProps = {
+type ChangePasswordScreenProps = {
+  email?: string;
   onBack?: () => void;
+  onForgotPassword?: () => void;
   onResetSuccess?: () => void;
 };
 
-export default function CreateNewPasswordScreen({
+function maskEmail(email: string) {
+  const [local = '', domain = 'gmail.com'] = email.split('@');
+  if (!local) {
+    return email;
+  }
+  const start = local.slice(0, 1);
+  const end = local.length > 2 ? local.slice(-1) : '';
+  return `${start}${'*'.repeat(Math.max(local.length - 2, 4))}${end}@${domain}`;
+}
+
+export default function ChangePasswordScreen({
+  email = 'user@gmail.com',
   onBack,
+  onForgotPassword,
   onResetSuccess,
-}: CreateNewPasswordScreenProps) {
+}: ChangePasswordScreenProps) {
   const insets = useSafeAreaInsets();
+  const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showCodeSent, setShowCodeSent] = useState(false);
 
   const validate = (
+    nextCurrent = currentPassword,
     nextPassword = password,
     nextConfirm = confirmPassword,
   ): FormErrors => {
     const nextErrors: FormErrors = {};
+
+    if (!nextCurrent.trim()) {
+      nextErrors.currentPassword = 'Current password is required';
+    }
 
     if (!nextPassword.trim()) {
       nextErrors.password = 'New password is required';
@@ -62,17 +87,22 @@ export default function CreateNewPasswordScreen({
     return nextErrors;
   };
 
-  const handlePasswordChange = (value: string) => {
-    setPassword(value);
+  const updateField = (
+    key: keyof FormErrors,
+    value: string,
+    setter: (value: string) => void,
+  ) => {
+    setter(value);
     if (submitted) {
-      setErrors(validate(value, confirmPassword));
-    }
-  };
-
-  const handleConfirmChange = (value: string) => {
-    setConfirmPassword(value);
-    if (submitted) {
-      setErrors(validate(password, value));
+      const next = {
+        currentPassword,
+        password,
+        confirmPassword,
+        [key]: value,
+      };
+      setErrors(
+        validate(next.currentPassword, next.password, next.confirmPassword),
+      );
     }
   };
 
@@ -90,8 +120,10 @@ export default function CreateNewPasswordScreen({
 
   return (
     <View style={styles.screen}>
+      <StatusBar style="light" />
       <Header
-        title="Create new password"
+        title="Change password"
+        titleAlign="left"
         showBack
         onBack={onBack}
         backgroundColor={COLORS.primary}
@@ -104,6 +136,7 @@ export default function CreateNewPasswordScreen({
           keyboardVerticalOffset={insets.top + 56}
         >
           <ScrollView
+            style={styles.scroll}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets
@@ -112,17 +145,39 @@ export default function CreateNewPasswordScreen({
               { paddingBottom: 24 },
             ]}
           >
-            <Text style={styles.helper}>
-              Your new password must be different from previous passwords
-            </Text>
+            <View style={styles.infoRow}>
+              <Ionicons
+                name="information-circle-outline"
+                size={16}
+                color={COLORS.muted}
+                style={styles.infoIcon}
+              />
+              <Text style={styles.infoText}>
+                For your security, please enter your current password before
+                setting a new one.
+              </Text>
+            </View>
 
             <View style={styles.form}>
+              <InputField
+                label="Enter current password"
+                variant="password"
+                placeholder="********"
+                value={currentPassword}
+                onChangeText={(value) =>
+                  updateField('currentPassword', value, setCurrentPassword)
+                }
+                error={errors.currentPassword}
+              />
+
               <InputField
                 label="Enter new Password"
                 variant="password"
                 placeholder="********"
                 value={password}
-                onChangeText={handlePasswordChange}
+                onChangeText={(value) =>
+                  updateField('password', value, setPassword)
+                }
                 error={errors.password}
               />
 
@@ -131,9 +186,20 @@ export default function CreateNewPasswordScreen({
                 variant="password"
                 placeholder="********"
                 value={confirmPassword}
-                onChangeText={handleConfirmChange}
+                onChangeText={(value) =>
+                  updateField('confirmPassword', value, setConfirmPassword)
+                }
                 error={errors.confirmPassword}
               />
+
+              <Pressable
+                onPress={() => setShowCodeSent(true)}
+                hitSlop={12}
+                style={styles.forgotWrap}
+                accessibilityRole="link"
+              >
+                <Text style={styles.forgotText}>Forgot password?</Text>
+              </Pressable>
             </View>
           </ScrollView>
 
@@ -154,11 +220,24 @@ export default function CreateNewPasswordScreen({
       </View>
 
       <PopupMessage
+        visible={showCodeSent}
+        variant="action"
+        title="Verification code sent!"
+        message={`We have sent a verification code to ${maskEmail(email)}.`}
+        actionLabel="Continue"
+        onAction={() => {
+          setShowCodeSent(false);
+          onForgotPassword?.();
+        }}
+        onClose={() => setShowCodeSent(false)}
+      />
+
+      <PopupMessage
         visible={showSuccess}
         variant="action"
         title="Password reset successful!"
         message="Your password has been successfully reset."
-        actionLabel="Back to Sign in"
+        actionLabel="Back to account"
         onAction={() => {
           setShowSuccess(false);
           onResetSuccess?.();
@@ -178,6 +257,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
   },
+  scroll: {
+    flex: 1,
+  },
   sheet: {
     flex: 1,
     width: '100%',
@@ -188,32 +270,55 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     width: '100%',
-    paddingHorizontal: '4.5%',
-    paddingTop: '5.5%',
-    gap: 24,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    gap: 30,
   },
-  helper: {
+  infoRow: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  infoIcon: {
+    marginTop: 2,
+  },
+  infoText: {
+    flex: 1,
     fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 20,
     color: COLORS.muted,
-    lineHeight: 22,
   },
   form: {
     width: '100%',
     gap: 16,
   },
+  forgotWrap: {
+    alignSelf: 'flex-end',
+    marginTop: -4,
+  },
+  forgotText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.primary,
+    lineHeight: 21,
+  },
   footer: {
     width: '100%',
-    paddingHorizontal: '4.5%',
+    paddingHorizontal: 20,
     paddingTop: 12,
     backgroundColor: COLORS.white,
   },
   resetButton: {
     width: '100%',
     height: 52,
+    borderRadius: 100,
     backgroundColor: COLORS.primary,
   },
   resetText: {
     fontSize: 16,
     fontWeight: '500',
+    color: COLORS.white,
   },
 });

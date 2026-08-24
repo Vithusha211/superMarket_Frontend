@@ -457,7 +457,8 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   popupButton: {
-    paddingVertical: 52,
+    width: '100%',
+    height: 52,
     backgroundColor: COLORS.primary,
     marginTop: 4,
   },
