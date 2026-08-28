@@ -14,6 +14,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ProductCard from '../../componets/layout/Cards';
 import Header from '../../componets/layout/Header';
+import SideBar from '../../componets/layout/SideBar';
 
 const COLORS = {
   primary: '#07C187',
@@ -121,6 +122,7 @@ export default function FruitsVegetablesScreen({
   const insets = useSafeAreaInsets();
   const [query, setQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterOption>('Newest');
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
 
   const products = useMemo(() => {
     let list = [...PRODUCTS];
@@ -175,7 +177,10 @@ export default function FruitsVegetablesScreen({
             accessibilityRole="button"
             accessibilityLabel="Open menu"
             style={styles.menuButton}
-            onPress={onMenuPress}
+            onPress={() => {
+              onMenuPress?.();
+              setIsMenuVisible(true);
+            }}
           >
             <Ionicons name="options-outline" size={18} color={COLORS.text} />
           </Pressable>
@@ -247,6 +252,15 @@ export default function FruitsVegetablesScreen({
           }
         />
       </View>
+
+      <SideBar
+        asModal
+        visible={isMenuVisible}
+        activeCategoryId="fruits-vegetables"
+        activeSubCategoryId="fruits"
+        onBack={() => setIsMenuVisible(false)}
+        onClose={() => setIsMenuVisible(false)}
+      />
     </View>
   );
 }
