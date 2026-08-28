@@ -49,10 +49,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     
   },
+  
   content: {
     flex: 1,
     alignItems: 'center',
-    // justifyContent: 'center',
     paddingHorizontal: '9%',
     paddingTop: 250,
     gap: 30,
@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
   },
   button: {
     height: 51,
+    
   },
   outlineButton: {
     backgroundColor: COLORS.white,

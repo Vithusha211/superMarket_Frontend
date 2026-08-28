@@ -20,7 +20,7 @@ const COLORS = {
   text: 'rgba(0, 0, 0, 1)',
   inputFocus: 'rgba(59, 130, 246, 1)',
   divider: 'rgba(209, 213, 219, 1)',
-  error: 'rgba(239, 68, 68, 1)',
+  error: '#FF4B2B',
 };
 
 export type InputFieldVariant =
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   inputFocused: {
-    borderColor: COLORS.inputFocus,
+    borderColor: 'transparent',
   },
   inputError: {
     borderColor: COLORS.error,
@@ -280,6 +280,7 @@ const styles = StyleSheet.create({
   inputText: {
     fontSize: 14,
     color: COLORS.text,
+    textAlign: 'center',
   },
   placeholderText: {
     color: COLORS.placeholder,
@@ -305,7 +306,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   phonePrefixFocused: {
-    borderColor: COLORS.inputFocus,
+    borderColor: COLORS.label,
   },
   phonePrefixError: {
     borderColor: COLORS.error,

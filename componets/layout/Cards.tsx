@@ -31,6 +31,7 @@ export type ProductCardProps = {
   oldPrice?: number | string;
   discount?: string | number;
   tag?: string;
+  compact?: boolean;
   onPress?: () => void;
   onAddPress?: () => void;
   style?: StyleProp<ViewStyle>;
@@ -52,6 +53,7 @@ export default function ProductCard({
   oldPrice,
   discount,
   tag,
+  compact = false,
   onPress,
   onAddPress,
   style,
@@ -67,20 +69,24 @@ export default function ProductCard({
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      style={[styles.card, style]}
+      style={[styles.card, compact && styles.compactCard, style]}
     >
-      <View style={styles.imageArea}>
-        <Image source={image} style={styles.image} resizeMode="contain" />
+      <View style={[styles.imageArea, compact && styles.compactImageArea]}>
+        <Image
+          source={image}
+          style={[styles.image, compact && styles.compactImage]}
+          resizeMode="contain"
+        />
 
         {tag ? (
           <View style={styles.tag}>
-            <Text style={styles.tagText}>{tag}</Text>
+            <Text style={[styles.tagText, compact && styles.compactTagText]}>{tag}</Text>
           </View>
         ) : null}
 
         {discountLabel ? (
           <View style={styles.discountBadge}>
-            <Text style={styles.discountText}>{discountLabel}</Text>
+            <Text style={[styles.discountText, compact && styles.compactDiscountText]}>{discountLabel}</Text>
           </View>
         ) : null}
 
@@ -88,7 +94,7 @@ export default function ProductCard({
           accessibilityRole="button"
           accessibilityLabel={`Add ${name}`}
           onPress={onAddPress}
-          style={styles.addButton}
+          style={[styles.addButton, compact && styles.compactAddButton]}
           hitSlop={6}
         >
           <Ionicons name="add" size={20} color={COLORS.white} />
@@ -96,22 +102,22 @@ export default function ProductCard({
       </View>
 
       <View style={styles.info}>
-        <Text style={styles.brand} numberOfLines={1}>
+        <Text style={[styles.brand, compact && styles.compactBrand]} numberOfLines={1}>
           {brand.toUpperCase()}
         </Text>
-        <Text style={styles.name} numberOfLines={2}>
+        <Text style={[styles.name, compact && styles.compactName]} numberOfLines={2}>
           {name}
         </Text>
         {quantity ? (
-          <Text style={styles.quantity} numberOfLines={1}>
+          <Text style={[styles.quantity, compact && styles.compactQuantity]} numberOfLines={1}>
             {quantity}
           </Text>
         ) : null}
 
         <View style={styles.priceRow}>
-          <Text style={styles.price}>{formatPrice(price)}</Text>
+          <Text style={[styles.price, compact && styles.compactPrice]}>{formatPrice(price)}</Text>
           {oldPrice !== undefined && oldPrice !== null ? (
-            <Text style={styles.oldPrice}>{formatPrice(oldPrice)}</Text>
+            <Text style={[styles.oldPrice, compact && styles.compactOldPrice]}>{formatPrice(oldPrice)}</Text>
           ) : null}
         </View>
       </View>
@@ -139,6 +145,42 @@ const styles = StyleSheet.create({
   image: {
     width: '80%',
     height: '80%',
+  },
+  compactCard: {
+    gap: 5,
+  },
+  compactImageArea: {
+    height: 76,
+  },
+  compactImage: {
+    width: '76%',
+    height: '76%',
+  },
+  compactAddButton: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+  },
+  compactTagText: {
+    fontSize: 7,
+  },
+  compactDiscountText: {
+    fontSize: 9,
+  },
+  compactBrand: {
+    fontSize: 9,
+  },
+  compactName: {
+    fontSize: 12,
+  },
+  compactQuantity: {
+    fontSize: 10,
+  },
+  compactPrice: {
+    fontSize: 12,
+  },
+  compactOldPrice: {
+    fontSize: 10,
   },
   tag: {
     position: 'absolute',

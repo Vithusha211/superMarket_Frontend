@@ -20,7 +20,6 @@ const COLORS = {
   text: '#111827',
   muted: '#9CA3AF',
   searchBg: '#F8F8F8',
-  cardBg: '#F3F4F6',
 };
 
 export type CategoryGridItem = {
@@ -45,17 +44,29 @@ const CATEGORIES: CategoryGridItem[] = [
     label: 'Grocery & Staples',
     image: require('../../assets/home/category-grocery.png'),
   },
+  {
+    id: 'frozen',
+    label: 'Frozen Food',
+    image: require('../../assets/home/category-frozen.png'),
+  },
+  {
+    id: 'personal-care',
+    label: 'Personal Care',
+    image: require('../../assets/home/category-personal-care.png'),
+  },
 ];
 
 type CategoryScreenProps = {
   categories?: CategoryGridItem[];
   onBack?: () => void;
+  onFilterPress?: () => void;
   onCategoryPress?: (id: string) => void;
 };
 
 export default function CategoryScreen({
   categories = CATEGORIES,
   onBack,
+  onFilterPress,
   onCategoryPress,
 }: CategoryScreenProps) {
   const insets = useSafeAreaInsets();
@@ -78,15 +89,24 @@ export default function CategoryScreen({
       />
 
       <View style={styles.sheet}>
-        <View style={styles.searchWrap}>
+        <View style={styles.searchRow}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Open filters"
+            style={styles.filterButton}
+            onPress={onFilterPress}
+          >
+            <Ionicons name="options-outline" size={18} color={COLORS.primary} />
+          </Pressable>
           <View style={styles.searchBar}>
-            <Ionicons name="search" size={18} color={COLORS.primary} />
+            <Ionicons name="search" size={18} color={COLORS.muted} />
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="Search category"
+              placeholder="Search"
               placeholderTextColor={COLORS.muted}
               style={styles.searchInput}
+              returnKeyType="search"
             />
           </View>
         </View>
@@ -138,20 +158,33 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
   },
-  searchWrap: {
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
     paddingHorizontal: '4.5%',
     paddingTop: '4%',
     paddingBottom: '3%',
   },
+  filterButton: {
+    width: '11.5%',
+    aspectRatio: 1,
+    maxWidth: 51,
+    minWidth: 44,
+    borderRadius: 8,
+    backgroundColor: COLORS.searchBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   searchBar: {
-    width: '100%',
+    flex: 1,
     minHeight: 48,
-    borderRadius: 12,
+    borderRadius: 8,
     backgroundColor: COLORS.searchBg,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingHorizontal: '3.5%',
+    paddingHorizontal: '3%',
   },
   searchInput: {
     flex: 1,
@@ -175,15 +208,13 @@ const styles = StyleSheet.create({
   imageWrap: {
     width: '100%',
     aspectRatio: 164 / 120,
-    borderRadius: 8,
-    backgroundColor: COLORS.cardBg,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
   image: {
-    width: '80%',
-    height: '80%',
+    width: '100%',
+    height: '100%',
   },
   label: {
     fontSize: 13,

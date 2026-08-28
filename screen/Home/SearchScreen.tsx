@@ -196,7 +196,7 @@ export default function SearchScreen({
       <StatusBar style="light" />
 
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-        <View style={styles.searchRow}>
+        <View style={styles.headerRow}>
           <Pressable style={styles.backChip} onPress={onBack} hitSlop={8}>
             <Image
               source={require('../../assets/back-icon.png')}
@@ -204,29 +204,7 @@ export default function SearchScreen({
               resizeMode="contain"
             />
           </Pressable>
-
-          <View style={styles.searchBar}>
-            <Ionicons name="search" size={18} color={COLORS.muted} />
-            <TextInput
-              ref={inputRef}
-              value={query}
-              onChangeText={(value) => {
-                setQuery(value);
-                setSubmitted(false);
-              }}
-              placeholder="search"
-              placeholderTextColor={COLORS.muted}
-              style={styles.searchInput}
-              returnKeyType="search"
-              autoFocus={!initialQuery}
-              onSubmitEditing={() => runSearch(query)}
-            />
-            {query ? (
-              <Pressable onPress={clearQuery} hitSlop={8}>
-                <Ionicons name="close-circle" size={18} color={COLORS.muted} />
-              </Pressable>
-            ) : null}
-          </View>
+          <Text style={styles.headerTitle}>Dairy</Text>
         </View>
       </View>
 
@@ -235,6 +213,41 @@ export default function SearchScreen({
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.sheet}>
+          <View style={styles.searchRow}>
+            <Pressable
+              style={styles.filterButton}
+              onPress={() => setActiveFilter('All')}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Filter search results"
+            >
+              <Ionicons name="options-outline" size={18} color={COLORS.primary} />
+            </Pressable>
+
+            <View style={styles.searchBar}>
+              <Ionicons name="search" size={18} color={COLORS.muted} />
+              <TextInput
+                ref={inputRef}
+                value={query}
+                onChangeText={(value) => {
+                  setQuery(value);
+                  setSubmitted(false);
+                }}
+                placeholder="Search"
+                placeholderTextColor={COLORS.muted}
+                style={styles.searchInput}
+                returnKeyType="search"
+                autoFocus={!initialQuery}
+                onSubmitEditing={() => runSearch(query)}
+              />
+              {query ? (
+                <Pressable onPress={clearQuery} hitSlop={8}>
+                  <Ionicons name="close-circle" size={18} color={COLORS.muted} />
+                </Pressable>
+              ) : null}
+            </View>
+          </View>
+
           {showRecent ? (
             <View style={styles.content}>
               <Text style={styles.sectionLabel}>Recently search</Text>
@@ -295,7 +308,7 @@ export default function SearchScreen({
                     <Pressable
                       key={filter}
                       onPress={() => setActiveFilter(filter)}
-                      style={[styles.filterChip, active && styles.filterChipActive]}
+                        style={[styles.filterChip, active && styles.filterChipActive]}
                     >
                       <Text
                         style={[
@@ -331,6 +344,7 @@ export default function SearchScreen({
                     oldPrice={item.oldPrice}
                     discount={item.discount}
                     tag={item.tag}
+                    compact
                     onPress={() => onProductPress?.(item.id)}
                     onAddPress={() => onAddProduct?.(item.id)}
                     style={styles.productCard}
@@ -356,12 +370,25 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: COLORS.primary,
     paddingHorizontal: '4.5%',
-    paddingBottom: 16,
+    paddingBottom: 18,
   },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
+    paddingHorizontal: '4.5%',
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.white,
   },
   backChip: {
     width: 32,
@@ -386,6 +413,14 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: '3.5%',
   },
+  filterButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 6,
+    backgroundColor: COLORS.searchBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   searchInput: {
     flex: 1,
     fontSize: 15,
@@ -400,7 +435,7 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: '4.5%',
-    paddingTop: 28,
+    paddingTop: 8,
     gap: 14,
   },
   sectionLabel: {
@@ -466,13 +501,13 @@ const styles = StyleSheet.create({
   },
   filterRow: {
     paddingHorizontal: '4.5%',
-    gap: 8,
-    paddingBottom: 12,
+    gap: 6,
+    paddingBottom: 10,
   },
   filterChip: {
-    height: 32,
-    borderRadius: 12,
-    paddingHorizontal: 10,
+    height: 24,
+    borderRadius: 8,
+    paddingHorizontal: 8,
     backgroundColor: COLORS.chipBg,
     alignItems: 'center',
     justifyContent: 'center',
@@ -481,7 +516,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   filterChipText: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '500',
     color: COLORS.text,
   },

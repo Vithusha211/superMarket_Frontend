@@ -432,15 +432,16 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingTop: '4.5%',
+    paddingHorizontal: 20,
     gap: 24,
     paddingBottom: '4%',
   },
   bannerWrap: {
-    paddingHorizontal: '4.5%',
+    width: '100%',
   },
   banner: {
     width: '100%',
-    aspectRatio: 400 / 160,
+    aspectRatio: 400 / 189,
     borderRadius: 16,
   },
   section: {
@@ -455,15 +456,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 8,
     marginBottom: 4,
   },
   seeAllIcon: {
-    width: 21,
-    height: 21,
+    width: 24,
+    height: 24,
   },
   hList: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 0,
     gap: 8,
   },
   categoryItem: {

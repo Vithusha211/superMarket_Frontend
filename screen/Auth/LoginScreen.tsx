@@ -23,9 +23,9 @@ const COLORS = {
   text: 'rgba(0, 0, 0, 1)',
   muted: 'rgba(114, 130, 138, 1)',
   link: 'rgba(7, 193, 135, 1)',
-  socialBg: 'rgba(255, 255, 255, 1)',
+  socialBg: 'rgba(247, 248, 249, 1)',
   border: 'rgba(229, 231, 235, 1)',
-  overlay: 'rgba(114, 130, 138, 1)',
+  overlay: 'rgba(16, 17, 17, 0.29)',
 };
 
 type SocialProvider = 'google' | 'apple' | 'facebook' | 'instagram';
@@ -401,10 +401,8 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   socialButton: {
-    width: '11.5%',
-    aspectRatio: 1,
-    maxWidth: 56,
-    minWidth: 44,
+    width: 42,
+    height: 42,
     borderRadius: 999,
     backgroundColor: COLORS.socialBg,
     alignItems: 'center',

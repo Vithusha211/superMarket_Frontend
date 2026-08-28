@@ -649,6 +649,12 @@ function AppContent() {
       ) : screen === 'categories' ? (
         <CategoryScreen
           onBack={() => setScreen('home')}
+          onFilterPress={() => {
+            setMenuReturnTo('categories');
+            setMenuCategoryId('dairy');
+            setMenuSubCategoryId('milk');
+            setScreen('menu');
+          }}
           onCategoryPress={openCategory}
         />
       ) : screen === 'brands' ? (
@@ -728,12 +734,6 @@ function AppContent() {
         <FruitsVegetablesScreen
           onBack={() => setScreen('home')}
           onSearchPress={() => setScreen('search')}
-          onMenuPress={() => {
-            setMenuReturnTo('fruits');
-            setMenuCategoryId('fruits-vegetables');
-            setMenuSubCategoryId('fruits');
-            setScreen('menu');
-          }}
           onProductPress={(product: FruitProduct) =>
             openProduct('fruits', {
               id: product.id,

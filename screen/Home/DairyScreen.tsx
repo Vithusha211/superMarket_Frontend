@@ -14,12 +14,13 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ProductCard from '../../componets/layout/Cards';
 import Header from '../../componets/layout/Header';
+import SideBar from '../../componets/layout/SideBar';
 
 const COLORS = {
   primary: '#07C187',
   white: '#FFFFFF',
   text: '#111827',
-  muted: '#9CA3AF',
+  muted: '#72828A',
   searchBg: '#FFFFFF',
   chipBg: '#F3F4F6',
 };
@@ -155,6 +156,7 @@ export default function DairyScreen({
   const insets = useSafeAreaInsets();
   const [query, setQuery] = useState('');
   const [activeChip, setActiveChip] = useState<SubChip>('All');
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
 
   const products = useMemo(() => {
     let list = [...PRODUCTS];
@@ -198,7 +200,7 @@ export default function DairyScreen({
             accessibilityRole="button"
             accessibilityLabel="Open menu"
             style={styles.menuButton}
-            onPress={onMenuPress}
+            onPress={() => setIsMenuVisible(true)}
           >
             <Ionicons name="options-outline" size={18} color={COLORS.text} />
           </Pressable>
@@ -266,6 +268,15 @@ export default function DairyScreen({
           }
         />
       </View>
+
+      <SideBar
+        asModal
+        visible={isMenuVisible}
+        activeCategoryId="dairy"
+        activeSubCategoryId="milk"
+        onBack={() => setIsMenuVisible(false)}
+        onClose={() => setIsMenuVisible(false)}
+      />
     </View>
   );
 }
@@ -331,7 +342,8 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   chip: {
-    minHeight: 32,
+   
+    height: 22,
     borderRadius: 12,
     paddingHorizontal: 12,
     backgroundColor: COLORS.chipBg,
@@ -342,9 +354,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   chipText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '500',
-    color: COLORS.text,
+    color: '#72828A',
   },
   chipTextActive: {
     color: COLORS.white,

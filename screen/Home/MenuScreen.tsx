@@ -9,6 +9,7 @@ import SideBar, {
 
 const COLORS = {
   white: '#FFFFFF',
+  overlay: 'rgba(0, 0, 0, 0.35)',
 };
 
 type MenuScreenProps = {
@@ -39,6 +40,7 @@ export default function MenuScreen({
   return (
     <View style={[styles.screen, { paddingTop: insets.top }]}>
       <StatusBar style="dark" />
+      <View style={styles.backdrop} />
       <SideBar
         asModal={false}
         visible
@@ -61,11 +63,16 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: COLORS.white,
   },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    left: 214,
+    backgroundColor: COLORS.overlay,
+  },
   menuSidebar: {
-    width: '100%',
-    maxWidth: '100%',
-    minWidth: '100%',
-    borderTopRightRadius: 0,
-    borderBottomRightRadius: 0,
+    width: 214,
+    maxWidth: 214,
+    minWidth: 214,
+    backgroundColor: COLORS.white,
+    zIndex: 2,
   },
 });
