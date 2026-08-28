@@ -14,6 +14,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ProductCard from '../../componets/layout/Cards';
 import Header from '../../componets/layout/Header';
+import SideBar from '../../componets/layout/SideBar';
 
 const COLORS = {
   primary: '#07C187',
@@ -178,6 +179,7 @@ export default function BestOffersScreen({
   const insets = useSafeAreaInsets();
   const [query, setQuery] = useState('');
   const [activeSort, setActiveSort] = useState<SortKey>('all');
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
 
   const products = useMemo(() => {
     let list = [...OFFERS];
@@ -221,7 +223,7 @@ export default function BestOffersScreen({
             accessibilityRole="button"
             accessibilityLabel="Open filters"
             style={styles.menuButton}
-            onPress={onMenuPress}
+            onPress={() => setIsMenuVisible(true)}
           >
             <Ionicons name="options-outline" size={18} color={COLORS.text} />
           </Pressable>
@@ -299,6 +301,15 @@ export default function BestOffersScreen({
           }
         />
       </View>
+
+      <SideBar
+        asModal
+        visible={isMenuVisible}
+        activeCategoryId="dairy"
+        activeSubCategoryId="milk"
+        onBack={() => setIsMenuVisible(false)}
+        onClose={() => setIsMenuVisible(false)}
+      />
     </View>
   );
 }

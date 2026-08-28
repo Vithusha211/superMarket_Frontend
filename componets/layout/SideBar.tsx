@@ -14,12 +14,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
-  activeBg: 'rgba(224, 247, 239, 1)',
-  white: 'rgba(255, 255, 255, 1)',
+  activeBg: 'rgb(234, 243, 240)',
+  white: '#FFFFFF',
   text: 'rgba(0, 0, 0, 1)',
   muted: 'rgba(114, 130, 138, 1)',
   border: 'rgba(229, 231, 235, 1)',
-  backBg: 'rgba(243, 244, 246, 1)',
+  backBg: 'rgba(8, 9, 9, 0.44)',
   overlayLight: 'rgba(0, 0, 0, 0.35)',
 };
 
