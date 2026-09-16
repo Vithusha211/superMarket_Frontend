@@ -36,6 +36,7 @@ export default function WelcomeScreen({
             variant="outline"
             onPress={onCreateAccount}
             containerStyle={[styles.button, styles.outlineButton]}
+            textStyle={styles.outlineButtonText}
           />
         </View>
       </View>
@@ -70,5 +71,9 @@ const styles = StyleSheet.create({
   },
   outlineButton: {
     backgroundColor: COLORS.white,
+  },
+  outlineButtonText: {
+    flex: 1,
+    textAlign: 'center',
   },
 });

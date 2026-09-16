@@ -17,6 +17,7 @@ import Button from '../../componets/layout/Button';
 import Header from '../../componets/layout/Header';
 import InputField from '../../componets/layout/InputField';
 import PopupMessage from '../../componets/layout/PopupMessage';
+import { useToast } from '../../context/ToastContext';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
@@ -63,10 +64,12 @@ export default function DeleteAccountScreen({
   onDeleted,
 }: DeleteAccountScreenProps) {
   const insets = useSafeAreaInsets();
+  const { showError } = useToast();
   const [step, setStep] = useState<'password' | 'reason'>('password');
   const [password, setPassword] = useState('');
   const [understood, setUnderstood] = useState(false);
   const [passwordError, setPasswordError] = useState('');
+  const [understoodError, setUnderstoodError] = useState('');
   const [reason, setReason] = useState('');
   const [otherReason, setOtherReason] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
@@ -82,11 +85,18 @@ export default function DeleteAccountScreen({
   };
 
   const handlePasswordContinue = () => {
+    let hasError = false;
+
     if (!password.trim()) {
       setPasswordError('Password is required');
-      return;
+      hasError = true;
     }
     if (!understood) {
+      setUnderstoodError('Please confirm that you understand this action.');
+      showError('Please confirm that you understand this action.');
+      hasError = true;
+    }
+    if (hasError) {
       return;
     }
     setPasswordError('');
@@ -156,7 +166,10 @@ export default function DeleteAccountScreen({
                 <Pressable
                   accessibilityRole="checkbox"
                   accessibilityState={{ checked: understood }}
-                  onPress={() => setUnderstood((value) => !value)}
+                  onPress={() => {
+                    setUnderstood((value) => !value);
+                    setUnderstoodError('');
+                  }}
                   style={[
                     styles.checkbox,
                     understood && styles.checkboxSelected,
@@ -177,6 +190,11 @@ export default function DeleteAccountScreen({
                   <Text style={styles.forgotText}>Forgot password?</Text>
                 </Pressable>
               </View>
+              {understoodError ? (
+                <Text style={styles.confirmationError} accessibilityRole="alert">
+                  {understoodError}
+                </Text>
+              ) : null}
             </ScrollView>
 
             <View
@@ -353,8 +371,8 @@ const styles = StyleSheet.create({
   },
   passwordContent: {
     paddingHorizontal: 20,
-    paddingTop: 20,
-    gap: 30,
+    paddingTop: 18,
+    gap: 24,
   },
   warningRow: {
     flexDirection: 'row',
@@ -375,6 +393,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8,
+    marginTop: -2,
+  },
+  confirmationError: {
+    marginTop: -16,
+    marginLeft: 24,
+    fontSize: 12,
+    lineHeight: 16,
+    color: COLORS.danger,
   },
   checkbox: {
     width: 16,

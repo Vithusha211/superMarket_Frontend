@@ -188,8 +188,9 @@ export default function LoginScreen({
               styles.scrollContent,
               { paddingBottom: insets.bottom + 24 },
             ]}
-            keyboardShouldPersistTaps="handled"
-            automaticallyAdjustKeyboardInsets
+            keyboardShouldPersistTaps="always"
+            keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+            automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
           >
             <View style={styles.form}>
               <InputField

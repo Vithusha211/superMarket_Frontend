@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ProductCard from '../../componets/layout/Cards';
+import CountryFlag from '../../componets/layout/CountryFlag';
 import Footer, { FooterTab } from '../../componets/layout/Footer';
 
 const COLORS = {
@@ -182,7 +183,7 @@ export default function HomeScreen({
 
           <View style={styles.headerActions}>
             <View style={styles.flagChip}>
-              <Text style={styles.flagText}>{countryFlag}</Text>
+              <CountryFlag flag={countryFlag} size={20} />
             </View>
             <Pressable
               style={styles.headerChip}

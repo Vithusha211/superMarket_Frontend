@@ -97,8 +97,8 @@ export default function PersonalInformationScreen({
   name = 'Kishana Yogathasan',
   email = 'example@gmail.com',
   phone = '0775512445',
-  gender = 'Female',
-  dateOfBirth = '12/02/2002',
+  gender = '',
+  dateOfBirth = '',
   avatar,
   onBack,
   onEditAvatar,
@@ -256,6 +256,7 @@ export default function PersonalInformationScreen({
       <StatusBar style="light" />
       <Header
         title="Personal Information"
+        titleAlign="left"
         showBack
         onBack={onBack}
         backgroundColor={COLORS.primary}
@@ -384,20 +385,22 @@ export default function PersonalInformationScreen({
                 <Text style={styles.editOptionLabel}>Gallery</Text>
               </Pressable>
 
-              <Pressable
-                style={styles.editOption}
-                onPress={handleRemoveProfile}
-                accessibilityRole="button"
-              >
-                <Image
-                  source={require('../../assets/profile/personal/remove.png')}
-                  style={styles.editOptionIconDanger}
-                  resizeMode="contain"
-                />
-                <Text style={[styles.editOptionLabel, styles.removeLabel]}>
-                  Remove Profile
-                </Text>
-              </Pressable>
+              {avatar ? (
+                <Pressable
+                  style={styles.editOption}
+                  onPress={handleRemoveProfile}
+                  accessibilityRole="button"
+                >
+                  <Image
+                    source={require('../../assets/profile/personal/remove.png')}
+                    style={styles.editOptionIconDanger}
+                    resizeMode="contain"
+                  />
+                  <Text style={[styles.editOptionLabel, styles.removeLabel]}>
+                    Remove Profile
+                  </Text>
+                </Pressable>
+              ) : null}
             </View>
           </View>
         </View>
@@ -599,8 +602,8 @@ const styles = StyleSheet.create({
   avatarWrap: {
     width: 80,
     height: 80,
-    marginTop: -28,
-    marginBottom: '4%',
+    marginTop: 20,
+    marginBottom: 26,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 2,
@@ -608,8 +611,8 @@ const styles = StyleSheet.create({
   avatar: {
     width: 80,
     height: 80,
-    borderRadius: 12,
-    backgroundColor: COLORS.avatarBg,
+    borderRadius: 40,
+    backgroundColor: 'rgba(245, 245, 245, 1)',
     borderWidth: 0,
     alignItems: 'center',
     justifyContent: 'center',
@@ -646,20 +649,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '400',
     color: COLORS.section,
-    marginBottom: 10,
+    marginBottom: 6,
     marginTop: 4,
   },
   fields: {
     width: '100%',
-    gap: 15,
+    gap: 4,
   },
   fieldRow: {
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    minHeight: 56,
-    paddingVertical: 10,
+    minHeight: 50,
+    paddingVertical: 6,
   },
   fieldIconSlot: {
     width: '4.8%',
@@ -676,7 +679,7 @@ const styles = StyleSheet.create({
   },
   fieldCopy: {
     flex: 1,
-    gap: 4,
+    gap: 2,
   },
   fieldLabel: {
     fontSize: 12,

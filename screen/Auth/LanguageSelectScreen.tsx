@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import Button from '../../componets/layout/Button';
+import CountryFlag from '../../componets/layout/CountryFlag';
 import Header from '../../componets/layout/Header';
 
 const COLORS = {
@@ -97,7 +98,7 @@ export default function LanguageSelectScreen({
                     >
                       {isSelected ? <View style={styles.radioInner} /> : null}
                     </View>
-                    <Text style={styles.flag}>{language.flag}</Text>
+                    <CountryFlag flag={language.flag} size={20} />
                     <View style={styles.languageText}>
                       <Text style={styles.languageLabel}>{language.label}</Text>
                       {language.subtitle ? (
@@ -215,7 +216,11 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.radio,
   },
   flag: {
-    fontSize: 18,
+    width: 20,
+    fontSize: 16,
+    lineHeight: 20,
+    textAlign: 'center',
+    includeFontPadding: false,
   },
   languageText: {
     flex: 1,

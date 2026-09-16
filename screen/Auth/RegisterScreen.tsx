@@ -163,7 +163,7 @@ export default function RegisterScreen({
     <KeyboardAvoidingView
       style={styles.screen}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      keyboardVerticalOffset={0}
     >
       <StatusBar style="light" />
 
@@ -178,9 +178,9 @@ export default function RegisterScreen({
             styles.scrollContent,
             { paddingBottom: insets.bottom + 40 },
           ]}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-          automaticallyAdjustKeyboardInsets
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+          automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
         >
           <View style={styles.form}>
             <InputField
@@ -302,12 +302,14 @@ const styles = StyleSheet.create({
     
   },
   scrollContent: {
+    flexGrow: 1,
     paddingHorizontal: '4.5%',
     paddingTop: '5.5%',
-    gap: 24,
+    paddingBottom: 24,
+    gap: 20,
   },
   form: {
-    gap: 16,
+    gap: 20,
   },
   nextButton: {
     paddingVertical: 14,

@@ -83,6 +83,7 @@ export default function CategoryScreen({
       <StatusBar style="light" />
       <Header
         title="Category"
+        titleAlign="left"
         showBack
         onBack={onBack}
         backgroundColor={COLORS.primary}

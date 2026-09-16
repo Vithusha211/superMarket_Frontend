@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
+import CountryFlag from '../../componets/layout/CountryFlag';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
@@ -97,7 +98,7 @@ export default function LanguageSheet({
                   <View style={[styles.radioOuter, active && styles.radioOuterActive]}>
                     {active ? <View style={styles.radioInner} /> : null}
                   </View>
-                  <Text style={styles.flag}>{language.flag}</Text>
+                  <CountryFlag flag={language.flag} size={20} />
                   <View style={styles.copy}>
                     <Text style={styles.label}>{language.label}</Text>
                     <Text style={styles.subtitle}>({language.subtitle})</Text>
@@ -185,7 +186,11 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   flag: {
-    fontSize: 18,
+    width: 20,
+    fontSize: 16,
+    lineHeight: 20,
+    textAlign: 'center',
+    includeFontPadding: false,
   },
   copy: {
     flex: 1,
