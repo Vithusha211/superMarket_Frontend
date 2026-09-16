@@ -168,6 +168,7 @@ export default function BrandScreen({
       <StatusBar style="light" />
       <Header
         title={brandName}
+        titleAlign="left"
         showBack
         onBack={onBack}
         backgroundColor={COLORS.primary}

@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
+import CountryFlag from '../../componets/layout/CountryFlag';
 import Header from '../../componets/layout/Header';
 
 const COLORS = {
@@ -89,7 +90,7 @@ export default function CountryCodeScreen({
                   >
                     {isSelected ? <View style={styles.radioInner} /> : null}
                   </View>
-                  <Text style={styles.flag}>{item.flag}</Text>
+                  <CountryFlag flag={item.flag} size={20} />
                   <Text style={styles.label}>{item.label}</Text>
                 </View>
                 <Text style={styles.code}>{item.code}</Text>

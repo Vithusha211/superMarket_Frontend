@@ -11,6 +11,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import CountryFlag from './CountryFlag';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
@@ -102,7 +103,7 @@ export default function InputField({
         accessibilityRole="button"
         accessibilityLabel="Select country code"
       >
-        <Text style={styles.flagText}>{countryFlag}</Text>
+        <CountryFlag flag={countryFlag} size={20} />
       </Pressable>
 
       <View
@@ -237,6 +238,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: COLORS.label,
+    lineHeight: 20,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -338,6 +340,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     color: COLORS.error,
+    lineHeight: 16,
     marginTop: -4,
   },
 });

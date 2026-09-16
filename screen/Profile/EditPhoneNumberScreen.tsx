@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
+import CountryFlag from '../../componets/layout/CountryFlag';
 import Header from '../../componets/layout/Header';
 
 const COLORS = {
@@ -81,7 +82,7 @@ export default function EditPhoneNumberScreen({
                 onPress={onCountryPress}
                 style={styles.countryField}
               >
-                <Text style={styles.flag}>{countryFlag}</Text>
+                <CountryFlag flag={countryFlag} size={20} />
                 <Text style={styles.countryCode}>{countryCode}</Text>
               </Pressable>
 

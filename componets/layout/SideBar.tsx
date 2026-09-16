@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
-  activeBg: 'rgb(234, 243, 240)',
+  activeBg: 'rgba(234, 243, 240, 0.35)',
   white: '#FFFFFF',
   text: 'rgba(0, 0, 0, 1)',
   muted: 'rgba(114, 130, 138, 1)',
@@ -129,6 +129,7 @@ function SideBarContent({
   categories,
   brands,
   expandedId,
+  activeCategoryId,
   activeSubCategoryId,
   onBack,
   onToggleCategory,
@@ -140,6 +141,7 @@ function SideBarContent({
   categories: SideBarCategory[];
   brands: SideBarBrand[];
   expandedId: string | null;
+  activeCategoryId: string | null | undefined;
   activeSubCategoryId: string | null;
   onBack?: () => void;
   onToggleCategory: (category: SideBarCategory) => void;
@@ -176,6 +178,7 @@ function SideBarContent({
           {categories.map((category) => {
             const isExpanded = expandedId === category.id;
             const hasChildren = !!category.children?.length;
+            const isActive = activeCategoryId === category.id;
 
             return (
               <View key={category.id}>
@@ -185,7 +188,7 @@ function SideBarContent({
                   onPress={() => onToggleCategory(category)}
                   style={[
                     styles.categoryItem,
-                    isExpanded && !hasChildren && styles.categoryActive,
+                    isActive && styles.categoryActive,
                   ]}
                 >
                   <Text
@@ -309,6 +312,7 @@ export default function SideBar({
       categories={categories}
       brands={brands}
       expandedId={expandedId}
+      activeCategoryId={activeCategoryId}
       activeSubCategoryId={resolvedSubId}
       onBack={handleBack}
       onToggleCategory={handleToggleCategory}

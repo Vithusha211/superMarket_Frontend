@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
     width: 41,
   },
   content: {
+    alignSelf: 'stretch',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

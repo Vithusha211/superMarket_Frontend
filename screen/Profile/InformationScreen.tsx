@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     marginTop: 48,
     fontSize: 14,
     fontWeight: '400',
-    lineHeight: 14,
+    lineHeight: 21,
     letterSpacing: 0,
     textAlign: 'justify',
     color: COLORS.muted,
