@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   frameBorder: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.35)',
   },

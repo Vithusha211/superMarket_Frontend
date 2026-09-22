@@ -169,7 +169,6 @@ export default function InputField({
             (variant === 'email' ? 'none' : 'sentences')
           }
           multiline={isTextarea}
-          textAlignVertical={isTextarea ? 'top' : 'center'}
           editable={editable}
           onFocus={(event) => {
             setIsFocused(true);

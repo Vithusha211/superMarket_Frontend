@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     left: 214,
     backgroundColor: COLORS.overlay,
   },

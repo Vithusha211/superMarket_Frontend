@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AddLocationScreen from './screen/Auth/AddLocationScreen';
 import CountryCodeScreen, {
@@ -57,6 +58,7 @@ import LanguageSheet, {
 } from './screen/Profile/LanguageSheet';
 import { ImageSourcePropType } from 'react-native';
 import { ToastProvider, useToast } from './context/ToastContext';
+import defaultCredentials from './data/defaultCredentials.json';
 
 type AppScreen =
   | 'splash'
@@ -109,6 +111,10 @@ function AppContent() {
     useState<InformationPage>('About us');
   const [signupEmail, setSignupEmail] = useState('user@gmail.com');
   const [signupPhone, setSignupPhone] = useState('1234565657');
+  const [registeredCredentials, setRegisteredCredentials] = useState({
+    username: defaultCredentials.username,
+    password: defaultCredentials.password,
+  });
   const [forgotEmail, setForgotEmail] = useState('');
   const [cartCount, setCartCount] = useState(0);
   const [cartSubtotal, setCartSubtotal] = useState(25);
@@ -148,6 +154,47 @@ function AppContent() {
     id: 'maliban',
     label: 'Maliban',
   });
+
+  const pickProfileImage = async (source: 'camera' | 'gallery') => {
+    try {
+      if (source === 'camera') {
+        const permission = await ImagePicker.requestCameraPermissionsAsync();
+        if (!permission.granted) {
+          showError('Camera permission is required to take a profile photo.');
+          return;
+        }
+      } else {
+        const permission =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!permission.granted) {
+          showError('Photo library permission is required to choose a profile photo.');
+          return;
+        }
+      }
+
+      const result =
+        source === 'camera'
+          ? await ImagePicker.launchCameraAsync({
+              mediaTypes: ['images'],
+              allowsEditing: true,
+              aspect: [1, 1],
+              quality: 1,
+            })
+          : await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ['images'],
+              allowsEditing: true,
+              aspect: [1, 1],
+              quality: 1,
+            });
+
+      if (!result.canceled && result.assets[0]) {
+        setCropImage({ uri: result.assets[0].uri });
+        setScreen('imageCrop');
+      }
+    } catch {
+      showError('Unable to select a profile photo. Please try again.');
+    }
+  };
   const [menuCategoryId, setMenuCategoryId] = useState<string | null>('dairy');
   const [menuSubCategoryId, setMenuSubCategoryId] = useState<string | null>(
     'milk',
@@ -268,9 +315,18 @@ function AppContent() {
       ) : screen === 'login' ? (
         <LoginScreen
           onSignUp={() => setScreen('signup')}
-          onContinue={() => {
+          onContinue={({ email, password }) => {
+            const isAuthenticated =
+              email.toLowerCase() === registeredCredentials.username.toLowerCase() &&
+              password === registeredCredentials.password;
+
+            if (!isAuthenticated) {
+              return false;
+            }
+
             showSuccess('Welcome back!');
             setScreen('home');
+            return true;
           }}
           onForgotPassword={(email) => {
             setForgotEmail(email);
@@ -595,16 +651,10 @@ function AppContent() {
             }
           }}
           onPickCamera={() => {
-            setCropImage(
-              require('./assets/profile/personal/crop-sample.png'),
-            );
-            setScreen('imageCrop');
+            void pickProfileImage('camera');
           }}
           onPickGallery={() => {
-            setCropImage(
-              require('./assets/profile/personal/crop-sample.png'),
-            );
-            setScreen('imageCrop');
+            void pickProfileImage('gallery');
           }}
           onRemoveProfile={() => setProfileAvatar(undefined)}
         />
@@ -938,6 +988,10 @@ function AppContent() {
           onNext={(data) => {
             setSignupEmail(data.email);
             setSignupPhone(data.phone);
+            setRegisteredCredentials({
+              username: data.email,
+              password: data.password,
+            });
             setScreen('emailOtp');
           }}
         />

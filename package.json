@@ -4,7 +4,7 @@
   "main": "index.ts",
   "scripts": {
     "start": "call start-expo.bat",
-    "start:lan": "set \"EXPO_NO_DEPENDENCY_VALIDATION=1\" && set \"REACT_NATIVE_PACKAGER_HOSTNAME=192.168.8.135\" && npx expo start --lan --port 8081",
+    "start:lan": "set \"REACT_NATIVE_PACKAGER_HOSTNAME=192.168.8.135\" && npx expo start --go --lan --port 8081",
     "start:windows": "call start-expo.bat",
     "start:tunnel": "npx expo start --tunnel",
     "start:localhost": "npx expo start --localhost --port 8081",
@@ -21,6 +21,7 @@
     "expo": "~57.0.23",
     "expo-blur": "~57.0.3",
     "expo-font": "~57.0.4",
+    "expo-image-picker": "~57.0.3",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -30,6 +31,7 @@
     "react-native-web": "^0.21.0"
   },
   "devDependencies": {
+    "@expo/cli": "~57.0.25",
     "@types/react": "~19.2.4",
     "typescript": "~6.0.3"
   },

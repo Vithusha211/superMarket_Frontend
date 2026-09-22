@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: COLORS.overlayLight,
   },
   container: {

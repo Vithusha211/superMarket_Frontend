@@ -13,6 +13,10 @@ import { StatusBar } from 'expo-status-bar';
 import Button from '../../componets/layout/Button';
 import InputField from '../../componets/layout/InputField';
 import Logo from '../../componets/layout/Logo';
+import {
+  isValidPassword,
+  PASSWORD_REQUIREMENTS_MESSAGE,
+} from '../../utils/passwordValidation';
 
 const COLORS = {
   primary: '#02B97D',
@@ -112,8 +116,8 @@ export default function RegisterScreen({
 
     if (!values.password.trim()) {
       nextErrors.password = 'Password is required';
-    } else if (values.password.length < 6) {
-      nextErrors.password = 'Password must be at least 6 characters';
+    } else if (!isValidPassword(values.password)) {
+      nextErrors.password = PASSWORD_REQUIREMENTS_MESSAGE;
     }
 
     if (!values.confirmPassword.trim()) {
@@ -176,11 +180,11 @@ export default function RegisterScreen({
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingBottom: insets.bottom + 40 },
+            { paddingBottom: insets.bottom + 56 },
           ]}
           keyboardShouldPersistTaps="always"
           keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
-          automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+          automaticallyAdjustKeyboardInsets={false}
         >
           <View style={styles.form}>
             <InputField
@@ -299,7 +303,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginLeft: 20,
     marginRight: 20,
-    
+    overflow: 'hidden',
   },
   scrollContent: {
     flexGrow: 1,

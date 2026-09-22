@@ -252,7 +252,6 @@ export default function DeleteAccountScreen({
                           placeholder="Could you tell us why?"
                           placeholderTextColor={COLORS.muted}
                           multiline
-                          textAlignVertical="top"
                           style={styles.otherInput}
                         />
                       ) : null}

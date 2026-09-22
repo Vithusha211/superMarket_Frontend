@@ -39,7 +39,7 @@ type LoginScreenProps = {
   onContinue?: (data: {
     email: string;
     password: string;
-  }) => void;
+  }) => boolean | void;
   onForgotPassword?: (email: string) => void;
   onSignUp?: () => void;
   onSocialPress?: (provider: SocialProvider) => void;
@@ -134,10 +134,14 @@ export default function LoginScreen({
       return;
     }
 
-    onContinue?.({
+    const isAuthenticated = onContinue?.({
       email: email.trim(),
       password,
     });
+
+    if (isAuthenticated === false) {
+      setErrors({ password: 'Incorrect username or password' });
+    }
   };
 
   const openForgotPopup = () => {
@@ -433,7 +437,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: '4.5%',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: COLORS.overlay,
   },
   popupCard: {

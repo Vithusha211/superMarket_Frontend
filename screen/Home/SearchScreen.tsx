@@ -113,6 +113,11 @@ type SearchScreenProps = {
   onAddProduct?: (id: string) => void;
 };
 
+type TextInputHandle = {
+  focus: () => void;
+  blur: () => void;
+};
+
 export default function SearchScreen({
   initialQuery = '',
   onBack,
@@ -120,7 +125,7 @@ export default function SearchScreen({
   onAddProduct,
 }: SearchScreenProps) {
   const insets = useSafeAreaInsets();
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<TextInputHandle | null>(null);
   const [query, setQuery] = useState(initialQuery);
   const [submitted, setSubmitted] = useState(!!initialQuery.trim());
   const [activeFilter, setActiveFilter] = useState<FilterOption>('All');
@@ -227,7 +232,9 @@ export default function SearchScreen({
             <View style={styles.searchBar}>
               <Ionicons name="search" size={18} color={COLORS.muted} />
               <TextInput
-                ref={inputRef}
+                ref={(ref) => {
+                  inputRef.current = ref;
+                }}
                 value={query}
                 onChangeText={(value) => {
                   setQuery(value);

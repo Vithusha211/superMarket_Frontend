@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   },
   copy: {
     width: '100%',
-    marginTop: 48,
+    marginTop: 20,
     fontSize: 14,
     fontWeight: '400',
     lineHeight: 21,
