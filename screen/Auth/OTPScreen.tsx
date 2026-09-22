@@ -37,6 +37,10 @@ type OTPScreenProps = {
   onResend?: () => void;
 };
 
+type TextInputHandle = {
+  focus: () => void;
+};
+
 function maskEmail(email: string) {
   const [local = '', domain = 'gmail.com'] = email.split('@');
   if (!local) {
@@ -73,7 +77,7 @@ export default function OTPScreen({
   const insets = useSafeAreaInsets();
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''));
   const [secondsLeft, setSecondsLeft] = useState(DEFAULT_SECONDS);
-  const inputsRef = useRef<Array<TextInput | null>>([]);
+  const inputsRef = useRef<Array<TextInputHandle | null>>([]);
 
   const isPhone = variant === 'phone';
   const headerTitle =

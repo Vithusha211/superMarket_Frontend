@@ -34,6 +34,10 @@ const COLORS = {
   borderIdle: 'rgba(229, 231, 235, 1)',
 };
 
+type TextInputHandle = {
+  focus: () => void;
+};
+
 const GENDER_OPTIONS = [
   'Male',
   'Female',
@@ -120,7 +124,7 @@ export default function PersonalInformationScreen({
   const [selectedGender, setSelectedGender] = useState(gender);
   const [birthDate, setBirthDate] = useState(dateOfBirth);
   const [draftBirthDate, setDraftBirthDate] = useState(dateOfBirth);
-  const dobInputRef = useRef<TextInput>(null);
+  const dobInputRef = useRef<TextInputHandle | null>(null);
   const initialGender = resolveGenderSelection(gender);
   const [draftGenderOption, setDraftGenderOption] = useState<GenderOption>(
     initialGender.option,
@@ -549,7 +553,9 @@ export default function PersonalInformationScreen({
               onPress={() => dobInputRef.current?.focus()}
             >
               <TextInput
-                ref={dobInputRef}
+                ref={(ref) => {
+                  dobInputRef.current = ref;
+                }}
                 value={draftBirthDate}
                 onChangeText={(text) =>
                   setDraftBirthDate(formatDateOfBirth(text))
@@ -702,7 +708,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.overlay,
   },
   editBackdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   editSheet: {
     width: '100%',

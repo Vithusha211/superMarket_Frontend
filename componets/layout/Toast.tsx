@@ -88,7 +88,7 @@ export default function Toast({
 
 const styles = StyleSheet.create({
   host: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     zIndex: 1000,
   },

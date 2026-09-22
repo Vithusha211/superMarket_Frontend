@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     height: 36,
   },
   center: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 48,

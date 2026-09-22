@@ -27,7 +27,14 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow HappyCart to access your photos so you can update your profile picture.",
+          "cameraPermission": "Allow HappyCart to use your camera to take a profile picture."
+        }
+      ]
     ]
   }
 }

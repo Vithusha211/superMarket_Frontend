@@ -220,7 +220,6 @@ function Field({
         placeholder={placeholder}
         placeholderTextColor={COLORS.muted}
         multiline={multiline}
-        textAlignVertical={multiline ? 'top' : 'center'}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
         style={[styles.input, multiline && styles.messageInput]}
