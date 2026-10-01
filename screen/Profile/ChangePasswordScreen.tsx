@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -14,7 +14,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
 import Header from '../../componets/layout/Header';
 import InputField from '../../componets/layout/InputField';
+import PasswordRequirements from '../../componets/layout/PasswordRequirements';
 import PopupMessage from '../../componets/layout/PopupMessage';
+import { isValidPassword } from '../../utils/passwordValidation';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
@@ -53,6 +55,7 @@ export default function ChangePasswordScreen({
   onResetSuccess,
 }: ChangePasswordScreenProps) {
   const insets = useSafeAreaInsets();
+  const scrollRef = useRef<ScrollView>(null);
   const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -74,8 +77,8 @@ export default function ChangePasswordScreen({
 
     if (!nextPassword.trim()) {
       nextErrors.password = 'New password is required';
-    } else if (nextPassword.length < 8) {
-      nextErrors.password = 'Password must be at least 8 characters';
+    } else if (!isValidPassword(nextPassword)) {
+      nextErrors.password = 'Password does not meet the requirements';
     }
 
     if (!nextConfirm.trim()) {
@@ -136,13 +139,14 @@ export default function ChangePasswordScreen({
           keyboardVerticalOffset={insets.top + 56}
         >
           <ScrollView
+            ref={scrollRef}
             style={styles.scroll}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets
             contentContainerStyle={[
               styles.scrollContent,
-              { paddingBottom: 24 },
+              { paddingBottom: 120 },
             ]}
           >
             <View style={styles.infoRow}>
@@ -170,16 +174,23 @@ export default function ChangePasswordScreen({
                 error={errors.currentPassword}
               />
 
-              <InputField
-                label="Enter new Password"
-                variant="password"
-                placeholder="********"
-                value={password}
-                onChangeText={(value) =>
-                  updateField('password', value, setPassword)
-                }
-                error={errors.password}
-              />
+              <View>
+                <InputField
+                  label="Enter new Password"
+                  variant="password"
+                  placeholder="********"
+                  value={password}
+                  onChangeText={(value) =>
+                    updateField('password', value, setPassword)
+                  }
+                  error={
+                    errors.password && !password.trim()
+                      ? errors.password
+                      : undefined
+                  }
+                />
+                <PasswordRequirements password={password} />
+              </View>
 
               <InputField
                 label="Confirm new password"
@@ -190,6 +201,11 @@ export default function ChangePasswordScreen({
                   updateField('confirmPassword', value, setConfirmPassword)
                 }
                 error={errors.confirmPassword}
+                onFocus={() => {
+                  setTimeout(() => {
+                    scrollRef.current?.scrollToEnd({ animated: true });
+                  }, 250);
+                }}
               />
 
               <Pressable

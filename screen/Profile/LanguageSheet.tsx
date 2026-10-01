@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import {
   Modal,
@@ -19,7 +20,6 @@ const COLORS = {
   muted: 'rgba(114, 130, 138, 1)',
   overlay: 'rgba(0, 0, 0, 0.45)',
   radioIdle: 'rgba(209, 213, 219, 1)',
-  selectedBg: 'rgba(240, 253, 248, 1)',
 };
 
 export type ProfileLanguage = {
@@ -93,11 +93,13 @@ export default function LanguageSheet({
                   accessibilityRole="radio"
                   accessibilityState={{ selected: active }}
                   onPress={() => setActiveId(language.id)}
-                  style={[styles.row, active && styles.rowActive]}
+                  style={styles.row}
                 >
-                  <View style={[styles.radioOuter, active && styles.radioOuterActive]}>
-                    {active ? <View style={styles.radioInner} /> : null}
-                  </View>
+                  <Ionicons
+                    name={active ? 'radio-button-on' : 'radio-button-off'}
+                    size={20}
+                    color={active ? COLORS.primary : COLORS.radioIdle}
+                  />
                   <CountryFlag flag={language.flag} size={20} />
                   <View style={styles.copy}>
                     <Text style={styles.label}>{language.label}</Text>
@@ -159,38 +161,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'transparent',
     backgroundColor: COLORS.white,
-  },
-  rowActive: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.selectedBg,
-  },
-  radioOuter: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: COLORS.radioIdle,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioOuterActive: {
-    borderColor: COLORS.primary,
-  },
-  radioInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: COLORS.primary,
-  },
-  flag: {
-    width: 20,
-    fontSize: 16,
-    lineHeight: 20,
-    textAlign: 'center',
-    includeFontPadding: false,
   },
   copy: {
     flex: 1,

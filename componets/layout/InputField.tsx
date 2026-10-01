@@ -158,16 +158,31 @@ export default function InputField({
       ) : (
         <TextInput
           style={[styles.input, isTextarea && styles.textareaInput]}
-          value={value}
-          onChangeText={onChangeText}
           placeholder={placeholder}
           placeholderTextColor={COLORS.placeholder}
-          secureTextEntry={isPassword && !isPasswordVisible}
           keyboardType={keyboardType}
+          {...textInputProps}
+          value={value}
+          onChangeText={onChangeText}
+          secureTextEntry={isPassword && !isPasswordVisible}
           autoCapitalize={
             textInputProps.autoCapitalize ??
-            (variant === 'email' ? 'none' : 'sentences')
+            (variant === 'email' || isPassword ? 'none' : 'sentences')
           }
+          autoCorrect={isPassword ? false : textInputProps.autoCorrect}
+          spellCheck={isPassword ? false : textInputProps.spellCheck}
+          textContentType={
+            textInputProps.textContentType ??
+            (isPassword ? 'none' : variant === 'email' ? 'emailAddress' : undefined)
+          }
+          autoComplete={
+            textInputProps.autoComplete ??
+            (isPassword ? 'off' : variant === 'email' ? 'email' : undefined)
+          }
+          importantForAutofill={
+            isPassword ? 'no' : textInputProps.importantForAutofill
+          }
+          blurOnSubmit={textInputProps.blurOnSubmit ?? false}
           multiline={isTextarea}
           editable={editable}
           onFocus={(event) => {
@@ -178,7 +193,6 @@ export default function InputField({
             setIsFocused(false);
             textInputProps.onBlur?.(event);
           }}
-          {...textInputProps}
         />
       )}
 
