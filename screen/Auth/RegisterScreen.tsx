@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -13,10 +13,8 @@ import { StatusBar } from 'expo-status-bar';
 import Button from '../../componets/layout/Button';
 import InputField from '../../componets/layout/InputField';
 import Logo from '../../componets/layout/Logo';
-import {
-  isValidPassword,
-  PASSWORD_REQUIREMENTS_MESSAGE,
-} from '../../utils/passwordValidation';
+import PasswordRequirements from '../../componets/layout/PasswordRequirements';
+import { isValidPassword } from '../../utils/passwordValidation';
 
 const COLORS = {
   primary: '#02B97D',
@@ -79,6 +77,7 @@ export default function RegisterScreen({
   countryCode = '+49',
 }: RegisterScreenProps) {
   const insets = useSafeAreaInsets();
+  const scrollRef = useRef<ScrollView>(null);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -117,7 +116,7 @@ export default function RegisterScreen({
     if (!values.password.trim()) {
       nextErrors.password = 'Password is required';
     } else if (!isValidPassword(values.password)) {
-      nextErrors.password = PASSWORD_REQUIREMENTS_MESSAGE;
+      nextErrors.password = 'Password does not meet the requirements';
     }
 
     if (!values.confirmPassword.trim()) {
@@ -164,28 +163,30 @@ export default function RegisterScreen({
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.screen}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={0}
-    >
+    <View style={styles.screen}>
       <StatusBar style="light" />
 
       <View style={[styles.greenTop, { paddingTop: insets.top + 16 }]}>
         <BrandHeader />
       </View>
 
-      <View style={styles.sheet}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[
-            styles.scrollContent,
-            { paddingBottom: insets.bottom + 56 },
-          ]}
-          keyboardShouldPersistTaps="always"
-          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
-          automaticallyAdjustKeyboardInsets={false}
-        >
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={0}
+      >
+        <View style={styles.sheet}>
+          <ScrollView
+            ref={scrollRef}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={[
+              styles.scrollContent,
+              { paddingBottom: insets.bottom + 120 },
+            ]}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+            automaticallyAdjustKeyboardInsets
+          >
           <View style={styles.form}>
             <InputField
               label="Fullname"
@@ -220,16 +221,23 @@ export default function RegisterScreen({
               error={errors.phone}
             />
 
-            <InputField
-              label="Password"
-              variant="password"
-              placeholder="********"
-              value={password}
-              onChangeText={(value) =>
-                updateField('password', value, setPassword)
-              }
-              error={errors.password}
-            />
+            <View>
+              <InputField
+                label="Password"
+                variant="password"
+                placeholder="********"
+                value={password}
+                onChangeText={(value) =>
+                  updateField('password', value, setPassword)
+                }
+                error={
+                  errors.password && !password.trim()
+                    ? errors.password
+                    : undefined
+                }
+              />
+              <PasswordRequirements password={password} />
+            </View>
 
             <InputField
               label="Confirm Password"
@@ -240,6 +248,11 @@ export default function RegisterScreen({
                 updateField('confirmPassword', value, setConfirmPassword)
               }
               error={errors.confirmPassword}
+              onFocus={() => {
+                setTimeout(() => {
+                  scrollRef.current?.scrollToEnd({ animated: true });
+                }, 250);
+              }}
             />
 
             <Button
@@ -257,8 +270,9 @@ export default function RegisterScreen({
             </Text>
           </Pressable>
         </ScrollView>
-      </View>
-    </KeyboardAvoidingView>
+        </View>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -266,6 +280,9 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: COLORS.primary,
+  },
+  flex: {
+    flex: 1,
   },
   greenTop: {
     backgroundColor: COLORS.primary,

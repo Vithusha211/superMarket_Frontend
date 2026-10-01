@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
   Image,
@@ -16,8 +17,8 @@ const COLORS = {
   white: 'rgba(255, 255, 255, 1)',
   text: 'rgba(13, 13, 13, 1)',
   muted: 'rgba(114, 130, 138, 1)',
-  border: 'rgba(255, 255, 255, 1)',
   radio: 'rgba(7, 193, 135, 1)',
+  radioIdle: 'rgba(209, 213, 219, 1)',
 };
 
 export type LanguageOption = {
@@ -84,20 +85,14 @@ export default function LanguageSelectScreen({
                   accessibilityRole="radio"
                   accessibilityState={{ selected: isSelected }}
                   onPress={() => setSelectedId(language.id)}
-                  style={[
-                    styles.languageRow,
-                    isSelected && styles.languageRowSelected,
-                  ]}
+                  style={styles.languageRow}
                 >
                   <View style={styles.languageLeft}>
-                    <View
-                      style={[
-                        styles.radioOuter,
-                        isSelected && styles.radioOuterSelected,
-                      ]}
-                    >
-                      {isSelected ? <View style={styles.radioInner} /> : null}
-                    </View>
+                    <Ionicons
+                      name={isSelected ? 'radio-button-on' : 'radio-button-off'}
+                      size={20}
+                      color={isSelected ? COLORS.radio : COLORS.radioIdle}
+                    />
                     <CountryFlag flag={language.flag} size={20} />
                     <View style={styles.languageText}>
                       <Text style={styles.languageLabel}>{language.label}</Text>
@@ -149,10 +144,12 @@ const styles = StyleSheet.create({
     aspectRatio: 360 / 200,
     alignItems: 'center',
     justifyContent: 'center',
+ 
   },
   illustrationImage: {
     width: '100%',
     height: '100%',
+  
     
   },
   copy: {
@@ -183,37 +180,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: '4.5%',
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.white,
     backgroundColor: COLORS.white,
-  },
-  languageRowSelected: {
-    borderColor: COLORS.primary,
-    backgroundColor: 'rgba(240, 253, 248, 1)',
   },
   languageLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 9,
     flex: 1,
-  },
-  radioOuter: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioOuterSelected: {
-    borderColor: COLORS.radio,
-  },
-  radioInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 10,
-    backgroundColor: COLORS.radio,
   },
   flag: {
     width: 20,

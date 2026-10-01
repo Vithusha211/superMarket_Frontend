@@ -1,6 +1,6 @@
 @echo off
 REM HappyCart Expo starter (Windows)
-REM Uses the local network by default so startup does not depend on ngrok.
+REM Uses the local network address explicitly so Expo Go can reach Metro.
 
 echo.
 echo ========================================
@@ -13,4 +13,5 @@ echo If LAN is unavailable, run: npm run start:tunnel
 echo ========================================
 echo.
 
-npx expo start --go --lan --clear --port 8081
+set "REACT_NATIVE_PACKAGER_HOSTNAME=192.168.8.135"
+node .\node_modules\expo\bin\cli start --go --lan --clear --port 8082

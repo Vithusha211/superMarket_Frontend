@@ -53,6 +53,7 @@ import HelpCenterScreen from './screen/Profile/HelpCenterScreen';
 import InformationScreen, {
   InformationPage,
 } from './screen/Profile/InformationScreen';
+import NotificationScreen from './screen/notification';
 import LanguageSheet, {
   PROFILE_LANGUAGES,
 } from './screen/Profile/LanguageSheet';
@@ -76,6 +77,7 @@ type AppScreen =
   | 'addressSelect'
   | 'getStarted'
   | 'home'
+  | 'notification'
   | 'search'
   | 'categories'
   | 'brands'
@@ -316,9 +318,14 @@ function AppContent() {
         <LoginScreen
           onSignUp={() => setScreen('signup')}
           onContinue={({ email, password }) => {
-            const isAuthenticated =
-              email.toLowerCase() === registeredCredentials.username.toLowerCase() &&
+            const normalizedEmail = email.trim().toLowerCase();
+            const isDefaultAccount =
+              normalizedEmail === defaultCredentials.username.toLowerCase() &&
+              password === defaultCredentials.password;
+            const isRegisteredAccount =
+              normalizedEmail === registeredCredentials.username.toLowerCase() &&
               password === registeredCredentials.password;
+            const isAuthenticated = isDefaultAccount || isRegisteredAccount;
 
             if (!isAuthenticated) {
               return false;
@@ -503,6 +510,7 @@ function AppContent() {
               countryFlag={selectedCountry.flag}
               addressLabel={deliveryAddress}
               onSearchPress={() => setScreen('search')}
+              onNotificationPress={() => setScreen('notification')}
               onTabPress={(tab) => {
                 if (tab === 'cart') {
                   setCartReturnTo('home');
@@ -536,6 +544,7 @@ function AppContent() {
           countryFlag={selectedCountry.flag}
           addressLabel={deliveryAddress}
           onSearchPress={() => setScreen('search')}
+          onNotificationPress={() => setScreen('notification')}
           onLocationPress={() => {
             setAddressFlow('change');
             setAddressSelectReturnTo('home');
@@ -577,6 +586,8 @@ function AppContent() {
             if (tab === 'profile') setScreen('account');
           }}
         />
+      ) : screen === 'notification' ? (
+        <NotificationScreen onBack={() => setScreen('home')} />
       ) : screen === 'account' ? (
         <>
           <ProfileScreen
