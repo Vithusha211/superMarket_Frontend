@@ -297,7 +297,7 @@ export default function SearchScreen({
             <View style={styles.emptyState}>
               <Ionicons name="cube-outline" size={96} color={COLORS.emptyIcon} />
               <Text style={styles.emptyTitle}>
-                We couldn't find what you're looking for.
+                We couldn’t find what you’re looking for.
               </Text>
             </View>
           ) : null}

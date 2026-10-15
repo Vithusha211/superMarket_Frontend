@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -55,7 +55,6 @@ export default function ChangePasswordScreen({
   onResetSuccess,
 }: ChangePasswordScreenProps) {
   const insets = useSafeAreaInsets();
-  const scrollRef = useRef<ScrollView>(null);
   const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -139,7 +138,6 @@ export default function ChangePasswordScreen({
           keyboardVerticalOffset={insets.top + 56}
         >
           <ScrollView
-            ref={scrollRef}
             style={styles.scroll}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
@@ -201,11 +199,6 @@ export default function ChangePasswordScreen({
                   updateField('confirmPassword', value, setConfirmPassword)
                 }
                 error={errors.confirmPassword}
-                onFocus={() => {
-                  setTimeout(() => {
-                    scrollRef.current?.scrollToEnd({ animated: true });
-                  }, 250);
-                }}
               />
 
               <Pressable

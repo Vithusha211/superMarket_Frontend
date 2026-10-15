@@ -198,9 +198,15 @@ export default function DairyScreen({
         <View style={styles.searchRow}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Open menu"
+            accessibilityLabel="Open categories menu"
             style={styles.menuButton}
-            onPress={() => setIsMenuVisible(true)}
+            onPress={() => {
+              if (onMenuPress) {
+                onMenuPress();
+                return;
+              }
+              setIsMenuVisible(true);
+            }}
           >
             <Ionicons name="options-outline" size={18} color={COLORS.text} />
           </Pressable>

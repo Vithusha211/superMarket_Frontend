@@ -47,6 +47,7 @@ import ImageCropScreen from './screen/Profile/ImageCropScreen';
 import EditPhoneNumberScreen, {
   VerificationChannel,
 } from './screen/Profile/EditPhoneNumberScreen';
+import NewPhoneNumberScreen from './screen/Profile/NewPhoneNumberScreen';
 import ChangePasswordScreen from './screen/Profile/ChangePasswordScreen';
 import DeleteAccountScreen from './screen/Profile/DeleteAccountScreen';
 import HelpCenterScreen from './screen/Profile/HelpCenterScreen';
@@ -60,6 +61,11 @@ import LanguageSheet, {
 import { ImageSourcePropType } from 'react-native';
 import { ToastProvider, useToast } from './context/ToastContext';
 import defaultCredentials from './data/defaultCredentials.json';
+import type {
+  SocialAccount,
+  SocialProvider,
+} from './componets/layout/SocialAuthButton';
+import { KindeAuthProvider, useKindeAuth } from '@kinde/expo';
 
 type AppScreen =
   | 'splash'
@@ -70,7 +76,6 @@ type AppScreen =
   | 'signup'
   | 'countryCode'
   | 'emailOtp'
-  | 'phoneOtp'
   | 'enableLocation'
   | 'address'
   | 'addLocation'
@@ -97,6 +102,7 @@ type AppScreen =
   | 'personalInformation'
   | 'editPhoneNumber'
   | 'editPhoneOtp'
+  | 'newPhoneNumber'
   | 'changePassword'
   | 'changePasswordOtp'
   | 'deleteAccount'
@@ -106,20 +112,25 @@ type AppScreen =
 /** Where address/add-location should return after finish */
 type AddressFlow = 'onboarding' | 'change' | 'addFromSelect';
 
-function AppContent() {
+type AppContentProps = {
+  onKindeSocialSignIn?: (
+    provider: SocialProvider,
+  ) => Promise<SocialAccount>;
+};
+
+function AppContent({ onKindeSocialSignIn }: AppContentProps) {
   const { showSuccess, showError } = useToast();
   const [screen, setScreen] = useState<AppScreen>('splash');
   const [informationPage, setInformationPage] =
     useState<InformationPage>('About us');
   const [signupEmail, setSignupEmail] = useState('user@gmail.com');
-  const [signupPhone, setSignupPhone] = useState('1234565657');
   const [registeredCredentials, setRegisteredCredentials] = useState({
     username: defaultCredentials.username,
     password: defaultCredentials.password,
   });
   const [forgotEmail, setForgotEmail] = useState('');
   const [cartCount, setCartCount] = useState(0);
-  const [cartSubtotal, setCartSubtotal] = useState(25);
+  const [cartSubtotal] = useState(25);
   const [deliveryAddress, setDeliveryAddress] = useState(
     '102 St Marks Pl, New York',
   );
@@ -142,12 +153,14 @@ function AppContent() {
   const [profileAvatar, setProfileAvatar] = useState<
     ImageSourcePropType | undefined
   >(undefined);
-  const [accountPhone, setAccountPhone] = useState('0775512445');
-  const [pendingPhone, setPendingPhone] = useState('0775512445');
+  const [accountPhone, setAccountPhone] = useState('0751847136');
   const [phoneVerificationChannel, setPhoneVerificationChannel] =
     useState<VerificationChannel>('email');
+  const [personalName, setPersonalName] = useState('Vithusha Kirushnabalan');
+  const [personalGender, setPersonalGender] = useState('');
+  const [personalDateOfBirth, setPersonalDateOfBirth] = useState('');
   const [countryCodeReturnTo, setCountryCodeReturnTo] = useState<
-    'signup' | 'editPhoneNumber'
+    'signup' | 'editPhoneNumber' | 'newPhoneNumber'
   >('signup');
   const [cropImage, setCropImage] = useState<ImageSourcePropType>(
     require('./assets/profile/personal/crop-sample.png'),
@@ -285,6 +298,37 @@ function AppContent() {
     setScreen('address');
   };
 
+  const handleSocialAuthenticated = (
+    account: SocialAccount,
+    provider: SocialProvider,
+  ) => {
+    const normalizedEmail = account.email.trim().toLowerCase();
+    const isExistingAccount =
+      normalizedEmail === defaultCredentials.username.toLowerCase() ||
+      normalizedEmail === registeredCredentials.username.toLowerCase();
+
+    setSignupEmail(account.email);
+    setPersonalName(account.name);
+    if (account.picture) {
+      setProfileAvatar({ uri: account.picture });
+    }
+    if (!isExistingAccount) {
+      setRegisteredCredentials({ username: account.email, password: '' });
+    }
+
+    if (isExistingAccount) {
+      showSuccess(`Signed in with ${provider}.`);
+      setScreen('home');
+      return;
+    }
+
+    showSuccess(
+      `${provider} account connected. Let’s finish setting up your account.`,
+    );
+    setAddressFlow('onboarding');
+    setScreen('enableLocation');
+  };
+
   return (
     <>
       {screen === 'splash' ? (
@@ -335,6 +379,9 @@ function AppContent() {
             setScreen('home');
             return true;
           }}
+          onSocialAuthenticated={handleSocialAuthenticated}
+          onSocialAuthError={showError}
+          onKindeSocialSignIn={onKindeSocialSignIn}
           onForgotPassword={(email) => {
             setForgotEmail(email);
             setScreen('forgotPassword');
@@ -354,6 +401,11 @@ function AppContent() {
         <CreateNewPasswordScreen
           onBack={() => setScreen(passwordReturnTo)}
           onResetSuccess={() => {
+            if (passwordReturnTo === 'deleteAccount') {
+              showSuccess('Password updated successfully. Confirm account deletion when ready.');
+              setScreen('deleteAccount');
+              return;
+            }
             showSuccess('Password reset successfully.');
             setScreen('login');
           }}
@@ -377,8 +429,13 @@ function AppContent() {
           onBack={() => setScreen('account')}
           onForgotPassword={() => {
             setProfilePasswordOtpReturnTo('deleteAccount');
+            setPasswordReturnTo('deleteAccount');
             setScreen('changePasswordOtp');
           }}
+          onPasswordCheck={(password) =>
+            password === registeredCredentials.password ||
+            password === defaultCredentials.password
+          }
           onDeleted={() => {
             showSuccess('Your account has been deleted.');
             setScreen('login');
@@ -403,7 +460,9 @@ function AppContent() {
           email={signupEmail}
           onBack={() => setScreen(profilePasswordOtpReturnTo)}
           onVerify={() => {
-            setPasswordReturnTo('changePasswordOtp');
+            if (profilePasswordOtpReturnTo !== 'deleteAccount') {
+              setPasswordReturnTo('changePasswordOtp');
+            }
             setScreen('createNewPassword');
           }}
           onResend={() => {}}
@@ -422,20 +481,12 @@ function AppContent() {
           variant="email"
           email={signupEmail}
           onBack={() => setScreen('signup')}
-          onVerify={() => setScreen('phoneOtp')}
-          onResend={() => {}}
-        />
-      ) : screen === 'phoneOtp' ? (
-        <OTPScreen
-          variant="phone"
-          phone={signupPhone}
-          onBack={() => setScreen('emailOtp')}
           onVerify={() => setScreen('enableLocation')}
           onResend={() => {}}
         />
       ) : screen === 'enableLocation' ? (
         <EnableLocationScreen
-          onBack={() => setScreen('phoneOtp')}
+          onBack={() => setScreen('emailOtp')}
           onAllowMaps={() => {
             setAddressFlow('onboarding');
             setScreen('address');
@@ -652,12 +703,26 @@ function AppContent() {
         </>
       ) : screen === 'personalInformation' ? (
         <PersonalInformationScreen
+          name={personalName}
           avatar={profileAvatar}
           phone={accountPhone}
+          gender={personalGender}
+          dateOfBirth={personalDateOfBirth}
           onBack={() => setScreen('account')}
+          onSaveName={(name) => {
+            setPersonalName(name);
+            showSuccess('Name updated successfully.');
+          }}
+          onSaveGender={(gender) => {
+            setPersonalGender(gender);
+            showSuccess('Gender updated successfully.');
+          }}
+          onSaveDateOfBirth={(dateOfBirth) => {
+            setPersonalDateOfBirth(dateOfBirth);
+            showSuccess('Date of birth updated successfully.');
+          }}
           onFieldPress={(fieldId) => {
             if (fieldId === 'phone') {
-              setPendingPhone(accountPhone);
               setScreen('editPhoneNumber');
             }
           }}
@@ -667,20 +732,18 @@ function AppContent() {
           onPickGallery={() => {
             void pickProfileImage('gallery');
           }}
-          onRemoveProfile={() => setProfileAvatar(undefined)}
+          onRemoveProfile={() => {
+            setProfileAvatar(undefined);
+            showSuccess('Profile photo removed.');
+          }}
         />
       ) : screen === 'editPhoneNumber' ? (
         <EditPhoneNumberScreen
-          phone={pendingPhone}
+          phone={accountPhone}
           countryFlag={selectedCountry.flag}
           countryCode={selectedCountry.code}
           onBack={() => setScreen('personalInformation')}
-          onCountryPress={() => {
-            setCountryCodeReturnTo('editPhoneNumber');
-            setScreen('countryCode');
-          }}
-          onNext={(phone, channel) => {
-            setPendingPhone(phone);
+          onNext={(channel) => {
             setPhoneVerificationChannel(channel);
             setScreen('editPhoneOtp');
           }}
@@ -688,15 +751,33 @@ function AppContent() {
       ) : screen === 'editPhoneOtp' ? (
         <OTPScreen
           variant={phoneVerificationChannel}
-          title="Edit Phone number"
+          title={
+            phoneVerificationChannel === 'email'
+              ? 'Verification to EMail'
+              : 'Verification to Phone'
+          }
           email={signupEmail}
-          phone={`${selectedCountry.code}${pendingPhone}`}
+          phone={`${selectedCountry.code}${accountPhone}`}
           onBack={() => setScreen('editPhoneNumber')}
           onVerify={() => {
-            setAccountPhone(pendingPhone);
-            setScreen('personalInformation');
+            setScreen('newPhoneNumber');
           }}
           onResend={() => {}}
+        />
+      ) : screen === 'newPhoneNumber' ? (
+        <NewPhoneNumberScreen
+          countryFlag={selectedCountry.flag}
+          countryCode={selectedCountry.code}
+          onBack={() => setScreen('editPhoneOtp')}
+          onCountryPress={() => {
+            setCountryCodeReturnTo('newPhoneNumber');
+            setScreen('countryCode');
+          }}
+          onSave={(phone) => {
+            setAccountPhone(phone);
+            showSuccess('Phone number updated successfully.');
+            setScreen('personalInformation');
+          }}
         />
       ) : screen === 'imageCrop' ? (
         <ImageCropScreen
@@ -704,6 +785,7 @@ function AppContent() {
           onCancel={() => setScreen('personalInformation')}
           onDone={(image) => {
             setProfileAvatar(image);
+            showSuccess('Profile photo uploaded successfully.');
             setScreen('personalInformation');
           }}
         />
@@ -998,7 +1080,6 @@ function AppContent() {
           }}
           onNext={(data) => {
             setSignupEmail(data.email);
-            setSignupPhone(data.phone);
             setRegisteredCredentials({
               username: data.email,
               password: data.password,
@@ -1011,11 +1092,59 @@ function AppContent() {
   );
 }
 
+const kindeDomain = process.env.EXPO_PUBLIC_KINDE_DOMAIN?.trim();
+const kindeClientId = process.env.EXPO_PUBLIC_KINDE_CLIENT_ID?.trim();
+const googleConnectionId =
+  process.env.EXPO_PUBLIC_KINDE_GOOGLE_CONNECTION_ID?.trim();
+const facebookConnectionId =
+  process.env.EXPO_PUBLIC_KINDE_FACEBOOK_CONNECTION_ID?.trim();
+
+function KindeAppContent() {
+  const kinde = useKindeAuth();
+
+  const handleKindeSocialSignIn = async (
+    provider: SocialProvider,
+  ): Promise<SocialAccount> => {
+    const connectionId =
+      provider === 'google' ? googleConnectionId : facebookConnectionId;
+    const response = await kinde.login(
+      connectionId ? { connectionId } : undefined,
+    );
+    if (!response.success) {
+      throw new Error(response.errorMessage);
+    }
+
+    const profile = await kinde.getUserProfile();
+    if (!profile?.email) {
+      throw new Error('Kinde did not return a user email address.');
+    }
+
+    return {
+      id: profile.id,
+      email: profile.email,
+      name:
+        [profile.givenName, profile.familyName].filter(Boolean).join(' ') ||
+        profile.email,
+      picture: profile.picture,
+    };
+  };
+
+  return <AppContent onKindeSocialSignIn={handleKindeSocialSignIn} />;
+}
+
 export default function App() {
   return (
     <SafeAreaProvider>
       <ToastProvider>
-        <AppContent />
+        {kindeDomain && kindeClientId ? (
+          <KindeAuthProvider
+            config={{ domain: kindeDomain, clientId: kindeClientId }}
+          >
+            <KindeAppContent />
+          </KindeAuthProvider>
+        ) : (
+          <AppContent />
+        )}
       </ToastProvider>
     </SafeAreaProvider>
   );

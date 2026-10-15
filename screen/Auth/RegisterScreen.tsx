@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -77,7 +77,6 @@ export default function RegisterScreen({
   countryCode = '+49',
 }: RegisterScreenProps) {
   const insets = useSafeAreaInsets();
-  const scrollRef = useRef<ScrollView>(null);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -109,8 +108,10 @@ export default function RegisterScreen({
       nextErrors.email = 'Enter a valid email address';
     }
 
-    if (!values.phone.trim()) {
-      nextErrors.phone = 'Phone number is required';
+    // Phone number is optional - only validate the format when provided.
+    const phoneDigits = values.phone.replace(/\D/g, '');
+    if (phoneDigits && (phoneDigits.length < 6 || phoneDigits.length > 15)) {
+      nextErrors.phone = 'Enter a valid phone number';
     }
 
     if (!values.password.trim()) {
@@ -173,15 +174,14 @@ export default function RegisterScreen({
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={0}
+        keyboardVerticalOffset={insets.top + 16}
       >
         <View style={styles.sheet}>
           <ScrollView
-            ref={scrollRef}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={[
               styles.scrollContent,
-              { paddingBottom: insets.bottom + 120 },
+              { paddingBottom: Math.max(insets.bottom + 40, 40) },
             ]}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
@@ -210,7 +210,7 @@ export default function RegisterScreen({
             />
 
             <InputField
-              label="Phone number"
+              label="Phone number (optional)"
               variant="phone"
               placeholder="1234 5678 9012"
               value={phone}
@@ -248,11 +248,6 @@ export default function RegisterScreen({
                 updateField('confirmPassword', value, setConfirmPassword)
               }
               error={errors.confirmPassword}
-              onFocus={() => {
-                setTimeout(() => {
-                  scrollRef.current?.scrollToEnd({ animated: true });
-                }, 250);
-              }}
             />
 
             <Button

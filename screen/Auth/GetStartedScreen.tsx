@@ -24,7 +24,7 @@ export default function GetStartedScreen({ onContinue }: GetStartedScreenProps) 
         <Logo height={60} />
 
         <View style={styles.copy}>
-          <Text style={styles.title}>Let's get started!</Text>
+          <Text style={styles.title}>Let’s get started!</Text>
           <Text style={styles.subtitle}>
             Your location is saved. Start shopping your daily essentials.
           </Text>

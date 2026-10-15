@@ -1,12 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -30,8 +29,7 @@ type EditPhoneNumberScreenProps = {
   countryFlag?: string;
   countryCode?: string;
   onBack?: () => void;
-  onCountryPress?: () => void;
-  onNext?: (phone: string, channel: VerificationChannel) => void;
+  onNext?: (channel: VerificationChannel) => void;
 };
 
 export default function EditPhoneNumberScreen({
@@ -39,19 +37,10 @@ export default function EditPhoneNumberScreen({
   countryFlag = '🇱🇰',
   countryCode = '+94',
   onBack,
-  onCountryPress,
   onNext,
 }: EditPhoneNumberScreenProps) {
   const insets = useSafeAreaInsets();
-  const [phoneNumber, setPhoneNumber] = useState(phone);
   const [channel, setChannel] = useState<VerificationChannel>('email');
-
-  useEffect(() => {
-    setPhoneNumber(phone);
-  }, [phone]);
-
-  const cleanPhone = phoneNumber.replace(/[^\d\s-]/g, '');
-  const canContinue = cleanPhone.replace(/\D/g, '').length >= 7;
 
   return (
     <KeyboardAvoidingView
@@ -76,45 +65,43 @@ export default function EditPhoneNumberScreen({
           <View style={styles.formGroup}>
             <Text style={styles.label}>Phone number</Text>
             <View style={styles.phoneRow}>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Select country code"
-                onPress={onCountryPress}
-                style={styles.countryField}
-              >
+              <View style={styles.countryField}>
                 <CountryFlag flag={countryFlag} size={20} />
-                <Text style={styles.countryCode}>{countryCode}</Text>
-              </Pressable>
+              </View>
 
               <View style={styles.phoneField}>
-                <TextInput
-                  value={phoneNumber}
-                  onChangeText={(value) =>
-                    setPhoneNumber(value.replace(/[^\d\s-]/g, ''))
-                  }
-                  placeholder="77 551 2445"
-                  placeholderTextColor={COLORS.muted}
-                  keyboardType="phone-pad"
-                  style={styles.phoneInput}
-                />
+                <Text style={styles.phoneText}>
+                  {countryCode} {phone.replace(/[^\d\s-]/g, '').trim()}
+                </Text>
               </View>
             </View>
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Send Verification Code to</Text>
-            <View style={styles.options}>
-              <VerificationOption
-                label="Email address"
-                selected={channel === 'email'}
-                onPress={() => setChannel('email')}
-              />
-              <VerificationOption
-                label="Phone number"
-                selected={channel === 'phone'}
-                onPress={() => setChannel('phone')}
-              />
-            </View>
+            <Text style={styles.label}>Send Verification Code to:</Text>
+            <Pressable
+              accessibilityRole="radio"
+              accessibilityState={{ selected: channel === 'email' }}
+              onPress={() => setChannel('email')}
+              style={[styles.option, channel === 'email' && styles.optionSelected]}
+            >
+              <View style={[styles.radio, channel === 'email' && styles.radioSelected]}>
+                {channel === 'email' ? <View style={styles.radioDot} /> : null}
+              </View>
+              <Text style={styles.optionLabel}>Email address</Text>
+            </Pressable>
+
+            <Pressable
+              accessibilityRole="radio"
+              accessibilityState={{ selected: channel === 'phone' }}
+              onPress={() => setChannel('phone')}
+              style={[styles.option, channel === 'phone' && styles.optionSelected]}
+            >
+              <View style={[styles.radio, channel === 'phone' && styles.radioSelected]}>
+                {channel === 'phone' ? <View style={styles.radioDot} /> : null}
+              </View>
+              <Text style={styles.optionLabel}>Phone number</Text>
+            </Pressable>
           </View>
         </View>
 
@@ -126,45 +113,13 @@ export default function EditPhoneNumberScreen({
         >
           <Button
             title="Next"
-            disabled={!canContinue}
-            onPress={
-              canContinue ? () => onNext?.(cleanPhone.trim(), channel) : undefined
-            }
-            containerStyle={[
-              styles.nextButton,
-              !canContinue && styles.nextButtonDisabled,
-            ]}
+            onPress={() => onNext?.(channel)}
+            containerStyle={styles.nextButton}
             textStyle={styles.nextText}
           />
         </View>
       </View>
     </KeyboardAvoidingView>
-  );
-}
-
-type VerificationOptionProps = {
-  label: string;
-  selected: boolean;
-  onPress: () => void;
-};
-
-function VerificationOption({
-  label,
-  selected,
-  onPress,
-}: VerificationOptionProps) {
-  return (
-    <Pressable
-      accessibilityRole="radio"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      style={[styles.option, selected && styles.optionSelected]}
-    >
-      <View style={[styles.radio, selected && styles.radioSelected]}>
-        {selected ? <View style={styles.radioDot} /> : null}
-      </View>
-      <Text style={styles.optionLabel}>{label}</Text>
-    </Pressable>
   );
 }
 
@@ -184,7 +139,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 20,
     paddingTop: 20,
-    gap: 24,
+    gap: 20,
   },
   description: {
     fontSize: 14,
@@ -211,64 +166,44 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   countryField: {
-    width: 91,
-    height: 57,
-    flexDirection: 'row',
+    width: 57,
+    height: 51,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    paddingHorizontal: 10,
     borderRadius: 8,
     backgroundColor: COLORS.inputBg,
-  },
-  flag: {
-    fontSize: 18,
-  },
-  countryCode: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: COLORS.text,
   },
   phoneField: {
     flex: 1,
-    height: 57,
+    height: 51,
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     borderRadius: 8,
     backgroundColor: COLORS.inputBg,
   },
-  phoneInput: {
+  phoneText: {
     width: '100%',
-    height: '100%',
-    padding: 0,
     fontSize: 14,
     fontWeight: '400',
     color: COLORS.text,
   },
-  options: {
-    width: '100%',
-    gap: 8,
-  },
   option: {
-    width: '100%',
-    height: 47,
+    minHeight: 40,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingVertical: 10,
+    gap: 9,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: 'transparent',
     borderRadius: 8,
-    backgroundColor: COLORS.white,
   },
   optionSelected: {
     borderColor: COLORS.primary,
   },
   radio: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     borderWidth: 1.5,
     borderColor: COLORS.muted,
     alignItems: 'center',
@@ -278,16 +213,13 @@ const styles = StyleSheet.create({
     borderColor: COLORS.primary,
   },
   radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: COLORS.primary,
   },
   optionLabel: {
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 21,
-    letterSpacing: 0.3,
+    fontSize: 13,
     color: COLORS.text,
   },
   footer: {
@@ -299,9 +231,6 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 100,
     backgroundColor: COLORS.primary,
-  },
-  nextButtonDisabled: {
-    backgroundColor: COLORS.muted,
   },
   nextText: {
     fontSize: 16,

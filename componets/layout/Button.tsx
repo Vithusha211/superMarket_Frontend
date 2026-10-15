@@ -1,6 +1,6 @@
-import { ActivityIndicator } from 'react-native';
-import React from 'react';
+import { type ReactNode } from 'react';
 import {
+  ActivityIndicator,
   Pressable,
   StyleProp,
   StyleSheet,
@@ -25,7 +25,7 @@ export type ButtonProps = {
   size?: ButtonSize;
   disabled?: boolean;
   loading?: boolean;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   containerStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
 };
