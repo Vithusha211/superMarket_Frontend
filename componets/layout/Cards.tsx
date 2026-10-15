@@ -32,6 +32,7 @@ export type ProductCardProps = {
   discount?: string | number;
   tag?: string;
   compact?: boolean;
+  imageAreaHeight?: number;
   onPress?: () => void;
   onAddPress?: () => void;
   style?: StyleProp<ViewStyle>;
@@ -54,6 +55,7 @@ export default function ProductCard({
   discount,
   tag,
   compact = false,
+  imageAreaHeight,
   onPress,
   onAddPress,
   style,
@@ -71,7 +73,13 @@ export default function ProductCard({
       onPress={onPress}
       style={[styles.card, compact && styles.compactCard, style]}
     >
-      <View style={[styles.imageArea, compact && styles.compactImageArea]}>
+      <View
+        style={[
+          styles.imageArea,
+          compact && styles.compactImageArea,
+          imageAreaHeight !== undefined ? { height: imageAreaHeight } : null,
+        ]}
+      >
         <Image
           source={image}
           style={[styles.image, compact && styles.compactImage]}

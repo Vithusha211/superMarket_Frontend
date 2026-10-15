@@ -1,9 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
+  FlatList,
   Image,
   ImageSourcePropType,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -89,34 +92,37 @@ const BRANDS: BrandItem[] = [
 const OFFERS: OfferItem[] = [
   {
     id: '1',
-    image: require('../../assets/home/product-sugar.png'),
-    brand: 'Japanese Style',
-    name: 'Brown Sugar',
-    quantity: '500g',
-    price: 3.49,
-    oldPrice: 4.29,
-    discount: 18,
+    image: require('../../assets/home/product-itambe.png'),
+    brand: 'Indo',
+    name: 'Indian Rich Rice',
+    quantity: '1kg',
+    price: 12,
+    discount: 20,
   },
   {
     id: '2',
-    image: require('../../assets/home/product-itambe.png'),
-    brand: 'Itambé',
+    image: require('../../assets/home/product-anchor.png'),
+    brand: 'Kotmale',
     name: 'Natural Milk',
     quantity: '1L',
-    price: 2.49,
-    oldPrice: 2.99,
-    discount: 15,
+    price: 5,
+    discount: 20,
   },
   {
     id: '3',
-    image: require('../../assets/home/product-anchor.png'),
+    image: require('../../assets/home/product-sugar.png'),
     brand: 'Anchor',
     name: 'Full Cream Milk',
     quantity: '1L',
-    price: 2.79,
-    oldPrice: 3.49,
+    price: 5,
     discount: 20,
   },
+];
+
+const BANNER_SLIDES = [
+  { id: 'banner-1', image: require('../../assets/home/banner.png') },
+  { id: 'banner-2', image: require('../../assets/home/banner.png') },
+  { id: 'banner-3', image: require('../../assets/home/banner.png') },
 ];
 
 type HomeScreenProps = {
@@ -153,6 +159,28 @@ export default function HomeScreen({
 }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<FooterTab>('home');
+  const [activeBanner, setActiveBanner] = useState(0);
+  const [bannerWidth, setBannerWidth] = useState(0);
+  const bannerListRef = useRef<FlatList<(typeof BANNER_SLIDES)[number]>>(null);
+  const activeBannerRef = useRef(0);
+
+  useEffect(() => {
+    if (!bannerWidth) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const nextIndex = (activeBannerRef.current + 1) % BANNER_SLIDES.length;
+      bannerListRef.current?.scrollToOffset({
+        offset: nextIndex * bannerWidth,
+        animated: true,
+      });
+      activeBannerRef.current = nextIndex;
+      setActiveBanner(nextIndex);
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [bannerWidth]);
 
   const handleTabPress = (tab: FooterTab) => {
     setActiveTab(tab);
@@ -221,11 +249,58 @@ export default function HomeScreen({
         ]}
       >
         <View style={styles.bannerWrap}>
-          <Image
-            source={require('../../assets/home/banner.png')}
-            style={styles.banner}
-            resizeMode="cover"
-          />
+          <View
+            style={styles.bannerFrame}
+            onLayout={(event) => setBannerWidth(event.nativeEvent.layout.width)}
+          >
+            <FlatList
+              ref={bannerListRef}
+              data={BANNER_SLIDES}
+              keyExtractor={(item) => item.id}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              getItemLayout={(_data, index) => ({
+                length: bannerWidth,
+                offset: bannerWidth * index,
+                index,
+              })}
+              onMomentumScrollEnd={(
+                event: NativeSyntheticEvent<NativeScrollEvent>,
+              ) => {
+                if (!bannerWidth) {
+                  return;
+                }
+                const index = Math.round(
+                  event.nativeEvent.contentOffset.x / bannerWidth,
+                );
+                activeBannerRef.current = index;
+                setActiveBanner(index);
+              }}
+              renderItem={({ item }) => (
+                <Image
+                  source={item.image}
+                  style={[styles.banner, { width: bannerWidth }]}
+                  resizeMode="cover"
+                />
+              )}
+            />
+          </View>
+          <View
+            style={styles.bannerPagination}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          >
+            {BANNER_SLIDES.map((slide, index) => (
+              <View
+                key={slide.id}
+                style={[
+                  styles.bannerPaginationDot,
+                  index === activeBanner && styles.bannerPaginationActive,
+                ]}
+              />
+            ))}
+          </View>
         </View>
 
         <View style={styles.section}>
@@ -328,6 +403,7 @@ export default function HomeScreen({
                 price={item.price}
                 oldPrice={item.oldPrice}
                 discount={item.discount}
+                imageAreaHeight={68}
                 onPress={() => onProductPress?.(item.id)}
                 onAddPress={() => onAddProduct?.(item.id)}
                 style={styles.offerCard}
@@ -439,11 +515,36 @@ const styles = StyleSheet.create({
   },
   bannerWrap: {
     width: '100%',
+    gap: 8,
+  },
+  bannerFrame: {
+    width: '100%',
+    aspectRatio: 400 / 189,
+    borderRadius: 12,
+    overflow: 'hidden',
   },
   banner: {
     width: '100%',
-    aspectRatio: 400 / 189,
-    borderRadius: 16,
+    height: '100%',
+  },
+  bannerPagination: {
+    minHeight: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  bannerPaginationDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#D1D5DB',
+  },
+  bannerPaginationActive: {
+    width: 20,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.primary,
   },
   section: {
     gap: 14,

@@ -1,8 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Image,
   ImageSourcePropType,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -14,6 +15,10 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
+import SocialAuthButton, {
+  SocialAccount,
+  SocialProvider,
+} from '../../componets/layout/SocialAuthButton';
 import InputField from '../../componets/layout/InputField';
 import Logo from '../../componets/layout/Logo';
 
@@ -28,7 +33,13 @@ const COLORS = {
   overlay: 'rgba(16, 17, 17, 0.29)',
 };
 
-type SocialProvider = 'google' | 'apple' | 'facebook' | 'instagram';
+type LoginSocialProvider = SocialProvider | 'apple' | 'instagram';
+
+function isKindeSocialProvider(
+  provider: LoginSocialProvider,
+): provider is SocialProvider {
+  return provider === 'google' || provider === 'facebook';
+}
 
 type FormErrors = {
   email?: string;
@@ -42,11 +53,17 @@ type LoginScreenProps = {
   }) => boolean | void;
   onForgotPassword?: (email: string) => void;
   onSignUp?: () => void;
-  onSocialPress?: (provider: SocialProvider) => void;
+  onSocialPress?: (provider: LoginSocialProvider) => void;
+  onKindeSocialSignIn?: (provider: SocialProvider) => Promise<SocialAccount>;
+  onSocialAuthenticated?: (
+    account: SocialAccount,
+    provider: SocialProvider,
+  ) => void;
+  onSocialAuthError?: (message: string) => void;
 };
 
 const SOCIALS: {
-  id: SocialProvider;
+  id: LoginSocialProvider;
   icon: ImageSourcePropType;
 }[] = [
   { id: 'google', icon: require('../../assets/social/google.png') },
@@ -79,8 +96,12 @@ export default function LoginScreen({
   onForgotPassword,
   onSignUp,
   onSocialPress,
+  onKindeSocialSignIn,
+  onSocialAuthenticated,
+  onSocialAuthError,
 }: LoginScreenProps) {
   const insets = useSafeAreaInsets();
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
@@ -88,6 +109,24 @@ export default function LoginScreen({
   const [showForgotPopup, setShowForgotPopup] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotError, setForgotError] = useState<string | undefined>();
+
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showSubscription = Keyboard.addListener(showEvent, () =>
+      setIsKeyboardVisible(true),
+    );
+    const hideSubscription = Keyboard.addListener(hideEvent, () =>
+      setIsKeyboardVisible(false),
+    );
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
 
   const validate = (nextEmail = email, nextPassword = password): FormErrors => {
     const nextErrors: FormErrors = {};
@@ -177,24 +216,34 @@ export default function LoginScreen({
     <View style={styles.screen}>
       <StatusBar style="light" />
 
-      <View style={[styles.greenTop, { paddingTop: insets.top + 16 }]}>
-        <BrandHeader />
-      </View>
+      {!isKeyboardVisible || Platform.OS === 'ios' ? (
+        <View style={[styles.greenTop, { paddingTop: insets.top + 16 }]}>
+          <BrandHeader />
+        </View>
+      ) : null}
 
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={insets.top + 16}
       >
-        <View style={styles.sheet}>
+        <View
+          style={[
+            styles.sheet,
+            isKeyboardVisible &&
+              Platform.OS === 'android' &&
+              styles.sheetKeyboardVisible,
+          ]}
+        >
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={[
               styles.scrollContent,
-              { paddingBottom: insets.bottom + 24 },
+              { paddingBottom: Math.max(insets.bottom + 24, 24) },
             ]}
-            keyboardShouldPersistTaps="always"
+            keyboardShouldPersistTaps="handled"
             keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
-            automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+            automaticallyAdjustKeyboardInsets
           >
             <View style={styles.form}>
               <InputField
@@ -237,26 +286,45 @@ export default function LoginScreen({
             </View>
 
             <View style={styles.socialRow}>
-              {SOCIALS.map((social) => (
-                <Pressable
-                  key={social.id}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Continue with ${social.id}`}
-                  onPress={() => onSocialPress?.(social.id)}
-                  style={styles.socialButton}
-                >
-                  <Image
-                    source={social.icon}
-                    style={styles.socialIcon}
-                    resizeMode="contain"
+              {SOCIALS.map((social) => {
+                const provider = social.id;
+
+                return isKindeSocialProvider(provider) ? (
+                  <SocialAuthButton
+                    key={provider}
+                    provider={provider}
+                    authenticate={
+                      onKindeSocialSignIn
+                        ? () => onKindeSocialSignIn(provider)
+                        : undefined
+                    }
+                    onSuccess={(account) =>
+                      onSocialAuthenticated?.(account, provider)
+                    }
+                    onError={(message) => onSocialAuthError?.(message)}
+                    style={styles.socialButton}
                   />
-                </Pressable>
-              ))}
+                ) : (
+                  <Pressable
+                    key={provider}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Continue with ${provider}`}
+                    onPress={() => onSocialPress?.(provider)}
+                    style={styles.socialButton}
+                  >
+                    <Image
+                      source={social.icon}
+                      style={styles.socialIcon}
+                      resizeMode="contain"
+                    />
+                  </Pressable>
+                );
+              })}
             </View>
 
             <Pressable onPress={onSignUp} style={styles.footer}>
               <Text style={styles.footerText}>
-                Don't have an account?{' '}
+                Don’t have an account?{' '}
                 <Text style={styles.footerLink}>Sign up</Text>
               </Text>
             </Pressable>
@@ -280,7 +348,7 @@ export default function LoginScreen({
           <View style={styles.popupCard}>
             <Text style={styles.popupTitle}>Forgot password</Text>
             <Text style={styles.popupMessage}>
-              Enter your email address and we'll send you an OTP to reset your
+              Enter your email address and we’ll send you an OTP to reset your
               password.
             </Text>
 
@@ -357,6 +425,10 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginLeft:20,
     marginRight:20,
+  },
+  sheetKeyboardVisible: {
+    marginTop: 0,
+    marginBottom: 0,
   },
   scrollContent: {
     paddingHorizontal: '4.5%',

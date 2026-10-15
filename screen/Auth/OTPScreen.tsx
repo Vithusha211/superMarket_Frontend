@@ -75,9 +75,11 @@ export default function OTPScreen({
   onResend,
 }: OTPScreenProps) {
   const insets = useSafeAreaInsets();
-  const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''));
+  const [otp, setOtp] = useState<string[]>(() =>
+    Array.from({ length: OTP_LENGTH }, () => ''),
+  );
   const [secondsLeft, setSecondsLeft] = useState(DEFAULT_SECONDS);
-  const inputsRef = useRef<Array<TextInputHandle | null>>([]);
+  const inputsRef = useRef<(TextInputHandle | null)[]>([]);
 
   const isPhone = variant === 'phone';
   const headerTitle =
@@ -86,11 +88,6 @@ export default function OTPScreen({
   const otpValue = otp.join('');
   const isComplete = otpValue.length === OTP_LENGTH && otp.every(Boolean);
   const canResend = secondsLeft <= 0;
-
-  useEffect(() => {
-    setOtp(Array(OTP_LENGTH).fill(''));
-    setSecondsLeft(DEFAULT_SECONDS);
-  }, [variant]);
 
   useEffect(() => {
     if (secondsLeft <= 0) {
@@ -147,11 +144,11 @@ export default function OTPScreen({
           keyboardVerticalOffset={insets.top + 56}
         >
           <View style={styles.content}>
-            <Text style={styles.title}>Enter your OTP number</Text>
+            <Text style={styles.title}>Enter verification code</Text>
             <Text style={styles.subtitle}>
               {isPhone
-                ? `We've sent the OTP number via sms to ${maskPhone(phone)}`
-                : `We've sent the OTP number via mail to ${maskEmail(email)}`}
+                ? `We’ve sent a verification code by SMS to ${maskPhone(phone)}`
+                : `We’ve sent a verification code to your email address ${maskEmail(email)}`}
             </Text>
 
             <View style={styles.otpRow}>
@@ -192,7 +189,7 @@ export default function OTPScreen({
               hitSlop={8}
             >
               <Text style={styles.resendText}>
-                Didn't receive the code?{' '}
+                Didn’t receive the code?{' '}
                 <Text
                   style={[
                     styles.resendLink,

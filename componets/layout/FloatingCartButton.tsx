@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/refs */
 import { useEffect, useRef } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import {
   Animated,
-  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -16,8 +17,6 @@ const COLORS = {
   white: 'rgba(255, 255, 255, 1)',
   badge: 'rgba(239, 68, 68, 1)',
 };
-
-const CART_ICON = require('../../assets/footer/floating-cart.png');
 
 type FloatingCartButtonProps = {
   count?: number;
@@ -39,7 +38,7 @@ export default function FloatingCartButton({
   const prevCount = useRef(count);
 
   const size = Math.min(Math.max(width * 0.16, 56), 70);
-  const iconSize = size * 0.42;
+  const iconSize = size * 0.46;
   const right = width * 0.045;
   const bottom = bottomOffset ?? Math.max(insets.bottom, 12) + 100;
 
@@ -85,11 +84,7 @@ export default function FloatingCartButton({
           { width: size, height: size, borderRadius: size / 2 },
         ]}
       >
-        <Image
-          source={CART_ICON}
-          style={{ width: iconSize, height: iconSize, tintColor: COLORS.white }}
-          resizeMode="contain"
-        />
+        <Ionicons name="basket-outline" size={iconSize} color={COLORS.white} />
         {count > 0 ? (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{count > 99 ? '99+' : count}</Text>

@@ -2,7 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import {
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,6 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
 import Header from '../../componets/layout/Header';
+import InputField from '../../componets/layout/InputField';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
@@ -26,7 +29,7 @@ const COLORS = {
   cancel: 'rgba(218, 218, 219, 1)',
 };
 
-const REASONS = [
+const DELETE_REASONS = [
   'I found a better app/service',
   'Delivery charges are too high',
   'Products I need are often unavailable',
@@ -39,18 +42,30 @@ type DeleteAccountScreenProps = {
   email?: string;
   onBack?: () => void;
   onForgotPassword?: () => void;
+  onPasswordCheck?: (password: string) => boolean;
   onDeleted?: () => void;
 };
 
 export default function DeleteAccountScreen({
+  onForgotPassword,
+  onPasswordCheck,
   onBack,
   onDeleted,
 }: DeleteAccountScreenProps) {
   const insets = useSafeAreaInsets();
-  const [reason, setReason] = useState<(typeof REASONS)[number]>(REASONS[0]);
+  const [password, setPassword] = useState('');
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [error, setError] = useState('');
+  const [isFeedbackStep, setIsFeedbackStep] = useState(false);
+  const [selectedReason, setSelectedReason] =
+    useState<(typeof DELETE_REASONS)[number]>(DELETE_REASONS[0]);
   const [otherReason, setOtherReason] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const isPasswordError =
+    error === 'Password is required.' ||
+    error === 'Incorrect password. Please try again.';
+  const isConfirmationError = error.startsWith('Please confirm');
 
   useEffect(() => {
     if (!showSuccess) {
@@ -65,11 +80,26 @@ export default function DeleteAccountScreen({
     return () => clearTimeout(timeout);
   }, [onDeleted, showSuccess]);
 
-  const handleNext = () => {
-    setShowConfirm(true);
+  const handleDelete = () => {
+    if (!password.trim()) {
+      setError('Password is required.');
+      return;
+    }
+    if (onPasswordCheck && !onPasswordCheck(password)) {
+      setError('Incorrect password. Please try again.');
+      return;
+    }
+    if (!isConfirmed) {
+      setError('Please confirm that you understand this action is permanent.');
+      return;
+    }
+    setError('');
+    setIsFeedbackStep(true);
   };
 
-  const footerBottom = Math.max(insets.bottom, 16);
+  const handleForgotPassword = () => {
+    onForgotPassword?.();
+  };
 
   return (
     <View style={styles.screen}>
@@ -78,67 +108,189 @@ export default function DeleteAccountScreen({
         title="Delete account"
         titleAlign="left"
         showBack
-        onBack={onBack}
+        onBack={() => {
+          if (isFeedbackStep) {
+            setIsFeedbackStep(false);
+            return;
+          }
+          onBack?.();
+        }}
         backgroundColor={COLORS.primary}
       />
 
       <View style={styles.sheet}>
-        <View style={styles.flex}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={styles.reasonContent}
+        {isFeedbackStep ? (
+          <KeyboardAvoidingView
+            style={styles.feedbackPage}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           >
-            <Text style={styles.reasonTitle}>We're Sorry to See You Go!</Text>
-            <Text style={styles.reasonSubtitle}>
-              Please let us know why you’re deleting your account —{`\n`}
-              your feedback helps us improve.
-            </Text>
-            <Text style={styles.question}>Why are you deleting your account?</Text>
-
-            <View style={styles.reasonList}>
-              {REASONS.map((item) => {
-                const selected = reason === item;
-                return (
-                  <View key={item} style={styles.reasonItemWrap}>
-                    <Pressable
-                      accessibilityRole="radio"
-                      accessibilityState={{ selected }}
-                      onPress={() => setReason(item)}
-                      style={[styles.reasonItem, selected && styles.reasonItemSelected]}
-                    >
-                      <View
-                        style={[styles.radio, selected && styles.radioSelected]}
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.feedbackScrollContent}
+            >
+              <View style={styles.feedbackContent}>
+                <Text style={styles.feedbackTitle}>
+                  We&apos;re Sorry to See You Go!
+                </Text>
+                <Text style={styles.feedbackDescription}>
+                  Please let us know why you&apos;re deleting your account — your
+                  feedback helps us improve.
+                </Text>
+                <Text style={styles.feedbackQuestion}>
+                  Why are you deleting your account?
+                </Text>
+                <View style={styles.reasonList}>
+                  {DELETE_REASONS.map((reason) => {
+                    const isSelected = selectedReason === reason;
+                    return (
+                      <Pressable
+                        key={reason}
+                        accessibilityRole="radio"
+                        accessibilityState={{ selected: isSelected }}
+                        onPress={() => setSelectedReason(reason)}
+                        style={[
+                          styles.reasonOption,
+                          isSelected && styles.reasonOptionSelected,
+                        ]}
                       >
-                        {selected ? <View style={styles.radioDot} /> : null}
-                      </View>
-                      <Text style={styles.reasonLabel}>{item}</Text>
-                    </Pressable>
+                        <View
+                          style={[
+                            styles.radioOuter,
+                            isSelected && styles.radioOuterSelected,
+                          ]}
+                        >
+                          {isSelected ? (
+                            <View style={styles.radioInner} />
+                          ) : null}
+                        </View>
+                        <Text style={styles.reasonText}>{reason}</Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+                {selectedReason === 'Other' ? (
+                  <TextInput
+                    accessibilityLabel="Tell us why you are deleting your account"
+                    placeholder="Type here....."
+                    placeholderTextColor={COLORS.muted}
+                    value={otherReason}
+                    onChangeText={setOtherReason}
+                    style={styles.otherReasonInput}
+                    returnKeyType="done"
+                  />
+                ) : null}
+              </View>
+              <View
+                style={[
+                  styles.feedbackFooter,
+                  { paddingBottom: Math.max(insets.bottom, 16) },
+                ]}
+              >
+                <Button
+                  title="Next"
+                  onPress={() => setShowConfirm(true)}
+                  containerStyle={styles.nextButton}
+                  textStyle={styles.nextButtonText}
+                />
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        ) : (
+          <KeyboardAvoidingView
+            style={styles.flex}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          >
+            <View style={styles.passwordContent}>
+              <View style={styles.warningRow}>
+                <Ionicons
+                  name="warning-outline"
+                  size={16}
+                  color={COLORS.muted}
+                  style={styles.warningIcon}
+                />
+                <Text style={styles.warningText}>
+                  This action cannot be undone. All your data will be
+                  permanently deleted.
+                </Text>
+              </View>
 
-                    {item === 'Other' && selected ? (
-                      <TextInput
-                        value={otherReason}
-                        onChangeText={setOtherReason}
-                        placeholder="Type here....."
-                        placeholderTextColor={COLORS.muted}
-                        style={styles.otherInput}
+              <View style={styles.passwordGroup}>
+                <InputField
+                  label="Password"
+                  variant="password"
+                  placeholder="********"
+                  value={password}
+                  onChangeText={(value) => {
+                    setPassword(value);
+                    setError('');
+                  }}
+                  error={isPasswordError ? error : undefined}
+                />
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={handleForgotPassword}
+                  style={styles.forgotRow}
+                >
+                  <Text style={styles.forgotText}>Forgot password?</Text>
+                </Pressable>
+              </View>
+
+              <View>
+                <Pressable
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: isConfirmed }}
+                  onPress={() => {
+                    setIsConfirmed((checked) => !checked);
+                    setError('');
+                  }}
+                  style={styles.consentRow}
+                >
+                  <View
+                    style={[
+                      styles.checkbox,
+                      isConfirmed && styles.checkboxSelected,
+                    ]}
+                  >
+                    {isConfirmed ? (
+                      <Ionicons
+                        name="checkmark"
+                        size={12}
+                        color={COLORS.white}
                       />
                     ) : null}
                   </View>
-                );
-              })}
+                  <Text style={styles.consentText}>
+                    I understand that this action is permanent and cannot be
+                    undone.
+                  </Text>
+                </Pressable>
+                {isConfirmationError ? (
+                  <Text
+                    accessibilityLiveRegion="polite"
+                    style={styles.confirmationError}
+                  >
+                    {error}
+                  </Text>
+                ) : null}
+              </View>
             </View>
-          </ScrollView>
 
-          <View style={[styles.footer, { paddingBottom: footerBottom }]}>
-            <Button
-              title="Next"
-              onPress={handleNext}
-              containerStyle={styles.nextButton}
-              textStyle={styles.buttonText}
-            />
-          </View>
-        </View>
+            <View
+              style={[
+                styles.footer,
+                { paddingBottom: Math.max(insets.bottom, 16) },
+              ]}
+            >
+              <Button
+                title="Delete account"
+                onPress={handleDelete}
+                containerStyle={styles.deleteButton}
+                textStyle={styles.buttonText}
+              />
+            </View>
+          </KeyboardAvoidingView>
+        )}
       </View>
 
       <Modal
@@ -220,10 +372,105 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     overflow: 'hidden',
   },
+  feedbackPage: {
+    flex: 1,
+  },
+  feedbackScrollContent: {
+    flexGrow: 1,
+  },
+  feedbackContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  feedbackTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 20,
+    color: COLORS.text,
+  },
+  feedbackDescription: {
+    marginTop: 8,
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 20,
+    color: COLORS.muted,
+  },
+  feedbackQuestion: {
+    marginTop: 10,
+    marginBottom: 14,
+    fontSize: 14,
+    fontWeight: '500',
+    lineHeight: 20,
+    color: COLORS.text,
+  },
+  reasonList: {
+    gap: 8,
+  },
+  reasonOption: {
+    minHeight: 38,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: 'transparent',
+    borderRadius: 8,
+  },
+  reasonOptionSelected: {
+    borderColor: COLORS.primary,
+  },
+  radioOuter: {
+    width: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: COLORS.muted,
+    borderRadius: 8,
+  },
+  radioOuterSelected: {
+    borderColor: COLORS.primary,
+  },
+  radioInner: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.primary,
+  },
+  reasonText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '400',
+    lineHeight: 18,
+    color: COLORS.text,
+  },
+  otherReasonInput: {
+    minHeight: 51,
+    marginTop: 8,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    backgroundColor: COLORS.inputBg,
+    color: COLORS.text,
+    fontSize: 14,
+  },
+  feedbackFooter: {
+    marginTop: 'auto',
+    paddingHorizontal: 20,
+    paddingTop: 12,
+  },
+  nextButton: {
+    height: 52,
+    borderRadius: 100,
+  },
+  nextButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.white,
+  },
   passwordContent: {
     paddingHorizontal: 20,
     paddingTop: 18,
-    gap: 24,
+    gap: 20,
   },
   warningRow: {
     flexDirection: 'row',
@@ -240,6 +487,12 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: COLORS.muted,
   },
+  passwordGroup: {
+    gap: 8,
+  },
+  forgotRow: {
+    alignItems: 'flex-end',
+  },
   consentRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -247,7 +500,7 @@ const styles = StyleSheet.create({
     marginTop: -2,
   },
   confirmationError: {
-    marginTop: -16,
+    marginTop: 8,
     marginLeft: 24,
     fontSize: 12,
     lineHeight: 16,
@@ -291,96 +544,10 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     backgroundColor: COLORS.danger,
   },
-  nextButton: {
-    height: 52,
-    borderRadius: 100,
-    backgroundColor: COLORS.primary,
-  },
   buttonText: {
     fontSize: 16,
     fontWeight: '500',
     color: COLORS.white,
-  },
-  reasonContent: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 24,
-  },
-  reasonTitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    lineHeight: 21,
-    color: COLORS.text,
-  },
-  reasonSubtitle: {
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 21,
-    color: COLORS.muted,
-    marginTop: 8,
-    marginBottom: 20,
-  },
-  question: {
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 21,
-    color: COLORS.text,
-    marginBottom: 10,
-  },
-  reasonList: {
-    gap: 4,
-  },
-  reasonItemWrap: {
-    gap: 10,
-  },
-  reasonItem: {
-    minHeight: 39,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: COLORS.white,
-    borderRadius: 8,
-  },
-  reasonItemSelected: {
-    borderColor: COLORS.primary,
-  },
-  radio: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 1.5,
-    borderColor: COLORS.muted,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioSelected: {
-    borderColor: COLORS.primary,
-  },
-  radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: COLORS.primary,
-  },
-  reasonLabel: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 21,
-    color: COLORS.text,
-  },
-  otherInput: {
-    width: '100%',
-    height: 51,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: COLORS.inputBg,
-    fontSize: 14,
-    color: COLORS.text,
   },
   modalOverlay: {
     flex: 1,

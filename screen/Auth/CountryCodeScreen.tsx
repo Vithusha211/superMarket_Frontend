@@ -28,6 +28,7 @@ export type CountryCodeOption = {
 };
 
 export const COUNTRY_CODES: CountryCodeOption[] = [
+  { id: 'lk', label: 'Sri Lanka', flag: '🇱🇰', code: '+94' },
   { id: 'de', label: 'Deutsch', flag: '🇩🇪', code: '+49' },
   { id: 'fr', label: 'Français', flag: '🇫🇷', code: '+33' },
   { id: 'en', label: 'English', flag: '🇬🇧', code: '+44' },

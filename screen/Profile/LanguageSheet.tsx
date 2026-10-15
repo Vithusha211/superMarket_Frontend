@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Modal,
   Pressable,
@@ -51,12 +51,6 @@ export default function LanguageSheet({
   const insets = useSafeAreaInsets();
   const [activeId, setActiveId] = useState(selectedId);
 
-  useEffect(() => {
-    if (visible) {
-      setActiveId(selectedId);
-    }
-  }, [visible, selectedId]);
-
   const handleSelect = () => {
     const language =
       PROFILE_LANGUAGES.find((item) => item.id === activeId) ??
@@ -93,7 +87,7 @@ export default function LanguageSheet({
                   accessibilityRole="radio"
                   accessibilityState={{ selected: active }}
                   onPress={() => setActiveId(language.id)}
-                  style={styles.row}
+                  style={[styles.row, active && styles.rowSelected]}
                 >
                   <Ionicons
                     name={active ? 'radio-button-on' : 'radio-button-off'}
@@ -161,7 +155,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'transparent',
     backgroundColor: COLORS.white,
+  },
+  rowSelected: {
+    borderColor: COLORS.primary,
   },
   copy: {
     flex: 1,

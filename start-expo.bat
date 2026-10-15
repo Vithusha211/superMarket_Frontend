@@ -1,17 +1,16 @@
 @echo off
-REM HappyCart Expo starter (Windows)
-REM Uses the local network address explicitly so Expo Go can reach Metro.
+REM HappyCart Expo Go starter (Windows)
 
 echo.
 echo ========================================
 echo  HappyCart Expo
 echo ========================================
-echo Expo Go will connect over the local network.
+echo Expo Go will connect over your local Wi-Fi.
 echo.
-echo Make sure the computer and device are on the same Wi-Fi network.
-echo If LAN is unavailable, run: npm run start:tunnel
+echo Connect your phone and computer to the same Wi-Fi network.
+echo Open Expo Go on your phone and scan the QR code shown below.
+echo If the connection fails, try: npm run start:go:tunnel
 echo ========================================
 echo.
 
-set "REACT_NATIVE_PACKAGER_HOSTNAME=192.168.8.135"
-node .\node_modules\expo\bin\cli start --go --lan --clear --port 8082
+node .\node_modules\expo\bin\cli start --go --lan --clear --port 8083

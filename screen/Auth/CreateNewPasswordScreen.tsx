@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -37,7 +37,6 @@ export default function CreateNewPasswordScreen({
   onResetSuccess,
 }: CreateNewPasswordScreenProps) {
   const insets = useSafeAreaInsets();
-  const scrollRef = useRef<ScrollView>(null);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
@@ -107,7 +106,6 @@ export default function CreateNewPasswordScreen({
           keyboardVerticalOffset={insets.top + 56}
         >
           <ScrollView
-            ref={scrollRef}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             automaticallyAdjustKeyboardInsets
@@ -144,11 +142,6 @@ export default function CreateNewPasswordScreen({
                 value={confirmPassword}
                 onChangeText={handleConfirmChange}
                 error={errors.confirmPassword}
-                onFocus={() => {
-                  setTimeout(() => {
-                    scrollRef.current?.scrollToEnd({ animated: true });
-                  }, 250);
-                }}
               />
             </View>
           </ScrollView>

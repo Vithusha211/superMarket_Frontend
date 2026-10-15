@@ -85,7 +85,10 @@ export default function LanguageSelectScreen({
                   accessibilityRole="radio"
                   accessibilityState={{ selected: isSelected }}
                   onPress={() => setSelectedId(language.id)}
-                  style={styles.languageRow}
+                  style={[
+                    styles.languageRow,
+                    isSelected && styles.languageRowSelected,
+                  ]}
                 >
                   <View style={styles.languageLeft}>
                     <Ionicons
@@ -181,6 +184,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: '4.5%',
     borderRadius: 12,
     backgroundColor: COLORS.white,
+  },
+  languageRowSelected: {
+    borderWidth: 1,
+    borderColor: COLORS.primary,
   },
   languageLeft: {
     flexDirection: 'row',

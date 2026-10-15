@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef } from 'react';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';

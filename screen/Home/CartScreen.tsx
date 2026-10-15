@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Image,
   ImageSourcePropType,
@@ -94,18 +94,16 @@ export default function CartScreen({
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
-  const [items, setItems] = useState<CartItem[]>(
-    controlledItems ?? DEFAULT_ITEMS,
-  );
-
-  useEffect(() => {
-    if (controlledItems) {
-      setItems(controlledItems);
-    }
-  }, [controlledItems]);
+  const [localItems, setLocalItems] = useState<CartItem[]>(DEFAULT_ITEMS);
+  const items = controlledItems ?? localItems;
 
   const updateItems = (next: CartItem[]) => {
-    setItems(next);
+    if (controlledItems) {
+      onItemsChange?.(next);
+      return;
+    }
+
+    setLocalItems(next);
     onItemsChange?.(next);
   };
 

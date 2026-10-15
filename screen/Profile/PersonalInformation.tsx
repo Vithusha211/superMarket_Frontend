@@ -1,9 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import { useRef, useState } from 'react';
+import DateTimePicker, {
+  DateTimePickerAndroid,
+} from '@react-native-community/datetimepicker';
 import {
   Image,
   ImageSourcePropType,
   KeyboardAvoidingView,
+  Keyboard,
   Modal,
   Platform,
   Pressable,
@@ -84,6 +88,58 @@ function formatDateOfBirth(input: string) {
   return [day, month, year].filter(Boolean).join('/');
 }
 
+function formatCalendarDate(date: Date) {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}/${date.getFullYear()}`;
+}
+
+function parseDateOfBirth(value: string): Date | null {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value);
+  if (!match) {
+    return null;
+  }
+
+  const [, dayText, monthText, yearText] = match;
+  const day = Number(dayText);
+  const month = Number(monthText);
+  const year = Number(yearText);
+  const date = new Date(year, month - 1, day);
+
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+
+  return date;
+}
+
+function shiftDateByYears(date: Date, years: number) {
+  const year = date.getFullYear() + years;
+  const day = Math.min(
+    date.getDate(),
+    new Date(year, date.getMonth() + 1, 0).getDate(),
+  );
+  return new Date(year, date.getMonth(), day);
+}
+
+function getDateOfBirthBounds() {
+  const today = new Date();
+  const todayAtMidnight = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
+
+  return {
+    minimumDate: shiftDateByYears(todayAtMidnight, -100),
+    maximumDate: shiftDateByYears(todayAtMidnight, -15),
+  };
+}
+
 function resolveGenderSelection(value: string): {
   option: GenderOption;
   otherText: string;
@@ -119,11 +175,16 @@ export default function PersonalInformationScreen({
   const [showEditFullname, setShowEditFullname] = useState(false);
   const [showEditGender, setShowEditGender] = useState(false);
   const [showEditDob, setShowEditDob] = useState(false);
+  const [showIosDatePicker, setShowIosDatePicker] = useState(false);
   const [fullName, setFullName] = useState(name);
   const [draftName, setDraftName] = useState(name);
   const [selectedGender, setSelectedGender] = useState(gender);
   const [birthDate, setBirthDate] = useState(dateOfBirth);
   const [draftBirthDate, setDraftBirthDate] = useState(dateOfBirth);
+  const [dateOfBirthError, setDateOfBirthError] = useState('');
+  const [pickerDate, setPickerDate] = useState(
+    () => getDateOfBirthBounds().maximumDate,
+  );
   const dobInputRef = useRef<TextInputHandle | null>(null);
   const initialGender = resolveGenderSelection(gender);
   const [draftGenderOption, setDraftGenderOption] = useState<GenderOption>(
@@ -213,16 +274,74 @@ export default function PersonalInformationScreen({
 
   const openEditDob = () => {
     setDraftBirthDate(formatDateOfBirth(birthDate));
+    setDateOfBirthError('');
     setShowEditDob(true);
   };
 
-  const closeEditDob = () => setShowEditDob(false);
+  const closeEditDob = () => {
+    setShowIosDatePicker(false);
+    setShowEditDob(false);
+  };
 
-  const handleSaveDob = () => {
-    const next = draftBirthDate.trim();
-    if (next.length < 10) {
+  const openDatePicker = () => {
+    Keyboard.dismiss();
+    const bounds = getDateOfBirthBounds();
+    const currentDate = parseDateOfBirth(draftBirthDate);
+    const initialDate =
+      currentDate &&
+      currentDate >= bounds.minimumDate &&
+      currentDate <= bounds.maximumDate
+        ? currentDate
+        : bounds.maximumDate;
+
+    setPickerDate(initialDate);
+
+    if (Platform.OS === 'android') {
+      DateTimePickerAndroid.open({
+        value: initialDate,
+        mode: 'date',
+        display: 'calendar',
+        minimumDate: bounds.minimumDate,
+        maximumDate: bounds.maximumDate,
+        onChange: (event, selectedDate) => {
+          if (event.type === 'set' && selectedDate) {
+            setDraftBirthDate(formatCalendarDate(selectedDate));
+            setDateOfBirthError('');
+          }
+        },
+      });
       return;
     }
+
+    setShowIosDatePicker(true);
+  };
+
+  const handleIosDateChange = (_event: unknown, selectedDate?: Date) => {
+    if (selectedDate) {
+      setPickerDate(selectedDate);
+    }
+  };
+
+  const handleIosDateConfirm = () => {
+    setDraftBirthDate(formatCalendarDate(pickerDate));
+    setDateOfBirthError('');
+    setShowIosDatePicker(false);
+  };
+
+  const handleSaveDob = () => {
+    const parsedDate = parseDateOfBirth(draftBirthDate.trim());
+    if (!parsedDate) {
+      setDateOfBirthError('Enter a valid date in DD/MM/YYYY format.');
+      return;
+    }
+    const { minimumDate, maximumDate } = getDateOfBirthBounds();
+    if (parsedDate < minimumDate || parsedDate > maximumDate) {
+      setDateOfBirthError('Age must be between 15 and 100 years.');
+      return;
+    }
+
+    const next = formatCalendarDate(parsedDate);
+    setDateOfBirthError('');
     setBirthDate(next);
     onSaveDateOfBirth?.(next);
     closeEditDob();
@@ -548,30 +667,39 @@ export default function PersonalInformationScreen({
 
             <Text style={styles.dobLabel}>Date of birth</Text>
 
-            <Pressable
-              style={styles.dobInputRow}
-              onPress={() => dobInputRef.current?.focus()}
-            >
+            <View style={styles.dobInputRow}>
               <TextInput
                 ref={(ref) => {
                   dobInputRef.current = ref;
                 }}
                 value={draftBirthDate}
-                onChangeText={(text) =>
-                  setDraftBirthDate(formatDateOfBirth(text))
-                }
+                onChangeText={(text) => {
+                  setDraftBirthDate(formatDateOfBirth(text));
+                  setDateOfBirthError('');
+                }}
                 placeholder="DD/MM/YYYY"
                 placeholderTextColor={COLORS.placeholder}
                 keyboardType="number-pad"
                 maxLength={10}
                 style={styles.dobInput}
               />
-              <Image
-                source={require('../../assets/profile/personal/calendar-input.png')}
-                style={styles.dobInputIcon}
-                resizeMode="contain"
-              />
-            </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Choose date of birth"
+                onPress={openDatePicker}
+                hitSlop={8}
+                style={styles.dobCalendarButton}
+              >
+                <Image
+                  source={require('../../assets/profile/personal/calendar-input.png')}
+                  style={styles.dobInputIcon}
+                  resizeMode="contain"
+                />
+              </Pressable>
+            </View>
+            {dateOfBirthError ? (
+              <Text style={styles.dobError}>{dateOfBirthError}</Text>
+            ) : null}
 
             <Button
               title="Save"
@@ -582,6 +710,54 @@ export default function PersonalInformationScreen({
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
+      {Platform.OS === 'ios' ? (
+        <Modal
+          visible={showIosDatePicker}
+          transparent
+          animationType="slide"
+          statusBarTranslucent
+          onRequestClose={() => setShowIosDatePicker(false)}
+        >
+          <View style={styles.datePickerOverlay}>
+            <Pressable
+              style={styles.datePickerBackdrop}
+              onPress={() => setShowIosDatePicker(false)}
+            />
+            <View
+              style={[
+                styles.datePickerSheet,
+                { paddingBottom: Math.max(insets.bottom, 16) },
+              ]}
+            >
+              <Text style={styles.datePickerTitle}>Date of birth</Text>
+              <DateTimePicker
+                value={pickerDate}
+                mode="date"
+                display="spinner"
+                minimumDate={getDateOfBirthBounds().minimumDate}
+                maximumDate={getDateOfBirthBounds().maximumDate}
+                onChange={handleIosDateChange}
+              />
+              <View style={styles.datePickerActions}>
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => setShowIosDatePicker(false)}
+                  style={styles.datePickerCancel}
+                >
+                  <Text style={styles.datePickerCancelText}>Cancel</Text>
+                </Pressable>
+                <Button
+                  title="Done"
+                  onPress={handleIosDateConfirm}
+                  containerStyle={styles.datePickerDone}
+                  textStyle={styles.saveText}
+                />
+              </View>
+            </View>
+          </View>
+        </Modal>
+      ) : null}
     </View>
   );
 }
@@ -829,11 +1005,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.borderIdle,
     backgroundColor: COLORS.white,
   },
   genderOptionActive: {
+    borderWidth: 1,
     borderColor: COLORS.primary,
   },
   radioOuter: {
@@ -920,6 +1095,19 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
   },
+  dobCalendarButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dobError: {
+    width: '100%',
+    marginTop: 8,
+    color: COLORS.danger,
+    fontSize: 12,
+    lineHeight: 16,
+  },
   dobSaveButton: {
     width: '100%',
     height: 52,
@@ -927,5 +1115,51 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     marginTop: 30,
     marginBottom: 14,
+  },
+  datePickerOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: COLORS.overlay,
+  },
+  datePickerBackdrop: {
+    ...StyleSheet.absoluteFill,
+  },
+  datePickerSheet: {
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 20,
+    paddingHorizontal: '4.5%',
+  },
+  datePickerTitle: {
+    color: COLORS.text,
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  datePickerActions: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginTop: 8,
+  },
+  datePickerCancel: {
+    minHeight: 52,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+  datePickerCancelText: {
+    color: COLORS.label,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  datePickerDone: {
+    flex: 1,
+    height: 52,
+    borderRadius: 100,
+    backgroundColor: COLORS.primary,
   },
 });
