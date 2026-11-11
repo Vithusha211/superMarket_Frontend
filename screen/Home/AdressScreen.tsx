@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import {
+import  {
   Modal,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import { Text } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Button from '../../componets/layout/Button';

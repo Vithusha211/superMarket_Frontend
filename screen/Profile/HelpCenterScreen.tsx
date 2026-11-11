@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import {
+import  {
   Image,
   ImageSourcePropType,
   KeyboardAvoidingView,
@@ -9,14 +9,14 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
-  TextInput,
   View,
 } from 'react-native';
+import { Text, TextInput } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
 import Header from '../../componets/layout/Header';
 import Logo from '../../componets/layout/Logo';
+import { isValidEmail } from '../../utils/emailValidation';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
@@ -77,13 +77,39 @@ export default function HelpCenterScreen({
   const [fullName, setFullName] = useState(initialName);
   const [email, setEmail] = useState(initialEmail);
   const [message, setMessage] = useState('');
+  const [emailError, setEmailError] = useState<string>();
 
   const handleSend = () => {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setEmailError('Email address is required');
+      return;
+    }
+    if (!isValidEmail(trimmedEmail)) {
+      setEmailError('Enter a valid email address');
+      return;
+    }
+
+    setEmailError(undefined);
     onSend?.({
       fullName: fullName.trim(),
-      email: email.trim(),
+      email: trimmedEmail,
       message: message.trim(),
     });
+  };
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (emailError) {
+      const trimmedEmail = value.trim();
+      setEmailError(
+        !trimmedEmail
+          ? 'Email address is required'
+          : isValidEmail(trimmedEmail)
+            ? undefined
+            : 'Enter a valid email address',
+      );
+    }
   };
 
   const handleContactPress = (contact: ContactItem) => {
@@ -137,10 +163,11 @@ export default function HelpCenterScreen({
               <Field
                 label="Email"
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={handleEmailChange}
                 placeholder="example@gmail.com"
                 keyboardType="email-address"
                 autoCapitalize="none"
+                error={emailError}
               />
               <Field
                 label="Message"
@@ -200,6 +227,7 @@ type FieldProps = {
   multiline?: boolean;
   keyboardType?: 'default' | 'email-address';
   autoCapitalize?: 'none' | 'sentences' | 'words';
+  error?: string;
 };
 
 function Field({
@@ -210,6 +238,7 @@ function Field({
   multiline = false,
   keyboardType = 'default',
   autoCapitalize = 'sentences',
+  error,
 }: FieldProps) {
   return (
     <View style={styles.field}>
@@ -222,8 +251,13 @@ function Field({
         multiline={multiline}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
-        style={[styles.input, multiline && styles.messageInput]}
+        style={[
+          styles.input,
+          multiline && styles.messageInput,
+          error && styles.inputError,
+        ]}
       />
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>
   );
 }
@@ -278,6 +312,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '400',
     color: COLORS.text,
+  },
+  inputError: {
+    borderWidth: 1,
+    borderColor: '#FF4B2B',
+  },
+  errorText: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: '#FF4B2B',
   },
   messageInput: {
     height: 139,

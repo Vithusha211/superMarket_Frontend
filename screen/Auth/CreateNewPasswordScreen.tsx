@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import {
+import  {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import { Text } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
 import Header from '../../componets/layout/Header';

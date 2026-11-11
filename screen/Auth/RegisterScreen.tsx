@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import {
+import  {
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import { Text } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import Button from '../../componets/layout/Button';
@@ -15,6 +15,7 @@ import InputField from '../../componets/layout/InputField';
 import Logo from '../../componets/layout/Logo';
 import PasswordRequirements from '../../componets/layout/PasswordRequirements';
 import { isValidPassword } from '../../utils/passwordValidation';
+import { isValidEmail } from '../../utils/emailValidation';
 
 const COLORS = {
   primary: '#02B97D',
@@ -49,10 +50,6 @@ type RegisterScreenProps = {
   countryFlag?: string;
   countryCode?: string;
 };
-
-function isValidEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
 
 function BrandHeader() {
   return (

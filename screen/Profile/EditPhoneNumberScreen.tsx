@@ -1,13 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import {
+import  {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import { Text } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
 import CountryFlag from '../../componets/layout/CountryFlag';
@@ -22,26 +20,24 @@ const COLORS = {
   border: 'rgba(229, 231, 235, 1)',
 };
 
-export type VerificationChannel = 'email' | 'phone';
-
 type EditPhoneNumberScreenProps = {
   phone?: string;
+  email?: string;
   countryFlag?: string;
   countryCode?: string;
   onBack?: () => void;
-  onNext?: (channel: VerificationChannel) => void;
+  onNext?: () => void;
 };
 
 export default function EditPhoneNumberScreen({
   phone = '0775512445',
+  email = '',
   countryFlag = '🇱🇰',
   countryCode = '+94',
   onBack,
   onNext,
 }: EditPhoneNumberScreenProps) {
   const insets = useSafeAreaInsets();
-  const [channel, setChannel] = useState<VerificationChannel>('email');
-
   return (
     <KeyboardAvoidingView
       style={styles.screen}
@@ -79,29 +75,13 @@ export default function EditPhoneNumberScreen({
 
           <View style={styles.formGroup}>
             <Text style={styles.label}>Send Verification Code to:</Text>
-            <Pressable
-              accessibilityRole="radio"
-              accessibilityState={{ selected: channel === 'email' }}
-              onPress={() => setChannel('email')}
-              style={[styles.option, channel === 'email' && styles.optionSelected]}
-            >
-              <View style={[styles.radio, channel === 'email' && styles.radioSelected]}>
-                {channel === 'email' ? <View style={styles.radioDot} /> : null}
+            <View style={[styles.option, styles.optionSelected]}>
+              <View style={styles.radioSelected}>
+                <View style={styles.radioDot} />
               </View>
               <Text style={styles.optionLabel}>Email address</Text>
-            </Pressable>
-
-            <Pressable
-              accessibilityRole="radio"
-              accessibilityState={{ selected: channel === 'phone' }}
-              onPress={() => setChannel('phone')}
-              style={[styles.option, channel === 'phone' && styles.optionSelected]}
-            >
-              <View style={[styles.radio, channel === 'phone' && styles.radioSelected]}>
-                {channel === 'phone' ? <View style={styles.radioDot} /> : null}
-              </View>
-              <Text style={styles.optionLabel}>Phone number</Text>
-            </Pressable>
+            </View>
+            {email ? <Text style={styles.emailText}>{email}</Text> : null}
           </View>
         </View>
 
@@ -113,7 +93,7 @@ export default function EditPhoneNumberScreen({
         >
           <Button
             title="Next"
-            onPress={() => onNext?.(channel)}
+            onPress={() => onNext?.()}
             containerStyle={styles.nextButton}
             textStyle={styles.nextText}
           />
@@ -210,7 +190,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   radioSelected: {
+    width: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
     borderColor: COLORS.primary,
+    borderRadius: 8,
   },
   radioDot: {
     width: 8,
@@ -221,6 +207,11 @@ const styles = StyleSheet.create({
   optionLabel: {
     fontSize: 13,
     color: COLORS.text,
+  },
+  emailText: {
+    paddingHorizontal: 12,
+    fontSize: 13,
+    color: COLORS.muted,
   },
   footer: {
     paddingHorizontal: 20,

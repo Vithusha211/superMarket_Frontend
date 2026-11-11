@@ -1,14 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import {
+import  {
   KeyboardAvoidingView,
   Platform,
   Pressable,
   StyleSheet,
-  Text,
-  TextInput,
   View,
 } from 'react-native';
+import { Text, TextInput } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
 import CountryFlag from '../../componets/layout/CountryFlag';
@@ -26,6 +25,7 @@ const COLORS = {
 type NewPhoneNumberScreenProps = {
   countryFlag: string;
   countryCode: string;
+  phone?: string;
   onBack?: () => void;
   onCountryPress?: () => void;
   onSave?: (phone: string) => void;
@@ -34,12 +34,13 @@ type NewPhoneNumberScreenProps = {
 export default function NewPhoneNumberScreen({
   countryFlag,
   countryCode,
+  phone: initialPhone = '',
   onBack,
   onCountryPress,
   onSave,
 }: NewPhoneNumberScreenProps) {
   const insets = useSafeAreaInsets();
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(initialPhone);
   const [error, setError] = useState('');
   const canSave = phone.replace(/\D/g, '').length >= 7;
 
@@ -69,7 +70,7 @@ export default function NewPhoneNumberScreen({
       <View style={styles.sheet}>
         <View style={styles.content}>
           <Text style={styles.description}>
-            Verification successful. Now, enter your new phone number.
+            Enter your new phone number.
           </Text>
 
           <View style={styles.formGroup}>

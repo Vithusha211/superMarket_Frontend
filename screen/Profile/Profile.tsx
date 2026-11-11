@@ -1,14 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import {
+import  {
   Image,
   ImageSourcePropType,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import { Text } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Footer, { FooterTab } from '../../componets/layout/Footer';
 import Header from '../../componets/layout/Header';
@@ -129,6 +129,7 @@ type ProfileScreenProps = {
   phone?: string;
   email?: string;
   language?: string;
+  avatar?: ImageSourcePropType;
   onMenuPress?: (action: MenuAction) => void;
   onLogoutConfirm?: () => void;
   onTabPress?: (tab: FooterTab) => void;
@@ -139,6 +140,7 @@ export default function ProfileScreen({
   phone = '07755112245',
   email = 'example@gmail.com',
   language = 'English',
+  avatar,
   onMenuPress,
   onLogoutConfirm,
   onTabPress,
@@ -172,11 +174,19 @@ export default function ProfileScreen({
             onPress={() => handleMenuPress('profile')}
           >
             <View style={styles.avatar}>
-              <Image
-                source={require('../../assets/profile/user.png')}
-                style={styles.avatarIcon}
-                resizeMode="contain"
-              />
+              {avatar ? (
+                <Image
+                  source={avatar}
+                  style={styles.avatarPhoto}
+                  resizeMode="cover"
+                />
+              ) : (
+                <Image
+                  source={require('../../assets/profile/user.png')}
+                  style={styles.avatarIcon}
+                  resizeMode="contain"
+                />
+              )}
             </View>
             <View style={styles.profileCopy}>
               <Text style={styles.profileName} numberOfLines={1}>
@@ -308,6 +318,11 @@ const styles = StyleSheet.create({
     height: 22,
     tintColor: COLORS.muted,
   },
+  avatarPhoto: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 23,
+  },
   profileCopy: {
     flex: 1,
     gap: 2,
@@ -367,9 +382,9 @@ const styles = StyleSheet.create({
   },
   languageValue: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '400',
     color: COLORS.text,
-    lineHeight: 15,
+    lineHeight: 18,
   },
   footerWrap: {
     position: 'absolute',

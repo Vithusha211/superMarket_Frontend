@@ -1,12 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
-import {
+import  {
   Modal,
   Pressable,
   StyleSheet,
-  Text,
   View,
   ViewStyle,
 } from 'react-native';
+import { Text } from './AppText';
 import Button from './Button';
 
 const COLORS = {

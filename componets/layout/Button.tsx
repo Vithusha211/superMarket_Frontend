@@ -1,14 +1,18 @@
 import { type ReactNode } from 'react';
-import {
+import  {
   ActivityIndicator,
   Pressable,
   StyleProp,
   StyleSheet,
-  Text,
   TextStyle,
   View,
   ViewStyle,
 } from 'react-native';
+import { Text } from './AppText';
+import {
+  useResponsiveFontScale,
+  useResponsiveScale,
+} from './useResponsiveScale';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
@@ -41,6 +45,9 @@ export default function Button({
   containerStyle,
   textStyle,
 }: ButtonProps) {
+  const scale = useResponsiveScale();
+  const fontScale = useResponsiveFontScale();
+  const suppliedContainerStyle = StyleSheet.flatten(containerStyle);
   const isDisabled = !!disabled || !!loading || !onPress;
 
   return (
@@ -52,14 +59,38 @@ export default function Button({
         styles.base,
         styles[size],
         styles[variant],
+        size === 'md'
+          ? { height: 52 * scale * fontScale }
+          : { width: 41 * scale, height: 41 * scale * fontScale },
         !isDisabled && pressed ? styles.pressed : null,
         containerStyle,
+        suppliedContainerStyle &&
+        (typeof suppliedContainerStyle.height === 'number' ||
+          typeof suppliedContainerStyle.minHeight === 'number')
+          ? {
+              height:
+                typeof suppliedContainerStyle.height === 'number'
+                  ? suppliedContainerStyle.height * scale * fontScale
+                  : undefined,
+              minHeight:
+                typeof suppliedContainerStyle.minHeight === 'number'
+                  ? suppliedContainerStyle.minHeight * scale * fontScale
+                  : undefined,
+            }
+          : null,
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={COLORS.white} />
+        <ActivityIndicator
+          color={variant === 'primary' ? COLORS.white : COLORS.primary}
+        />
       ) : (
-        <View style={styles.content}>
+        <View
+          style={[
+            styles.content,
+            { gap: 8 * scale, paddingHorizontal: 10 * scale },
+          ]}
+        >
           {icon ? <View style={styles.iconWrap}>{icon}</View> : null}
           {title ? (
             <Text

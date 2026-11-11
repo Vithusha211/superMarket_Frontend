@@ -1,4 +1,5 @@
 import { Image, ImageStyle, StyleProp, StyleSheet } from 'react-native';
+import { useResponsiveScale } from './useResponsiveScale';
 
 const LOGO_ASPECT = 180 / 70;
 
@@ -8,6 +9,8 @@ type LogoProps = {
 };
 
 export default function Logo({ height = 48, style }: LogoProps) {
+  const scale = useResponsiveScale();
+  const responsiveHeight = height * scale;
   return (
     <Image
       source={require('../../assets/logo.png')}
@@ -15,7 +18,7 @@ export default function Logo({ height = 48, style }: LogoProps) {
       resizeMode="contain"
       style={[
         styles.logo,
-        { width: height * LOGO_ASPECT, height },
+        { width: responsiveHeight * LOGO_ASPECT, height: responsiveHeight },
         style,
       ]}
     />

@@ -6,6 +6,8 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { useResponsiveScale } from './useResponsiveScale';
+import { useLocale } from '../../context/LocaleContext';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
@@ -57,8 +59,20 @@ type FooterProps = {
 };
 
 export default function Footer({ activeTab, onTabPress, style }: FooterProps) {
+  const scale = useResponsiveScale();
+  const { translate } = useLocale();
   return (
-    <View style={[styles.container, style]}>
+    <View
+      style={[
+        styles.container,
+        {
+          height: 68 * scale,
+          paddingTop: 12 * scale,
+          paddingBottom: 12 * scale,
+        },
+        style,
+      ]}
+    >
       {TABS.map((tab) => {
         const isActive = activeTab === tab.key;
         const useFilledActive = isActive && !!tab.activeIcon;
@@ -67,12 +81,17 @@ export default function Footer({ activeTab, onTabPress, style }: FooterProps) {
           <Pressable
             key={tab.key}
             accessibilityRole="button"
-            accessibilityLabel={tab.label}
+            accessibilityLabel={translate(tab.label)}
             accessibilityState={{ selected: isActive }}
             onPress={() => onTabPress(tab.key)}
             style={styles.tab}
           >
-            <View style={styles.iconWrap}>
+            <View
+              style={[
+                styles.iconWrap,
+                { width: 24 * scale, height: 24 * scale },
+              ]}
+            >
               <Image
                 source={useFilledActive ? tab.activeIcon! : tab.icon}
                 style={[

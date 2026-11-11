@@ -1,4 +1,6 @@
-import { Image, ImageSourcePropType, StyleSheet, Text } from 'react-native';
+import  { Image, ImageSourcePropType, StyleSheet } from 'react-native';
+import { Text } from './AppText';
+import { useResponsiveScale } from './useResponsiveScale';
 
 type CountryFlagProps = {
   flag: string;
@@ -28,6 +30,7 @@ const FLAG_IMAGES: Record<string, ImageSourcePropType | string> = {
 };
 
 export default function CountryFlag({ flag, size = 20 }: CountryFlagProps) {
+  const scale = useResponsiveScale();
   const source = FLAG_IMAGES[flag];
 
   if (source && typeof source !== 'string') {
@@ -35,7 +38,10 @@ export default function CountryFlag({ flag, size = 20 }: CountryFlagProps) {
       <Image
         source={source}
         accessibilityLabel="country flag"
-        style={[styles.image, { width: size, height: size }]}
+        style={[
+          styles.image,
+          { width: size * scale, height: size * scale },
+        ]}
         resizeMode="contain"
       />
     );

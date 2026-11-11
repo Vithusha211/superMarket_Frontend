@@ -1,16 +1,17 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import {
+import  {
   Modal,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import { Text } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
 import CountryFlag from '../../componets/layout/CountryFlag';
+import type { AppLocale } from '../../context/LocaleContext';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
@@ -23,7 +24,7 @@ const COLORS = {
 };
 
 export type ProfileLanguage = {
-  id: string;
+  id: AppLocale;
   label: string;
   subtitle: string;
   flag: string;

@@ -1,16 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import {
+import  {
+  ImageBackground,
   KeyboardAvoidingView,
   Modal,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
-  TextInput,
   View,
 } from 'react-native';
+import { Text, TextInput } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
 import Header from '../../componets/layout/Header';
@@ -23,8 +23,6 @@ const COLORS = {
   muted: 'rgba(114, 130, 138, 1)',
   border: 'rgba(229, 231, 235, 1)',
   inputBg: 'rgba(242, 242, 243, 1)',
-  mapBg: 'rgba(232, 245, 240, 1)',
-  mapRoad: 'rgba(255, 255, 255, 1)',
   overlay: 'rgba(0, 0, 0, 0.45)',
 };
 
@@ -129,15 +127,15 @@ export default function AddLocationScreen({
             ]}
           >
             <View style={styles.mapWrap}>
-              <View style={styles.mapPlaceholder}>
-                <View style={styles.mapRoadH} />
-                <View style={styles.mapRoadV} />
-                <View style={[styles.mapBlock, styles.mapBlockOne]} />
-                <View style={[styles.mapBlock, styles.mapBlockTwo]} />
+              <ImageBackground
+                source={require('../../assets/location-figma-map.png')}
+                resizeMode="cover"
+                style={styles.mapImage}
+              >
                 <View style={styles.mapPin}>
                   <Ionicons name="location" size={28} color={COLORS.primary} />
                 </View>
-              </View>
+              </ImageBackground>
 
               <Pressable
                 style={styles.mapActionTop}
@@ -322,45 +320,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
   },
-  mapPlaceholder: {
+  mapImage: {
     flex: 1,
-    backgroundColor: COLORS.mapBg,
     overflow: 'hidden',
-  },
-  mapRoadH: {
-    position: 'absolute',
-    top: '45%',
-    left: 0,
-    right: 0,
-    height: '6%',
-    backgroundColor: COLORS.mapRoad,
-  },
-  mapRoadV: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: '38%',
-    width: '2.5%',
-    backgroundColor: COLORS.mapRoad,
-  },
-  mapBlock: {
-    position: 'absolute',
-    borderRadius: 6,
-    backgroundColor: '#C8E6D8',
-    borderWidth: 1,
-    borderColor: COLORS.primary,
-  },
-  mapBlockOne: {
-    top: '15%',
-    left: '6%',
-    width: '16%',
-    height: '30%',
-  },
-  mapBlockTwo: {
-    bottom: '17%',
-    right: '12.5%',
-    width: '20%',
-    height: '35%',
   },
   mapPin: {
     position: 'absolute',

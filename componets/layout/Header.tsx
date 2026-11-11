@@ -1,15 +1,19 @@
 import { StatusBar } from 'expo-status-bar';
 import { ReactNode } from 'react';
-import {
+import  {
   Image,
   Pressable,
   StyleSheet,
-  Text,
   View,
   ViewStyle,
 } from 'react-native';
+import { Text } from './AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Logo from './Logo';
+import {
+  useResponsiveFontScale,
+  useResponsiveScale,
+} from './useResponsiveScale';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
@@ -41,19 +45,26 @@ export default function Header({
   titleColor = COLORS.white,
   style,
 }: HeaderProps) {
+  const scale = useResponsiveScale();
+  const fontScale = useResponsiveFontScale();
   const insets = useSafeAreaInsets();
 
   return (
     <View
       style={[
         styles.container,
-        { backgroundColor, paddingTop: insets.top + 12 },
+        { backgroundColor, paddingTop: insets.top + 12 * scale },
         style,
       ]}
     >
       <StatusBar style="light" />
 
-      <View style={styles.row}>
+      <View
+        style={[
+          styles.row,
+          { minHeight: 40 * scale * fontScale },
+        ]}
+      >
         {showLogo && !showBack && !left && !right && !title ? (
           <View style={styles.logoOnly}>
             <Logo height={36} />
@@ -64,11 +75,25 @@ export default function Header({
               accessibilityRole="button"
               onPress={onBack}
               hitSlop={8}
-              style={styles.backButton}
+              style={[
+                styles.backButton,
+                {
+                  width: 36 * scale,
+                  height: 36 * scale,
+                  borderRadius: 18 * scale,
+                },
+              ]}
             >
               <Image
                 source={require('../../assets/back-icon.png')}
-                style={[styles.backIcon, { tintColor: titleColor }]}
+                style={[
+                  styles.backIcon,
+                  {
+                    width: 20 * scale,
+                    height: 20 * scale,
+                    tintColor: titleColor,
+                  },
+                ]}
                 resizeMode="contain"
               />
             </Pressable>
@@ -81,23 +106,42 @@ export default function Header({
           </View>
         ) : (
           <>
-            <View style={styles.side}>
+            <View style={[styles.side, { width: 40 * scale }]}>
               {left ??
                 (showBack ? (
                   <Pressable
                     accessibilityRole="button"
                     onPress={onBack}
                     hitSlop={8}
-                    style={styles.backButton}
+                    style={[
+                      styles.backButton,
+                      {
+                        width: 36 * scale,
+                        height: 36 * scale,
+                        borderRadius: 18 * scale,
+                      },
+                    ]}
                   >
                     <Image
                       source={require('../../assets/back-icon.png')}
-                      style={[styles.backIcon, { tintColor: titleColor }]}
+                      style={[
+                        styles.backIcon,
+                        {
+                          width: 20 * scale,
+                          height: 20 * scale,
+                          tintColor: titleColor,
+                        },
+                      ]}
                       resizeMode="contain"
                     />
                   </Pressable>
                 ) : (
-                  <View style={styles.sideSpacer} />
+                  <View
+                    style={[
+                      styles.sideSpacer,
+                      { width: 36 * scale, height: 36 * scale },
+                    ]}
+                  />
                 ))}
             </View>
 
@@ -114,8 +158,17 @@ export default function Header({
               ) : null}
             </View>
 
-            <View style={[styles.side, styles.sideRight]}>
-              {right ?? <View style={styles.sideSpacer} />}
+            <View
+              style={[styles.side, styles.sideRight, { width: 40 * scale }]}
+            >
+              {right ?? (
+                <View
+                  style={[
+                    styles.sideSpacer,
+                    { width: 36 * scale, height: 36 * scale },
+                  ]}
+                />
+              )}
             </View>
           </>
         )}

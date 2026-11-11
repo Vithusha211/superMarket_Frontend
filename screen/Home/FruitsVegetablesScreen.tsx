@@ -1,16 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo, useState } from 'react';
-import {
+import  {
   FlatList,
   ImageSourcePropType,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
-  TextInput,
   View,
 } from 'react-native';
+import { Text, TextInput } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ProductCard from '../../componets/layout/Cards';
 import Header from '../../componets/layout/Header';

@@ -1,9 +1,13 @@
-import {
+import { useState } from 'react';
+import  {
   Image,
+  Alert,
+  Linking,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import * as Location from 'expo-location';
+import { Text } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
 import Header from '../../componets/layout/Header';
@@ -17,16 +21,44 @@ const COLORS = {
 
 type EnableLocationScreenProps = {
   onBack?: () => void;
-  onAllowMaps?: () => void;
   onSetManually?: () => void;
 };
 
 export default function EnableLocationScreen({
   onBack,
-  onAllowMaps,
   onSetManually,
 }: EnableLocationScreenProps) {
   const insets = useSafeAreaInsets();
+  const [isOpeningMap, setIsOpeningMap] = useState(false);
+
+  const allowOpenStreetMap = async () => {
+    setIsOpeningMap(true);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Location permission needed',
+          'Enable location access in your device settings to open OpenStreetMap at your current location.'
+        );
+        return;
+      }
+
+      const position = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      const { latitude, longitude } = position.coords;
+      const mapUrl = `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=16/${latitude}/${longitude}`;
+      await Linking.openURL(mapUrl);
+    } catch (error) {
+      console.error('Unable to open OpenStreetMap at the current location.', error);
+      Alert.alert(
+        'Unable to open OpenStreetMap',
+        'Please try again or set your location manually.'
+      );
+    } finally {
+      setIsOpeningMap(false);
+    }
+  };
 
   return (
     <View style={styles.screen}>
@@ -62,8 +94,9 @@ export default function EnableLocationScreen({
           ]}
         >
           <Button
-            title="Allow Google Maps"
-            onPress={onAllowMaps}
+            title="Allow OpenStreetMap"
+            onPress={allowOpenStreetMap}
+            loading={isOpeningMap}
             containerStyle={styles.primaryButton}
             textStyle={styles.buttonText}
           />

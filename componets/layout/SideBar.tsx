@@ -1,15 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import {
+import  {
   Image,
   Modal,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
   ViewStyle,
 } from 'react-native';
+import { Text } from './AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const COLORS = {

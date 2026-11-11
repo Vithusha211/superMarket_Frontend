@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
+import * as SecureStore from 'expo-secure-store';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AddLocationScreen from './screen/Auth/AddLocationScreen';
 import CountryCodeScreen, {
@@ -44,9 +45,7 @@ import WelcomeScreen from './screen/Auth/WelcomeScreen';
 import ProfileScreen from './screen/Profile/Profile';
 import PersonalInformationScreen from './screen/Profile/PersonalInformation';
 import ImageCropScreen from './screen/Profile/ImageCropScreen';
-import EditPhoneNumberScreen, {
-  VerificationChannel,
-} from './screen/Profile/EditPhoneNumberScreen';
+import EditPhoneNumberScreen from './screen/Profile/EditPhoneNumberScreen';
 import NewPhoneNumberScreen from './screen/Profile/NewPhoneNumberScreen';
 import ChangePasswordScreen from './screen/Profile/ChangePasswordScreen';
 import DeleteAccountScreen from './screen/Profile/DeleteAccountScreen';
@@ -58,8 +57,9 @@ import NotificationScreen from './screen/notification';
 import LanguageSheet, {
   PROFILE_LANGUAGES,
 } from './screen/Profile/LanguageSheet';
-import { ImageSourcePropType } from 'react-native';
+import { BackHandler, ImageSourcePropType } from 'react-native';
 import { ToastProvider, useToast } from './context/ToastContext';
+import { LocaleProvider, useLocale } from './context/LocaleContext';
 import defaultCredentials from './data/defaultCredentials.json';
 import type {
   SocialAccount,
@@ -67,6 +67,34 @@ import type {
 } from './componets/layout/SocialAuthButton';
 import { KindeAuthProvider, useKindeAuth } from '@kinde/expo';
 
+const secureStore = SecureStore as typeof SecureStore | undefined;
+
+const getStoredValue = async (key: string): Promise<string | null> => {
+  if (typeof secureStore?.getItemAsync !== 'function') {
+    return null;
+  }
+
+  try {
+    return await secureStore.getItemAsync(key);
+  } catch (error) {
+    console.error(`Unable to read secure storage key "${key}".`, error);
+    return null;
+  }
+};
+
+const storeValue = async (key: string, value: string): Promise<boolean> => {
+  if (typeof secureStore?.setItemAsync !== 'function') {
+    return false;
+  }
+
+  try {
+    await secureStore.setItemAsync(key, value);
+    return true;
+  } catch (error) {
+    console.error(`Unable to write secure storage key "${key}".`, error);
+    return false;
+  }
+};
 type AppScreen =
   | 'splash'
   | 'language'
@@ -120,10 +148,29 @@ type AppContentProps = {
 
 function AppContent({ onKindeSocialSignIn }: AppContentProps) {
   const { showSuccess, showError } = useToast();
-  const [screen, setScreen] = useState<AppScreen>('splash');
+  const { setLocale } = useLocale();
+  const [screen, setCurrentScreen] = useState<AppScreen>('splash');
+  const currentScreenRef = useRef(screen);
+  const screenHistoryRef = useRef<AppScreen[]>([]);
+  const setScreen = (nextScreen: AppScreen) => {
+    const currentScreen = currentScreenRef.current;
+    if (nextScreen === currentScreen) return;
+
+    const previousScreenIndex = screenHistoryRef.current.lastIndexOf(nextScreen);
+    if (previousScreenIndex >= 0) {
+      screenHistoryRef.current.splice(previousScreenIndex);
+    } else {
+      screenHistoryRef.current.push(currentScreen);
+    }
+
+    currentScreenRef.current = nextScreen;
+    setCurrentScreen(nextScreen);
+  };
   const [informationPage, setInformationPage] =
     useState<InformationPage>('About us');
-  const [signupEmail, setSignupEmail] = useState('user@gmail.com');
+  const [signupEmail, setSignupEmail] = useState(
+    defaultCredentials.username,
+  );
   const [registeredCredentials, setRegisteredCredentials] = useState({
     username: defaultCredentials.username,
     password: defaultCredentials.password,
@@ -150,12 +197,30 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
     useState<AppScreen>('home');
   const [appLanguage, setAppLanguage] = useState(PROFILE_LANGUAGES[1]);
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        if (showLanguageSheet) {
+          setShowLanguageSheet(false);
+          return true;
+        }
+
+        const previousScreen = screenHistoryRef.current.pop();
+        if (!previousScreen) return false;
+
+        currentScreenRef.current = previousScreen;
+        setCurrentScreen(previousScreen);
+        return true;
+      },
+    );
+
+    return () => subscription.remove();
+  }, [showLanguageSheet]);
   const [profileAvatar, setProfileAvatar] = useState<
     ImageSourcePropType | undefined
   >(undefined);
   const [accountPhone, setAccountPhone] = useState('0751847136');
-  const [phoneVerificationChannel, setPhoneVerificationChannel] =
-    useState<VerificationChannel>('email');
   const [personalName, setPersonalName] = useState('Vithusha Kirushnabalan');
   const [personalGender, setPersonalGender] = useState('');
   const [personalDateOfBirth, setPersonalDateOfBirth] = useState('');
@@ -169,6 +234,28 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
     id: 'maliban',
     label: 'Maliban',
   });
+
+  useEffect(() => {
+    let mounted = true;
+
+    void getStoredValue('profile.personalName')
+      .then((savedName) => {
+        if (mounted && savedName?.trim()) {
+          setPersonalName(savedName);
+        }
+      });
+
+    void getStoredValue('profile.email')
+      .then((savedEmail) => {
+        if (mounted && savedEmail?.trim()) {
+          setSignupEmail(savedEmail.trim());
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const pickProfileImage = async (source: 'camera' | 'gallery') => {
     try {
@@ -308,6 +395,7 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
       normalizedEmail === registeredCredentials.username.toLowerCase();
 
     setSignupEmail(account.email);
+    void storeValue('profile.email', account.email.trim());
     setPersonalName(account.name);
     if (account.picture) {
       setProfileAvatar({ uri: account.picture });
@@ -344,7 +432,10 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
             const match = PROFILE_LANGUAGES.find(
               (item) => item.id === language.id,
             );
-            if (match) setAppLanguage(match);
+            if (match) {
+              setAppLanguage(match);
+              setLocale(match.id);
+            }
             setScreen(languageReturnTo);
           }}
         />
@@ -375,6 +466,8 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
               return false;
             }
 
+            setSignupEmail(email.trim());
+            void storeValue('profile.email', email.trim());
             showSuccess('Welcome back!');
             setScreen('home');
             return true;
@@ -487,10 +580,6 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
       ) : screen === 'enableLocation' ? (
         <EnableLocationScreen
           onBack={() => setScreen('emailOtp')}
-          onAllowMaps={() => {
-            setAddressFlow('onboarding');
-            setScreen('address');
-          }}
           onSetManually={() => {
             setAddressFlow('onboarding');
             setScreen('address');
@@ -501,6 +590,15 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
           onBack={backFromEnterLocation}
           onAllowMaps={() => setScreen('addLocation')}
           onSelectAddress={() => setScreen('addLocation')}
+          onUseCurrentLocation={(address) => {
+            setDeliveryAddress(address);
+            if (addressFlow === 'onboarding') {
+              setScreen('getStarted');
+              return;
+            }
+            showSuccess('Address saved successfully.');
+            finishAddLocation();
+          }}
         />
       ) : screen === 'addLocation' ? (
         <AddLocationScreen
@@ -543,7 +641,10 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
             />
           ) : addressSelectReturnTo === 'account' ? (
             <ProfileScreen
+              name={personalName}
+              avatar={profileAvatar}
               phone={accountPhone}
+              email={signupEmail}
               language={appLanguage.label}
               onTabPress={(tab) => {
                 if (tab === 'home') setScreen('home');
@@ -642,7 +743,10 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
       ) : screen === 'account' ? (
         <>
           <ProfileScreen
+            name={personalName}
+            avatar={profileAvatar}
             phone={accountPhone}
+            email={signupEmail}
             language={appLanguage.label}
             onTabPress={(tab) => {
               if (tab === 'home') setScreen('home');
@@ -696,6 +800,7 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
             onClose={() => setShowLanguageSheet(false)}
             onSelect={(language) => {
               setAppLanguage(language);
+              setLocale(language.id);
               setShowLanguageSheet(false);
               setScreen('account');
             }}
@@ -704,6 +809,7 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
       ) : screen === 'personalInformation' ? (
         <PersonalInformationScreen
           name={personalName}
+          email={signupEmail}
           avatar={profileAvatar}
           phone={accountPhone}
           gender={personalGender}
@@ -711,6 +817,11 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
           onBack={() => setScreen('account')}
           onSaveName={(name) => {
             setPersonalName(name);
+            void storeValue('profile.personalName', name).then((saved) => {
+              if (!saved) {
+                showError('Name updated, but it could not be saved.');
+              }
+            });
             showSuccess('Name updated successfully.');
           }}
           onSaveGender={(gender) => {
@@ -740,34 +851,26 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
       ) : screen === 'editPhoneNumber' ? (
         <EditPhoneNumberScreen
           phone={accountPhone}
+          email={signupEmail}
           countryFlag={selectedCountry.flag}
           countryCode={selectedCountry.code}
           onBack={() => setScreen('personalInformation')}
-          onNext={(channel) => {
-            setPhoneVerificationChannel(channel);
-            setScreen('editPhoneOtp');
-          }}
+          onNext={() => setScreen('editPhoneOtp')}
         />
       ) : screen === 'editPhoneOtp' ? (
         <OTPScreen
-          variant={phoneVerificationChannel}
-          title={
-            phoneVerificationChannel === 'email'
-              ? 'Verification to EMail'
-              : 'Verification to Phone'
-          }
+          variant="email"
+          title="Verification to Email"
           email={signupEmail}
-          phone={`${selectedCountry.code}${accountPhone}`}
           onBack={() => setScreen('editPhoneNumber')}
-          onVerify={() => {
-            setScreen('newPhoneNumber');
-          }}
+          onVerify={() => setScreen('newPhoneNumber')}
           onResend={() => {}}
         />
       ) : screen === 'newPhoneNumber' ? (
         <NewPhoneNumberScreen
           countryFlag={selectedCountry.flag}
           countryCode={selectedCountry.code}
+          phone={accountPhone}
           onBack={() => setScreen('editPhoneOtp')}
           onCountryPress={() => {
             setCountryCodeReturnTo('newPhoneNumber');
@@ -1062,12 +1165,9 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
       ) : screen === 'invoice' ? (
         <InvoiceScreen
           deliveryLocation={deliveryAddress}
+          customerName={personalName}
           subtotal={cartSubtotal}
           onBack={() => setScreen(invoiceReturnTo)}
-          onDownload={() => {
-            showSuccess('Invoice downloaded successfully.');
-            setScreen(invoiceReturnTo);
-          }}
         />
       ) : (
         <RegisterScreen
@@ -1080,6 +1180,7 @@ function AppContent({ onKindeSocialSignIn }: AppContentProps) {
           }}
           onNext={(data) => {
             setSignupEmail(data.email);
+            void storeValue('profile.email', data.email.trim());
             setRegisteredCredentials({
               username: data.email,
               password: data.password,
@@ -1098,6 +1199,10 @@ const googleConnectionId =
   process.env.EXPO_PUBLIC_KINDE_GOOGLE_CONNECTION_ID?.trim();
 const facebookConnectionId =
   process.env.EXPO_PUBLIC_KINDE_FACEBOOK_CONNECTION_ID?.trim();
+const secureStoreAvailable =
+  typeof secureStore?.getItemAsync === 'function' &&
+  typeof secureStore.setItemAsync === 'function' &&
+  typeof secureStore.deleteItemAsync === 'function';
 
 function KindeAppContent() {
   const kinde = useKindeAuth();
@@ -1105,6 +1210,14 @@ function KindeAppContent() {
   const handleKindeSocialSignIn = async (
     provider: SocialProvider,
   ): Promise<SocialAccount> => {
+    if (
+      !secureStoreAvailable ||
+      typeof secureStore?.isAvailableAsync !== 'function' ||
+      !(await secureStore.isAvailableAsync())
+    ) {
+      throw new Error('Secure storage is unavailable on this device.');
+    }
+
     const connectionId =
       provider === 'google' ? googleConnectionId : facebookConnectionId;
     const response = await kinde.login(
@@ -1135,17 +1248,19 @@ function KindeAppContent() {
 export default function App() {
   return (
     <SafeAreaProvider>
-      <ToastProvider>
-        {kindeDomain && kindeClientId ? (
-          <KindeAuthProvider
-            config={{ domain: kindeDomain, clientId: kindeClientId }}
-          >
-            <KindeAppContent />
-          </KindeAuthProvider>
-        ) : (
-          <AppContent />
-        )}
-      </ToastProvider>
+      <LocaleProvider>
+        <ToastProvider>
+          {kindeDomain && kindeClientId && secureStoreAvailable ? (
+            <KindeAuthProvider
+              config={{ domain: kindeDomain, clientId: kindeClientId }}
+            >
+              <KindeAppContent />
+            </KindeAuthProvider>
+          ) : (
+            <AppContent />
+          )}
+        </ToastProvider>
+      </LocaleProvider>
     </SafeAreaProvider>
   );
 }
