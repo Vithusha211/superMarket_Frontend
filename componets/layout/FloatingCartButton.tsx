@@ -1,15 +1,15 @@
 /* eslint-disable react-hooks/refs */
 import { useEffect, useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import {
+import  {
   Animated,
   Pressable,
   StyleSheet,
-  Text,
   useWindowDimensions,
   View,
   ViewStyle,
 } from 'react-native';
+import { Text } from './AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const COLORS = {

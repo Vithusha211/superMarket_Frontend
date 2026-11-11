@@ -6,6 +6,7 @@ import {
   StyleSheet,
   type ViewStyle,
 } from 'react-native';
+import { useResponsiveScale } from './useResponsiveScale';
 
 export type SocialAccount = {
   id: string;
@@ -36,6 +37,7 @@ export default function SocialAuthButton({
   onError,
   style,
 }: SocialAuthButtonProps) {
+  const scale = useResponsiveScale();
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePress = async () => {
@@ -67,14 +69,22 @@ export default function SocialAuthButton({
       accessibilityState={{ disabled: isLoading, busy: isLoading }}
       disabled={isLoading}
       onPress={() => void handlePress()}
-      style={[styles.button, style]}
+      style={[
+        styles.button,
+        {
+          width: 52 * scale,
+          height: 52 * scale,
+          borderRadius: 14 * scale,
+        },
+        style,
+      ]}
     >
       {isLoading ? (
         <ActivityIndicator color="#4285F4" />
       ) : (
         <Image
           source={providerIcons[provider]}
-          style={styles.icon}
+          style={[styles.icon, { width: 25 * scale, height: 25 * scale }]}
           resizeMode="contain"
         />
       )}

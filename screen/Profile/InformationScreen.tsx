@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import  { ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Header from '../../componets/layout/Header';
 import Logo from '../../componets/layout/Logo';

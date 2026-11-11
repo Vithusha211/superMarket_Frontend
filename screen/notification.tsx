@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import {
-	ScrollView,
-	StyleSheet,
-	Text,
-	View,
+import  {
+  ScrollView,
+  StyleSheet,
+  View,
 } from 'react-native';
+import { Text } from '../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Header from '../componets/layout/Header';
 

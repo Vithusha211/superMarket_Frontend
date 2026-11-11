@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState } from 'react';
-import {
+import  {
   FlatList,
   Image,
   ImageSourcePropType,
@@ -10,13 +10,17 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import { Text } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ProductCard from '../../componets/layout/Cards';
 import CountryFlag from '../../componets/layout/CountryFlag';
 import Footer, { FooterTab } from '../../componets/layout/Footer';
+import {
+  useResponsiveFontScale,
+  useResponsiveScale,
+} from '../../componets/layout/useResponsiveScale';
 
 const COLORS = {
   primary: '#07C187',
@@ -97,6 +101,7 @@ const OFFERS: OfferItem[] = [
     name: 'Indian Rich Rice',
     quantity: '1kg',
     price: 12,
+    oldPrice: 15,
     discount: 20,
   },
   {
@@ -106,6 +111,7 @@ const OFFERS: OfferItem[] = [
     name: 'Natural Milk',
     quantity: '1L',
     price: 5,
+    oldPrice: 7,
     discount: 20,
   },
   {
@@ -115,6 +121,7 @@ const OFFERS: OfferItem[] = [
     name: 'Full Cream Milk',
     quantity: '1L',
     price: 5,
+    oldPrice: 7,
     discount: 20,
   },
 ];
@@ -157,6 +164,8 @@ export default function HomeScreen({
   onAddProduct,
   onTabPress,
 }: HomeScreenProps) {
+  const scale = useResponsiveScale();
+  const controlScale = scale * useResponsiveFontScale();
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<FooterTab>('home');
   const [activeBanner, setActiveBanner] = useState(0);
@@ -198,8 +207,17 @@ export default function HomeScreen({
             onPress={onLocationPress}
             hitSlop={6}
           >
-            <View style={styles.headerChip}>
-              <Ionicons name="location-outline" size={18} color={COLORS.white} />
+            <View
+              style={[
+                styles.headerChip,
+                {
+                  width: 32 * scale,
+                  height: 32 * scale,
+                  borderRadius: 16 * scale,
+                },
+              ]}
+            >
+              <Ionicons name="location-outline" size={18 * scale} color={COLORS.white} />
             </View>
             <View style={styles.locationCopy}>
               <Text style={styles.deliverLabel}>Deliver to</Text>
@@ -210,11 +228,27 @@ export default function HomeScreen({
           </Pressable>
 
           <View style={styles.headerActions}>
-            <View style={styles.flagChip}>
+            <View
+              style={[
+                styles.flagChip,
+                {
+                  width: 32 * scale,
+                  height: 32 * scale,
+                  borderRadius: 16 * scale,
+                },
+              ]}
+            >
               <CountryFlag flag={countryFlag} size={20} />
             </View>
             <Pressable
-              style={styles.headerChip}
+              style={[
+                styles.headerChip,
+                {
+                  width: 32 * scale,
+                  height: 32 * scale,
+                  borderRadius: 16 * scale,
+                },
+              ]}
               onPress={onNotificationPress}
               hitSlop={6}
               accessibilityRole="button"
@@ -222,7 +256,7 @@ export default function HomeScreen({
             >
               <Ionicons
                 name="notifications-outline"
-                size={18}
+                size={18 * scale}
                 color={COLORS.white}
               />
             </Pressable>
@@ -230,12 +264,19 @@ export default function HomeScreen({
         </View>
 
         <Pressable
-          style={styles.searchBar}
+          style={[
+            styles.searchBar,
+            {
+              height: 51 * controlScale,
+              gap: 10 * controlScale,
+              paddingHorizontal: 16 * controlScale,
+            },
+          ]}
           onPress={onSearchPress}
           accessibilityRole="button"
           accessibilityLabel="Search"
         >
-          <Ionicons name="search" size={18} color={COLORS.muted} />
+          <Ionicons name="search" size={18 * scale} color={COLORS.muted} />
           <Text style={styles.searchPlaceholder}>Search</Text>
         </Pressable>
       </View>
@@ -245,7 +286,10 @@ export default function HomeScreen({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: Math.max(insets.bottom, 12) + 88 },
+          {
+            paddingHorizontal: 20 * scale,
+            paddingBottom: Math.max(insets.bottom, 12) + 88 * scale,
+          },
         ]}
       >
         <View style={styles.bannerWrap}>
@@ -322,10 +366,22 @@ export default function HomeScreen({
             {CATEGORIES.map((item) => (
               <Pressable
                 key={item.id}
-                style={styles.categoryItem}
+                style={[
+                  styles.categoryItem,
+                  { width: 126 * scale, gap: 4 * scale },
+                ]}
                 onPress={() => onCategoryPress?.(item.id)}
               >
-                <View style={styles.categoryBox}>
+                <View
+                  style={[
+                    styles.categoryBox,
+                    {
+                      width: 126 * scale,
+                      height: 100 * scale,
+                      borderRadius: 12 * scale,
+                    },
+                  ]}
+                >
                   <Image
                     source={item.image}
                     style={styles.categoryImage}
@@ -359,10 +415,23 @@ export default function HomeScreen({
             {BRANDS.map((item) => (
               <Pressable
                 key={item.id}
-                style={styles.brandItem}
+                style={[
+                  styles.brandItem,
+                  { width: 126 * scale, gap: 4 * scale },
+                ]}
                 onPress={() => onBrandPress?.(item.id)}
               >
-                <View style={styles.brandBox}>
+                <View
+                  style={[
+                    styles.brandBox,
+                    {
+                      width: 126 * scale,
+                      height: 100 * scale,
+                      borderRadius: 12 * scale,
+                      padding: 12 * scale,
+                    },
+                  ]}
+                >
                   <Image
                     source={item.image}
                     style={styles.brandImage}
@@ -403,10 +472,13 @@ export default function HomeScreen({
                 price={item.price}
                 oldPrice={item.oldPrice}
                 discount={item.discount}
-                imageAreaHeight={68}
+                imageAreaHeight={100}
                 onPress={() => onProductPress?.(item.id)}
                 onAddPress={() => onAddProduct?.(item.id)}
-                style={styles.offerCard}
+                style={[
+                  styles.offerCard,
+                  { width: 120 * scale, marginRight: 8 * scale },
+                ]}
               />
             ))}
           </ScrollView>
@@ -618,7 +690,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   offerCard: {
-    width: 126,
+    width: 120,
+    marginRight: 8,
+    minHeight: 220,
   },
   footerWrap: {
     position: 'absolute',

@@ -1,16 +1,24 @@
-import {
+import  {
   Image,
   ImageSourcePropType,
+  Platform,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import { Text } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import Button from '../../componets/layout/Button';
 import Header from '../../componets/layout/Header';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
+import { useState } from 'react';
+import { useToast } from '../../context/ToastContext';
+import { useLocale } from '../../context/LocaleContext';
+import { createInvoiceHtml, createInvoicePdf } from '../../utils/invoicePdf';
 
 const COLORS = {
   primary: '#07C187',
@@ -39,7 +47,6 @@ type InvoiceScreenProps = {
   items?: InvoiceItem[];
   subtotal?: number;
   onBack?: () => void;
-  onDownload?: () => void;
 };
 
 const DEFAULT_ITEMS: InvoiceItem[] = [
@@ -70,9 +77,83 @@ export default function InvoiceScreen({
   items = DEFAULT_ITEMS,
   subtotal = 25,
   onBack,
-  onDownload,
 }: InvoiceScreenProps) {
   const insets = useSafeAreaInsets();
+  const { showError } = useToast();
+  const { translate } = useLocale();
+  const [busyAction, setBusyAction] = useState<'download' | null>(null);
+  const invoiceData = {
+    orderDate,
+    orderTime,
+    customerName,
+    orderType,
+    deliveryLocation,
+    items: items.map((item) => ({
+      ...item,
+      name: translate(item.name),
+    })),
+    subtotal,
+    labels: {
+      title: translate('HappyCart Invoice'),
+      orderDate: translate('Order date'),
+      orderTime: translate('Order time'),
+      customerName: translate('Customer name'),
+      orderType: translate('Order type'),
+      deliveryLocation: translate('Delivery location'),
+      item: translate('Item'),
+      quantity: translate('Quantity'),
+      price: translate('Price'),
+      total: translate('Total'),
+      subtotal: translate('Subtotal'),
+    },
+  };
+
+  const handleDownload = async () => {
+    setBusyAction('download');
+    try {
+      if (Platform.OS === 'web') {
+        await Print.printAsync({ html: createInvoiceHtml(invoiceData) });
+        return;
+      }
+
+      const { uri, base64 } = await createInvoicePdf(invoiceData);
+      if (Platform.OS === 'android' && Number(Platform.Version) >= 30) {
+        const permission =
+          await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+        if (!permission.granted) return;
+
+        const fileUri = await FileSystem.StorageAccessFramework.createFileAsync(
+          permission.directoryUri,
+          `HappyCart-Invoice-${Date.now()}.pdf`,
+          'application/pdf',
+        );
+        if (!base64) {
+          throw new Error('Unable to generate the invoice file.');
+        }
+        await FileSystem.writeAsStringAsync(fileUri, base64, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        return;
+      }
+
+      if (!(await Sharing.isAvailableAsync())) {
+        throw new Error('Invoice sharing is not available on this device.');
+      }
+      await Sharing.shareAsync(uri, {
+        dialogTitle: 'Save invoice',
+        mimeType: 'application/pdf',
+        UTI: 'com.adobe.pdf',
+      });
+    } catch (error) {
+      showError(
+        error instanceof Error
+          ? error.message
+          : 'Unable to download invoice. Please try again.',
+      );
+    } finally {
+      setBusyAction(null);
+    }
+  };
 
   const rows = [
     { label: 'Order date', value: orderDate },
@@ -158,7 +239,9 @@ export default function InvoiceScreen({
         >
           <Button
             title="Download Invoice"
-            onPress={onDownload}
+            onPress={handleDownload}
+            loading={busyAction === 'download'}
+            disabled={busyAction !== null}
             containerStyle={styles.downloadButton}
             textStyle={styles.downloadText}
           />
@@ -319,6 +402,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: '4.5%',
     paddingTop: 12,
+    gap: 10,
     backgroundColor: COLORS.white,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,

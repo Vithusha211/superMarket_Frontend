@@ -5,12 +5,12 @@ echo.
 echo ========================================
 echo  HappyCart Expo
 echo ========================================
-echo Expo Go will connect over your local Wi-Fi.
+echo Expo Go will connect through an Expo tunnel.
 echo.
-echo Connect your phone and computer to the same Wi-Fi network.
-echo Open Expo Go on your phone and scan the QR code shown below.
-echo If the connection fails, try: npm run start:go:tunnel
+echo Make sure your phone has internet access.
+echo Open Expo Go and scan the QR code shown below.
 echo ========================================
 echo.
 
-node .\node_modules\expo\bin\cli start --go --lan --clear --port 8083
+set "EXPO_NO_REDIRECT_PAGE=1"
+node .\node_modules\expo\bin\cli start --go --tunnel ngrok --clear --port 8083

@@ -1,16 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import {
+import  {
   Image,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import { Text } from '../../componets/layout/AppText';
 import Button from '../../componets/layout/Button';
 import CountryFlag from '../../componets/layout/CountryFlag';
 import Header from '../../componets/layout/Header';
+import { useResponsiveFontScale } from '../../componets/layout/useResponsiveScale';
+import type { AppLocale } from '../../context/LocaleContext';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
@@ -22,7 +24,7 @@ const COLORS = {
 };
 
 export type LanguageOption = {
-  id: string;
+  id: AppLocale;
   label: string;
   subtitle?: string;
   flag: string;
@@ -41,6 +43,7 @@ type LanguageSelectScreenProps = {
 export default function LanguageSelectScreen({
   onSelect,
 }: LanguageSelectScreenProps) {
+  const fontScale = useResponsiveFontScale();
   const [selectedId, setSelectedId] = useState('en');
 
   const handleSelect = () => {
@@ -75,7 +78,7 @@ export default function LanguageSelectScreen({
             </Text>
           </View>
 
-          <View style={styles.list}>
+          <View style={[styles.list, { gap: 10 * fontScale }]}>
             {LANGUAGES.map((language) => {
               const isSelected = selectedId === language.id;
 
@@ -87,13 +90,17 @@ export default function LanguageSelectScreen({
                   onPress={() => setSelectedId(language.id)}
                   style={[
                     styles.languageRow,
+                    {
+                      minHeight: 50 * fontScale,
+                      paddingVertical: 10 * fontScale,
+                    },
                     isSelected && styles.languageRowSelected,
                   ]}
                 >
                   <View style={styles.languageLeft}>
                     <Ionicons
                       name={isSelected ? 'radio-button-on' : 'radio-button-off'}
-                      size={20}
+                      size={20 * fontScale}
                       color={isSelected ? COLORS.radio : COLORS.radioIdle}
                     />
                     <CountryFlag flag={language.flag} size={20} />

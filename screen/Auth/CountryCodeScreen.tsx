@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import {
+import  {
   FlatList,
   Pressable,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import { Text } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Button from '../../componets/layout/Button';
 import CountryFlag from '../../componets/layout/CountryFlag';

@@ -1,17 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import {
+import  {
   Image,
   ImageSourcePropType,
   Pressable,
   StyleSheet,
-  Text,
-  TextInput,
   TextInputProps,
   View,
   ViewStyle,
 } from 'react-native';
+import { Text, TextInput } from './AppText';
 import CountryFlag from './CountryFlag';
+import {
+  useResponsiveFontScale,
+  useResponsiveScale,
+} from './useResponsiveScale';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
@@ -70,6 +73,8 @@ export default function InputField({
   editable = true,
   ...textInputProps
 }: InputFieldProps) {
+  const scale = useResponsiveScale();
+  const controlScale = scale * useResponsiveFontScale();
   const [isFocused, setIsFocused] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -95,6 +100,7 @@ export default function InputField({
       <Pressable
         style={[
           styles.phonePrefix,
+          { width: 58 * scale, height: 51 * controlScale },
           isFocused && !error && styles.phonePrefixFocused,
           !!error && styles.phonePrefixError,
         ]}
@@ -109,6 +115,7 @@ export default function InputField({
       <View
         style={[
           styles.phoneInputContainer,
+          { height: 51 * controlScale, paddingHorizontal: 16 * controlScale },
           isFocused && !error && styles.inputFocused,
           !!error && styles.inputError,
         ]}
@@ -138,6 +145,11 @@ export default function InputField({
       style={[
         styles.inputContainer,
         isTextarea && styles.textareaContainer,
+        !isTextarea && {
+          height: 51 * controlScale,
+          paddingHorizontal: 16 * controlScale,
+        },
+        isTextarea && { minHeight: 87 * controlScale },
         isFocused && !error && styles.inputFocused,
         !!error && styles.inputError,
       ]}
@@ -203,7 +215,7 @@ export default function InputField({
         >
           <Ionicons
             name={isPasswordVisible ? 'eye-outline' : 'eye-off-outline'}
-            size={20}
+            size={20 * scale}
             color={COLORS.placeholder}
           />
         </Pressable>
@@ -218,13 +230,16 @@ export default function InputField({
           {rightImage ? (
             <Image
               source={rightImage}
-              style={styles.rightImage}
+              style={[
+                styles.rightImage,
+                { width: 20 * scale, height: 20 * scale },
+              ]}
               resizeMode="contain"
             />
           ) : (
             <Ionicons
               name={resolvedRightIcon!}
-              size={20}
+              size={20 * scale}
               color={COLORS.primary}
             />
           )}
@@ -295,7 +310,7 @@ const styles = StyleSheet.create({
   inputText: {
     fontSize: 14,
     color: COLORS.text,
-    textAlign: 'center',
+    textAlign: 'left',
   },
   placeholderText: {
     color: COLORS.placeholder,

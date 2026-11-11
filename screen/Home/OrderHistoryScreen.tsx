@@ -1,14 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo, useState } from 'react';
-import {
+import  {
   Image,
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import { Text } from '../../componets/layout/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Footer, { FooterTab } from '../../componets/layout/Footer';
 import Header from '../../componets/layout/Header';
@@ -23,6 +23,7 @@ const COLORS = {
   statusText: 'rgba(255, 152, 0, 1)',
   completedBg: 'rgba(7, 193, 135, 0.12)',
   itemsBg: 'rgba(7, 193, 135, 0.12)',
+  tabInactive: 'rgba(243, 244, 246, 1)',
 };
 
 export type OrderStatus = 'in-progress' | 'completed';
@@ -315,23 +316,18 @@ const styles = StyleSheet.create({
   },
   tabs: {
     width: '100%',
-    height: 56,
+    height: 42,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 6,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 100,
-    backgroundColor: COLORS.white,
+    gap: 12,
   },
   tab: {
     flex: 1,
-    height: 36,
+    height: 32,
     borderRadius: 100,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.tabInactive,
   },
   tabActive: {
     backgroundColor: COLORS.primary,

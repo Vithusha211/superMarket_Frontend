@@ -1,14 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
-import {
+import  {
   Image,
   ImageSourcePropType,
   Pressable,
   StyleProp,
   StyleSheet,
-  Text,
   View,
   ViewStyle,
 } from 'react-native';
+import { Text } from './AppText';
+import {
+  useResponsiveFontScale,
+  useResponsiveScale,
+} from './useResponsiveScale';
 
 const COLORS = {
   primary: 'rgba(7, 193, 135, 1)',
@@ -60,6 +64,8 @@ export default function ProductCard({
   onAddPress,
   style,
 }: ProductCardProps) {
+  const scale = useResponsiveScale();
+  const controlScale = scale * useResponsiveFontScale();
   const discountLabel =
     discount === undefined || discount === null
       ? null
@@ -71,13 +77,22 @@ export default function ProductCard({
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      style={[styles.card, compact && styles.compactCard, style]}
+      style={[
+        styles.card,
+        compact && styles.compactCard,
+        { width: 120 * scale, gap: (compact ? 5 : 8) * scale },
+        style,
+      ]}
     >
       <View
         style={[
           styles.imageArea,
           compact && styles.compactImageArea,
-          imageAreaHeight !== undefined ? { height: imageAreaHeight } : null,
+          {
+            height:
+              (imageAreaHeight ?? (compact ? 76 : 100)) * scale,
+            borderRadius: 18 * scale,
+          },
         ]}
       >
         <Image
@@ -93,7 +108,18 @@ export default function ProductCard({
         ) : null}
 
         {discountLabel ? (
-          <View style={styles.discountBadge}>
+          <View
+            style={[
+              styles.discountBadge,
+              {
+                width: 36 * controlScale,
+                height: 36 * controlScale,
+                borderRadius: 18 * controlScale,
+                top: 8 * controlScale,
+                right: 8 * controlScale,
+              },
+            ]}
+          >
             <Text style={[styles.discountText, compact && styles.compactDiscountText]}>{discountLabel}</Text>
           </View>
         ) : null}
@@ -102,10 +128,18 @@ export default function ProductCard({
           accessibilityRole="button"
           accessibilityLabel={`Add ${name}`}
           onPress={onAddPress}
-          style={[styles.addButton, compact && styles.compactAddButton]}
+          style={[
+            styles.addButton,
+            compact && styles.compactAddButton,
+            {
+              width: (compact ? 24 : 26) * controlScale,
+              height: (compact ? 24 : 26) * controlScale,
+              borderRadius: (compact ? 12 : 13) * controlScale,
+            },
+          ]}
           hitSlop={6}
         >
-          <Ionicons name="add" size={20} color={COLORS.white} />
+          <Ionicons name="add" size={18 * controlScale} color={COLORS.white} />
         </Pressable>
       </View>
 
@@ -135,24 +169,24 @@ export default function ProductCard({
 
 const styles = StyleSheet.create({
   card: {
-    width: '47%',
+    width: 120,
     maxWidth: '100%',
     gap: 8,
   },
   imageArea: {
     width: '100%',
     height: 100,
-    borderRadius: 12,
-    backgroundColor: COLORS.imageBg,
+    borderRadius: 18,
+    backgroundColor: '#F3F4F6',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: '#E5E7EB',
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
   image: {
-    width: '80%',
-    height: '80%',
+    width: '78%',
+    height: '78%',
   },
   compactCard: {
     gap: 5,
@@ -211,11 +245,11 @@ const styles = StyleSheet.create({
   },
   discountBadge: {
     position: 'absolute',
-    top: 6,
-    right: 6,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    top: 8,
+    right: 8,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: COLORS.badge,
     alignItems: 'center',
     justifyContent: 'center',
@@ -227,31 +261,36 @@ const styles = StyleSheet.create({
   },
   addButton: {
     position: 'absolute',
-    right: 6,
-    bottom: 6,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    right: 10,
+    bottom: 10,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#D7FFF0',
   },
   info: {
     gap: 2,
+    paddingHorizontal: 2,
   },
   brand: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '500',
     color: COLORS.brand,
     letterSpacing: 0.4,
+    textTransform: 'uppercase',
   },
   name: {
     fontSize: 14,
     fontWeight: '700',
     color: COLORS.text,
+    lineHeight: 18,
   },
   quantity: {
-    fontSize: 12,
+    fontSize: 11,
     color: COLORS.muted,
   },
   priceRow: {
